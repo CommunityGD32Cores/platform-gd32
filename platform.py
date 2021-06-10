@@ -114,6 +114,11 @@ class Gd32Platform(PlatformBase):
                         "-f", "interface/%s.cfg" % link,
                         "-c", "transport select %s" % (
                             "hla_swd" if link == "stlink" else "swd"),
+                    ])
+                    # for GD32 chips we need to be able to insert a -c "set CPUTAPID .." command
+                    # *before* the target cfg is loaded.                    
+                    server_args.extend(debug.get("openocd_extra_pre_target_args", []))
+                    server_args.extend([
                         "-f", "target/%s.cfg" % debug.get("openocd_target")
                     ])
                     server_args.extend(debug.get("openocd_extra_args", []))
@@ -127,6 +132,7 @@ class Gd32Platform(PlatformBase):
                 }
             debug["tools"][link]["onboard"] = link in debug.get("onboard_tools", [])
             debug["tools"][link]["default"] = link in debug.get("default_tools", [])
+        print(debug["tools"]["stlink"])
 
         board.manifest["debug"] = debug
         return board
