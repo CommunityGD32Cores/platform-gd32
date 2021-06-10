@@ -2,7 +2,7 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F303xC -DGD32F1",
+    "extra_flags": "-DGD32F303xC -DGD32F1 -DGD32F30X_HD",
     "f_cpu": "120000000L",
     "hwids": [
       [
