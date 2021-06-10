@@ -132,7 +132,6 @@ class Gd32Platform(PlatformBase):
                 }
             debug["tools"][link]["onboard"] = link in debug.get("onboard_tools", [])
             debug["tools"][link]["default"] = link in debug.get("default_tools", [])
-        print(debug["tools"]["stlink"])
 
         board.manifest["debug"] = debug
         return board
