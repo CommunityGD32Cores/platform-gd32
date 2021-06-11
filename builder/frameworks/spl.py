@@ -39,14 +39,16 @@ assert isdir(FRAMEWORK_DIR)
 
 
 def get_linker_script(mcu):
+    # naming convention is to take the MCU name but without the package name
+    # e.g., GD32F103RC (without "T6" at the end)
     ldscript = join(FRAMEWORK_DIR, "platformio",
-                    "ldscripts", mcu[0:11].upper() + "_FLASH.ld")
+                    "ldscripts", mcu[-2].upper() + "_FLASH.ld")
 
     if isfile(ldscript):
         return ldscript
 
     default_ldscript = join(FRAMEWORK_DIR, "platformio",
-                            "ldscripts", mcu[0:11].upper() + "_DEFAULT.ld")
+                            "ldscripts", mcu[-2].upper() + "_DEFAULT.ld")
 
     print("Warning! Cannot find a linker script for the required board! "
           "Firmware will be linked with a default linker script!")
@@ -77,11 +79,11 @@ env.Append(
         join(FRAMEWORK_DIR, board.get("build.core"),
              "cmsis", "cores", board.get("build.core")),
         join(FRAMEWORK_DIR, board.get("build.core"), "cmsis",
-             "variants", board.get("build.mcu")[0:7]),
+             "variants", board.get("build.spl_series")),
         join(FRAMEWORK_DIR, board.get("build.core"), "spl",
-             "variants", board.get("build.mcu")[0:7], "inc"),
+             "variants", board.get("build.spl_series"), "inc"),
         join(FRAMEWORK_DIR, board.get("build.core"), "spl",
-             "variants", board.get("build.mcu")[0:7], "src")
+             "variants", board.get("build.spl_series"), "src")
     ]
 )
 
@@ -101,6 +103,7 @@ if not board.get("build.ldscript", ""):
 
 extra_flags = board.get("build.extra_flags", "")
 src_filter_patterns = ["+<*>"]
+# could come in handy later to exclude certain files, not needed / trigger now
 if "STM32F40_41xxx" in extra_flags:
     src_filter_patterns += ["-<stm32f4xx_fmc.c>"]
 if "STM32F427_437xx" in extra_flags:
@@ -116,7 +119,7 @@ libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkCMSISVariant"),
     join(
         FRAMEWORK_DIR, board.get("build.core"), "cmsis",
-        "variants", board.get("build.mcu")[0:7]
+        "variants", board.get("build.spl_series")
     )
 ))
 
@@ -124,7 +127,7 @@ libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkSPL"),
     join(FRAMEWORK_DIR, board.get("build.core"),
          "spl", "variants",
-         board.get("build.mcu")[0:7], "src"),
+         board.get("build.spl_series"), "src"),
     src_filter=" ".join(src_filter_patterns)
 ))
 

@@ -16,7 +16,8 @@
     ],
     "mcu": "gd32f303cct6",
     "product_line": "GD32F303xC",
-    "variant": "STM32F3xx/F303CC"
+    "variant": "STM32F3xx/F303CC",
+    "spl_series": "gd32f30x"
   },
   "debug": {
     "jlink_device": "GD32F303CC",
