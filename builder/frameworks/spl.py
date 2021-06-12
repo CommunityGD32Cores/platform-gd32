@@ -16,11 +16,9 @@
 SPL
 
 The ST Standard Peripheral Library provides a set of functions for
-handling the peripherals on the STM32 Cortex-M3 family.
+handling the peripherals on the GD32 ARM chip family.
 The idea is to save the user (the new user, in particular) having to deal
 directly with the registers.
-
-http://www.st.com/web/en/catalog/tools/FM147/CL1794/SC961/SS1743?sc=stm32embeddedsoftware
 """
 
 from os.path import isdir, isfile, join
@@ -34,7 +32,7 @@ board = env.BoardConfig()
 
 env.SConscript("_bare.py")
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-spl")
+FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
 assert isdir(FRAMEWORK_DIR)
 
 
