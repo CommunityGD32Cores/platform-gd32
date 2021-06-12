@@ -32,6 +32,11 @@ board = env.BoardConfig()
 
 env.SConscript("_bare.py")
 
+# by default, add newlibnano into linker flags.
+# otherwise many standard C functions won't be accessible without using a own syscall
+# implementation.
+env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
+
 FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
 assert isdir(FRAMEWORK_DIR)
 
