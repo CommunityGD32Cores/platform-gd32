@@ -28,7 +28,7 @@
   },
   "frameworks": [
     "arduino",
-    "cmsis"
+    "spl"
   ],
   "name": "GD32F303CC (48k RAM. 256k Flash)",
   "upload": {
