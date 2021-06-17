@@ -33,6 +33,8 @@ class Gd32Platform(PlatformBase):
         frameworks = variables.get("pioframework", [])
         if "arduino" in frameworks:
                 self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
+                if build_core == "gd32":
+                    self.packages["framework-arduinogd32"]["optional"] = False
         # include or exclude other packages for different frameworks.. 
 
         default_protocol = board_config.get("upload.protocol") or ""
