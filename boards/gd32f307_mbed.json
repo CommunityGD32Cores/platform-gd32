@@ -30,7 +30,7 @@
     "arduino",
     "spl"
   ],
-  "name": "GD32F307VG-mbed (48k RAM. 256k Flash)",
+  "name": "GD32F307VG-mbed (96k RAM. 1024k Flash)",
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 98304,
