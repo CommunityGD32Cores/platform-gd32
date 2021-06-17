@@ -1,0 +1,53 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F303xE -DGD32F3 -DGD32F30x -DGD32F30X_HD",
+    "f_cpu": "120000000L",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
+    "mcu": "gd32f303zet6",
+    "product_line": "GD32F303xE",
+    "variant": "GD32F303ZE_EVAL",
+    "spl_series": "gd32f30x"
+  },
+  "debug": {
+    "jlink_device": "GD32F303ZE",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32F30x_HD.svd",
+	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+	"default_tools" : ["stlink"]
+  },
+  "frameworks": [
+    "arduino",
+    "spl"
+  ],
+  "name": "GD32303E-EVAL (64k RAM. 512k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 65536,
+    "maximum_size": 524288,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial",
+      "dfu"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/products/microcontrollers/gd32-development-tools/gd32-evaluation-boards/",
+  "vendor": "GigaDevice"
+}
