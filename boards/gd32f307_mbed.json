@@ -1,0 +1,53 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F307xG -DGD32F3 -DGD32F30X_XD",
+    "f_cpu": "120000000L",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
+    "mcu": "gd32f307vgt6",
+    "product_line": "GD32F307xG",
+    "variant": "GD32F307VG_MBED",
+    "spl_series": "gd32f30x"
+  },
+  "debug": {
+    "jlink_device": "GD32F307VG",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32F30x_XD.svd",
+	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+	"default_tools" : ["stlink"]
+  },
+  "frameworks": [
+    "arduino",
+    "spl"
+  ],
+  "name": "GD32F307VG-mbed (48k RAM. 256k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 98304,
+    "maximum_size": 1048576,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial",
+      "dfu"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://os.mbed.com/platforms/GD32-F307VG/",
+  "vendor": "GigaDevice"
+}
