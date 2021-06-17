@@ -33,8 +33,8 @@ core = env.BoardConfig().get("build.core", "")
 
 if core == "gd32":
     build_script = join(
-        env.PioPlatform().get_package_dir("framework-arduinostgd32"),
-        "tools", "platformio-build-%s.py" % mcu[0:7])
+        env.PioPlatform().get_package_dir("framework-arduinogd32"),
+        "tools", "platformio-build.py")
 
 if not isfile(build_script):
     sys.stderr.write("Error: Missing PlatformIO build script %s!\n" % build_script)
