@@ -2,7 +2,7 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F307xG -DGD32F3 -DGD32F30X_XD",
+    "extra_flags": "-DGD32F307xG -DGD32F3 -DGD32F30X_CL",
     "f_cpu": "120000000L",
     "hwids": [
       [
@@ -22,7 +22,7 @@
   "debug": {
     "jlink_device": "GD32F307VG",
     "openocd_target": "stm32f1x",
-    "svd_path": "GD32F30x_XD.svd",
+    "svd_path": "GD32F30x_CL.svd",
 	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
 	"default_tools" : ["stlink"]
   },
