@@ -50,7 +50,7 @@
       "type": "framework",
       "optional": true,
       "owner": "maxgerhardt",
-      "version": "~2.10201.0"
+      "version": "~2.10000.0"
     },
     "framework-arduinogd32": {
       "type": "framework",
