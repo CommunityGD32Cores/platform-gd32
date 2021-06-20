@@ -2,7 +2,7 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m3",
-        "extra_flags": "-DGD32F10X_MD",
+        "extra_flags": "-DGD32F103xC -DGD32F1 -DGD32F10x -DGD32F10X_MD",
         "f_cpu": "108000000L",
         "mcu": "gd32f103rct6",
         "product_line": "GD32F103xC",
