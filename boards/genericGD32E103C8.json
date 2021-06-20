@@ -1,0 +1,40 @@
+{
+    "build": {
+        "core": "gd32",
+        "cpu": "cortex-m4",
+        "extra_flags": "-DGD32F103x8 -DGD32E1 -DGD32E10x",
+        "f_cpu": "108000000L",
+        "mcu": "gd32e103c8t6",
+        "product_line": "GD32FE03x8",
+        "spl_series": "gd32e10x"
+    },
+    "connectivity": [],
+    "debug": {
+        "default_tools": [
+            "stlink"
+        ],
+        "jlink_device": "GD32E103C8",
+        "onboard_tools": [
+            "stlink"
+        ],
+        "openocd_target": "stm32f1x",
+        "svd_path": "GD32E10x.svd"
+    },
+    "frameworks": [
+        "spl"
+    ],
+    "name": "Generic GD32E103C8T6",
+    "upload": {
+        "maximum_ram_size": 20480,
+        "maximum_size": 65536,
+        "protocol": "stlink",
+        "protocols": [
+            "jlink",
+            "stlink",
+            "blackmagic",
+            "mbed"
+        ]
+    },
+    "url": "https://www.gigadevice.com/microcontroller/gd32e103c8t6/",
+    "vendor": "GigaDevice"
+}
