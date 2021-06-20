@@ -1,0 +1,40 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F3x0 -DGD32F350",
+    "f_cpu": "108000000L",
+    "mcu": "gd32f350cbt6",
+    "product_line": "GD32F350xB",
+    "spl_series": "gd32f3x0"
+  },
+  "connectivity": [],
+  "debug": {
+    "default_tools": [
+      "stlink"
+    ],
+    "jlink_device": "GD32F350CB",
+    "onboard_tools": [
+      "stlink"
+    ],
+    "openocd_target": "stm32f3x",
+    "svd_path": "GD32F3x0.svd"
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "Generic GD32F350CBT6",
+  "upload": {
+    "maximum_ram_size": 16384,
+    "maximum_size": 131072,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "stlink",
+      "blackmagic",
+      "mbed"
+    ]
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f350cbt6/",
+  "vendor": "GigaDevice"
+}
