@@ -40,6 +40,11 @@ env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
 FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
 assert isdir(FRAMEWORK_DIR)
 
+# hardcoded -- only gd32 chips 
+spl_chip_type = "gd32"
+if not board.get("build.mcu").startswith("gd32"):
+    print("Error! This is a non GD32 chip in the GD32 repository. Don't know which SPL implementation to use.")
+    env.Exit(-1)
 
 def get_linker_script(mcu):
     # naming convention is to take the MCU name but without the package name
@@ -79,13 +84,13 @@ def get_linker_script(mcu):
 
 env.Append(
     CPPPATH=[
-        join(FRAMEWORK_DIR, board.get("build.core"),
-             "cmsis", "cores", board.get("build.core")),
-        join(FRAMEWORK_DIR, board.get("build.core"), "cmsis",
+        join(FRAMEWORK_DIR, spl_chip_type,
+             "cmsis", "cores", spl_chip_type),
+        join(FRAMEWORK_DIR, spl_chip_type, "cmsis",
              "variants", board.get("build.spl_series")),
-        join(FRAMEWORK_DIR, board.get("build.core"), "spl",
+        join(FRAMEWORK_DIR, spl_chip_type, "spl",
              "variants", board.get("build.spl_series"), "inc"),
-        join(FRAMEWORK_DIR, board.get("build.core"), "spl",
+        join(FRAMEWORK_DIR, spl_chip_type, "spl",
              "variants", board.get("build.spl_series"), "src")
     ]
 )
@@ -121,14 +126,14 @@ libs = []
 libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkCMSISVariant"),
     join(
-        FRAMEWORK_DIR, board.get("build.core"), "cmsis",
+        FRAMEWORK_DIR, spl_chip_type, "cmsis",
         "variants", board.get("build.spl_series")
     )
 ))
 
 libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkSPL"),
-    join(FRAMEWORK_DIR, board.get("build.core"),
+    join(FRAMEWORK_DIR, spl_chip_type,
          "spl", "variants",
          board.get("build.spl_series"), "src"),
     src_filter=" ".join(src_filter_patterns)
