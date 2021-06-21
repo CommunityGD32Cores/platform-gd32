@@ -218,8 +218,8 @@ elif upload_protocol == "dfu":
                 0,
                 env.VerboseAction(BeforeUpload, "Looking for upload port...")
             )
-        elif board.get("build.mcu").startswith("gd32f103"):
-            # F103 series doesn't have embedded DFU over USB
+        elif board.get("build.mcu").startswith("gd32f103") or board.get("build.mcu").startswith("gd32f303"):
+            # F103 and F303 series doesn't have embedded DFU over USB
             # stm32duino bootloader (v1, v2) is used instead
             def __configure_upload_port(env):
                 return basename(env.subst("$UPLOAD_PORT"))
