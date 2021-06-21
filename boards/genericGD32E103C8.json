@@ -18,7 +18,11 @@
             "stlink"
         ],
         "openocd_target": "stm32f1x",
-        "svd_path": "GD32E10x.svd"
+        "svd_path": "GD32E10x.svd",
+        "openocd_extra_pre_target_args": [
+          "-c",
+          "set CPUTAPID 0"
+        ]
     },
     "frameworks": [
         "spl"
