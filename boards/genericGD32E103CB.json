@@ -13,7 +13,7 @@
         "default_tools": [
             "stlink"
         ],
-        "jlink_device": "GD32E103C8",
+        "jlink_device": "GD32E103CB",
         "onboard_tools": [
             "stlink"
         ],
