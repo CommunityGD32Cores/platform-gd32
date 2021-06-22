@@ -61,8 +61,10 @@ def get_linker_script(mcu):
     print("Warning! Cannot find a linker script for the required board! "
           "Firmware will be linked with a default linker script!")
 
-    if isfile(default_ldscript):
-        return default_ldscript
+    # even if the file is there, regenerate the linker script.
+    # this way dynamic changes the linker script are applied and old errors are overwritten.
+    # if isfile(default_ldscript):
+    #    return default_ldscript
 
     ram = board.get("upload.maximum_ram_size", 0)
     flash = board.get("upload.maximum_size", 0)
