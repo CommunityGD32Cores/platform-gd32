@@ -25,7 +25,7 @@
     ],
     "name": "Generic GD32F190C8T6",
     "upload": {
-        "maximum_ram_size": 8196,
+        "maximum_ram_size": 8192,
         "maximum_size": 65536,
         "protocol": "stlink",
         "protocols": [
