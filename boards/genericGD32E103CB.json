@@ -1,0 +1,44 @@
+{
+    "build": {
+        "core": "gd32",
+        "cpu": "cortex-m4",
+        "extra_flags": "-DGD32E103xB -DGD32E1 -DGD32E10X",
+        "f_cpu": "120000000L",
+        "mcu": "gd32e103cbt6",
+        "product_line": "GD32E103xB",
+        "spl_series": "gd32e10x"
+    },
+    "connectivity": [],
+    "debug": {
+        "default_tools": [
+            "stlink"
+        ],
+        "jlink_device": "GD32E103C8",
+        "onboard_tools": [
+            "stlink"
+        ],
+        "openocd_target": "stm32f1x",
+        "svd_path": "GD32E10x.svd",
+        "openocd_extra_pre_target_args": [
+            "-c",
+            "set CPUTAPID 0"
+        ]
+    },
+    "frameworks": [
+        "spl"
+    ],
+    "name": "Generic GD32E103CBT6",
+    "upload": {
+        "maximum_ram_size": 32768,
+        "maximum_size": 131072,
+        "protocol": "stlink",
+        "protocols": [
+            "jlink",
+            "stlink",
+            "blackmagic",
+            "mbed"
+        ]
+    },
+    "url": "https://www.gigadevice.com/microcontroller/gd32e103cbt6/",
+    "vendor": "GigaDevice"
+}
