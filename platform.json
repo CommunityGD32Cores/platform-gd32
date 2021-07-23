@@ -50,13 +50,13 @@
       "type": "framework",
       "optional": true,
       "owner": "maxgerhardt",
-      "version": "~2.10000.0"
+      "version": "https://github.com/CommunityGD32Cores/gd32-pio-spl-package.git"
     },
     "framework-arduinogd32": {
       "type": "framework",
       "optional": true,
       "owner": "maxgerhardt",
-      "version": "~4.10000.0"
+      "version": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32.git"
     },
     "tool-stm32duino": {
       "type": "uploader",
