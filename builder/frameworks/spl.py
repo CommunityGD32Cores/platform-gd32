@@ -46,6 +46,11 @@ if not board.get("build.mcu").startswith("gd32"):
     print("Error! This is a non GD32 chip in the GD32 repository. Don't know which SPL implementation to use.")
     env.Exit(-1)
 
+# the SPL series key in the JSON is mixed case to match the vendor convention, 
+# but our directory names are lowercase. 
+spl_series = board.get("build.spl_series").lower()
+
+
 def get_linker_script(mcu):
     # naming convention is to take the MCU name but without the package name
     # e.g., GD32F103RC (without "T6" at the end)
@@ -89,11 +94,11 @@ env.Append(
         join(FRAMEWORK_DIR, spl_chip_type,
              "cmsis", "cores", spl_chip_type),
         join(FRAMEWORK_DIR, spl_chip_type, "cmsis",
-             "variants", board.get("build.spl_series")),
+             "variants", spl_series,
         join(FRAMEWORK_DIR, spl_chip_type, "spl",
-             "variants", board.get("build.spl_series"), "inc"),
+             "variants", spl_series, "inc"),
         join(FRAMEWORK_DIR, spl_chip_type, "spl",
-             "variants", board.get("build.spl_series"), "src")
+             "variants", spl_series, "src")
     ]
 )
 
@@ -129,15 +134,14 @@ libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkCMSISVariant"),
     join(
         FRAMEWORK_DIR, spl_chip_type, "cmsis",
-        "variants", board.get("build.spl_series")
+        "variants", spl_series
     )
 ))
 
 libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkSPL"),
     join(FRAMEWORK_DIR, spl_chip_type,
-         "spl", "variants",
-         board.get("build.spl_series"), "src"),
+         "spl", "variants", spl_series, "src"),
     src_filter=" ".join(src_filter_patterns)
 ))
 

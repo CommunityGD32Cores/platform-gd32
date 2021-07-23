@@ -17,7 +17,7 @@
     "mcu": "gd32f303zet6",
     "product_line": "GD32F303xE",
     "variant": "GD32F303ZE_EVAL",
-    "spl_series": "gd32f30x"
+    "spl_series": "GD32F30x"
   },
   "debug": {
     "jlink_device": "GD32F303ZE",

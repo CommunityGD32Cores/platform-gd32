@@ -17,7 +17,7 @@
     "mcu": "gd32f307vgt6",
     "product_line": "GD32F307xG",
     "variant": "GD32F307VG_MBED",
-    "spl_series": "gd32f30x"
+    "spl_series": "GD32F30x"
   },
   "debug": {
     "jlink_device": "GD32F307VG",
