@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxgerhardt/platform-gd32"
+    "url": "https://github.com/CommunityGD32Cores/platform-gd32"
   },
   "version": "1.0.0",
   "frameworks": {
@@ -31,7 +31,7 @@
       "package": "framework-arduinogd32",
       "script": "builder/frameworks/arduino.py",
       "description": "Arduino Wiring-based Framework allows writing cross-platform software to control devices attached to a wide range of Arduino boards to create all kinds of creative coding, interactive objects, spaces or physical experiences",
-      "homepage": "https://github.com/maxgerhardt/gd32-arduino-core/",
+      "homepage": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32",
       "title": "Arduino"
     }
   },
