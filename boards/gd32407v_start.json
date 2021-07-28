@@ -1,0 +1,54 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F407xK -DGD32F4 -DGD32F40x -DGD32F407 -DGD32407V_START",
+    "f_cpu": "168000000L",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
+    "mcu": "gd32f407vkt6",
+    "product_line": "GD32F407xK",
+    "variant": "GD32407V_START",
+    "spl_series": "GD32F40x"
+  },
+  "debug": {
+    "jlink_device": "GD32F407VK",
+    "openocd_target": "gd32f4xx",
+    "svd_path": "GD32F40x.svd",
+	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+	"default_tools" : ["cmsis-dap"]
+  },
+  "frameworks": [
+    "arduino",
+    "spl"
+  ],
+  "name": "GD32407V-START (192k RAM. 3072k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 131072,
+    "closely_coupled_ram_size": 65536,
+    "maximum_size": 3145728,
+    "protocol": "cmsis-dap",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial",
+      "dfu"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f407vkt6/",
+  "vendor": "GigaDevice"
+}
