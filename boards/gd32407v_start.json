@@ -34,6 +34,7 @@
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 131072,
+    "closely_coupled_ram_size": 65536,
     "maximum_size": 3145728,
     "protocol": "cmsis-dap",
     "protocols": [
