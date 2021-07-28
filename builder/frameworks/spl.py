@@ -72,6 +72,7 @@ def get_linker_script(mcu):
     #    return default_ldscript
 
     ram = board.get("upload.maximum_ram_size", 0)
+    ccram = board.get("upload.closely_coupled_ram_size", 0)
     flash = board.get("upload.maximum_size", 0)
     template_file = join(FRAMEWORK_DIR, "platformio",
                          "ldscripts", "tpl", "linker.tpl")
@@ -81,6 +82,7 @@ def get_linker_script(mcu):
         content = data.substitute(
             stack=hex(0x20000000 + ram), # 0x20000000 - start address for RAM
             ram=str(int(ram/1024)) + "K",
+            ccram=str(int(ccram/1024)) + "K", # Closely coupled RAM - not all parts have this
             flash=str(int(flash/1024)) + "K"
         )
 
