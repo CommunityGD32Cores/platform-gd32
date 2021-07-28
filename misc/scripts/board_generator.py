@@ -80,6 +80,10 @@ class GD32MCUInfo:
         compile_flags += ["-D" + self.spl_series]
         if self.sub_series is not None:
             compile_flags += ["-D" + self.spl_series.upper() + "_" + self.sub_series]
+        # todo add series specific compile flags
+        # fpr genericGD32F190C8 -DGD32F130_150 -D__GD32F130_SUBFAMILY -D__GD32F1x0_FAMILY
+        # for genericGD32F130C8 -DGD32F130_150 -D__GD32F130_SUBFAMILY -D__GD32F1x0_FAMILY
+        # double check if these are used in SPL
         self.compile_flags = compile_flags
 
     def infer_arduino_variant(self):
