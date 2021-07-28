@@ -11,6 +11,7 @@ from typing import Tuple, List
 class GD32MCUInfo:
     def __init__(self, name, series, line, speed_mhz, flash_kb, sram_kb, core_type) -> None:
         self.name : str = name
+        self.name_no_package = self.name[:-2]
         self.series = series
         self.line = line
         self.speed_mhz = speed_mhz
@@ -22,6 +23,9 @@ class GD32MCUInfo:
         self.sub_series = None
         self.mcu_url = None
         self.svd_path = None
+        self.compile_flags = None
+        self.arduino_variant = None
+        self.usb_dfu_supported = False
         self.infer_missing_info()
     
     def __str__(self) -> str:
@@ -39,12 +43,17 @@ class GD32MCUInfo:
         "GD32F403": "GD32F403", #yes, this is correct. special SPL package for only that chip.
         "GD32F405": "GD32F4xx",
         "GD32F407": "GD32F4xx",
-        "GD32F450": "GD32F4xx"
+        "GD32F450": "GD32F4xx",
+        "GD32E103": "GD32E10x"
+    }
+
+    known_arduino_variants = {
+        "GD32F303CCT6": "GD32F303CC_GENERIC"
     }
 
     def infer_sub_series(self):
         sub_series = None
-        if self.spl_series == "GD32F3x0":
+        if self.spl_series == "GD32F30x":
             # per GD32F30x user manual page 114. 
             # all 305xx are conenctivity line (CL)
             # other devs strictly over 512 kByte flash are XD (extra-density)
@@ -65,16 +74,105 @@ class GD32MCUInfo:
             svd = f"{self.series}_{self.sub_series}.svd"
         self.svd_path = svd
 
+    def infer_compile_flags(self):
+        compile_flags = [] 
+        compile_flags += ["-D" + self.series]
+        compile_flags += ["-D" + self.spl_series]
+        if self.sub_series is not None:
+            compile_flags += ["-D" + self.spl_series.upper() + "_" + self.sub_series]
+        self.compile_flags = compile_flags
+
+    def infer_arduino_variant(self):
+        if self.name in GD32MCUInfo.known_arduino_variants:
+            self.arduino_variant =  GD32MCUInfo.known_arduino_variants[self.name]
+
+    def infer_openocd_target(self):
+        # TODO
+        pass
+
+    def infer_usb_dfu_supported(self):
+        # TODO better logic. 
+        # should return whether the device supports
+        # native USB upload *or* supported by e.g.
+        # STM32Duino bootloader.
+        # USB bootloader created at later stage
+        self.usb_dfu_supported = any( [
+            self.name.startswith("GD32F103"),
+            self.name.startswith("GD32F303"),
+        ]) 
+        pass
+
     def infer_missing_info(self):
         self.infer_spl_series()
         self.infer_sub_series()
         self.infer_svd_path()
+        self.infer_compile_flags()
+        self.infer_arduino_variant()
+        self.infer_openocd_target()
+        self.infer_usb_dfu_supported()
         self.mcu_url = f"https://www.gigadevice.com/microcontroller/{self.name.lower()}/"
         pass
+
+    def set_val_if_exists(self, d, key, val):
+        if val is not None:
+            d[key] = val
     
+    def add_val_if_true(self, d, key, check_value, add_value):
+        if check_value is True:
+            d[key] += [add_value]
+
     def generate_board_def(self) -> Tuple[str,str]:
         # cut off last 2 chars for name
-        output_filename = f"generic{self.name[:-2]}.json"
+        output_filename = f"generic{self.name_no_package}.json"
+        board = {
+            "build": {
+                "core": "gd32",
+                "cpu": self.core_type,
+                "extra_flags": " ".join(self.compile_flags),
+                "f_cpu": str(self.speed_mhz * 1_000_000) + "L",
+                "mcu": self.name.lower(),
+                "spl_series": self.spl_series
+            },
+            "debug": {
+                "jlink_device": self.name_no_package.upper(),
+                "openocd_target": "unknown",
+                "svd_path": self.svd_path,
+                "default_tools": [
+                    "stlink"
+                ]
+                # todo: think about how to handle set CPUTAPID better.. just set to 0
+                # openocd_extra_pre_target_args
+            },
+            "frameworks": [
+                "spl"
+            ],
+            "name": self.name,
+            "upload": {
+                "disable_flushing": False,
+                "maximum_ram_size": self.sram_kb * 1024,
+                "maximum_size": self.flash_kb * 1024,
+                "protocol": "stlink",
+                "protocols": [
+                    "jlink",
+                    "cmsis-dap",
+                    "stlink",
+                    "blackmagic",
+                    "serial"
+                ],
+                # todo check if these make sense...
+                "require_upload_port": True,
+                "use_1200bps_touch": False,
+                "wait_for_upload_port": False,
+            },
+            "url": self.mcu_url,
+            "vendor": "GigaDevice"
+        }
+        self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
+        self.add_val_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
+        self.add_val_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
+
+        board_def = json.dumps(board, indent=2)
+        return output_filename, board_def
 
 def read_csv(filename, core_type) -> List[GD32MCUInfo]:
     mcus = []
@@ -103,6 +201,16 @@ def main():
         print(repr(x))
 
     print(get_info_for_mcu_name("GD32F303CC", mcus))
+    print(get_info_for_mcu_name("GD32F350CB", mcus))
+
+    output_filename, board_def = get_info_for_mcu_name("GD32F303CC", mcus).generate_board_def()
+    print(output_filename + ":")
+    print(board_def)
+
+    output_filename, board_def = get_info_for_mcu_name("GD32F350CB", mcus).generate_board_def()
+    print(output_filename + ":")
+    print(board_def)
+
     pass
 
 if __name__ == '__main__':
