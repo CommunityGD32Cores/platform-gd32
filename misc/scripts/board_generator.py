@@ -8,6 +8,16 @@ from typing import Tuple, List
 # button at e.g. https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m3/ 
 # to PlatformIO board JSON definition.
 
+# notes on SRAM situation on GD32F4xx devices:
+# per GD32F4xx_User_Manual_Rev2.5.pdf p41 & 42
+# 0x1000 0000 - 0x1000 FFFF   TCMSRAM(64KB)
+# 0x2000 0000 - 0x2001 BFFF   SRAM0(112KB)
+# 0x2001 C000 - 0x2001 FFFF   SRAM1(16KB)
+# 0x2002 0000 - 0x2002 FFFF   SRAM2(64KB)
+
+# -> we can treat all SRAMx sections as one continuous SRAM section
+# however tightly-coupled memory SRAM (TCMSRAM) needs to be separated from that.
+
 class GD32MCUInfo:
     def __init__(self, name, series, line, speed_mhz, flash_kb, sram_kb, core_type) -> None:
         self.name : str = name
@@ -55,10 +65,11 @@ class GD32MCUInfo:
         sub_series = None
         if self.spl_series == "GD32F30x":
             # per GD32F30x user manual page 114. 
-            # all 305xx are conenctivity line (CL)
+            # all 305xx and 307xx are conenctivity line (CL)
             # other devs strictly over 512 kByte flash are XD (extra-density)
             # else HD (high-density)
-            sub_series = "CL" if self.name.startswith("GD32F305") else "HD" if self.flash_kb <= 512 else "XD"
+            sub_series = "CL" if self.name.startswith("GD32F305") or self.name.startswith(
+                "GD32F307") else "HD" if self.flash_kb <= 512 else "XD"
         # todo: GD32F10x logic
         self.sub_series = sub_series
 
@@ -100,9 +111,13 @@ class GD32MCUInfo:
         # native USB upload *or* supported by e.g.
         # STM32Duino bootloader.
         # USB bootloader created at later stage
+        # GD32F305xx and GD32F307xx have native DFU
+        # see user manual page 41.
         self.usb_dfu_supported = any( [
-            self.name.startswith("GD32F103"),
-            self.name.startswith("GD32F303"),
+            self.name.startswith("GD32F103"), # STM32Duino bootloader
+            self.name.startswith("GD32F303"), # STM32Duino bootloader
+            self.name.startswith("GD32F305"), # native DFU
+            self.name.startswith("GD32F307"), # native DFU
         ]) 
         pass
 
@@ -115,7 +130,6 @@ class GD32MCUInfo:
         self.infer_openocd_target()
         self.infer_usb_dfu_supported()
         self.mcu_url = f"https://www.gigadevice.com/microcontroller/{self.name.lower()}/"
-        pass
 
     def set_val_if_exists(self, d, key, val):
         if val is not None:
