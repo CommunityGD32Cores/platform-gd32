@@ -2,34 +2,33 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F407xK -DGD32F4 -DGD32F40x -DGD32F407 -DGD32407V_START",
-    "f_cpu": "168000000L",
+    "extra_flags": "-DGD32F307xC -DGD32F3 -DGD32F30x -DGD32F30X_CL",
+    "f_cpu": "120000000L",
     "hwids": [
       [
         "0x28E9",
         "0x0189"
       ]
     ],
-    "mcu": "gd32f407vkt6",
-    "product_line": "GD32F407xK",
-    "spl_series": "GD32F40x",
+    "mcu": "gd32f307vct6",
+    "product_line": "GD32F307xC",
+    "spl_series": "GD32F30x"
   },
   "debug": {
-    "jlink_device": "GD32F407VK",
-    "openocd_target": "gd32f4xx",
-    "svd_path": "GD32F40x.svd",
+    "jlink_device": "GD32F307VC",
+    "openocd_target": "gd32f30x",
+    "svd_path": "GD32F30x_CL.svd",
 	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
 	"default_tools" : ["cmsis-dap"]
   },
   "frameworks": [
     "spl"
   ],
-  "name": "GD32407V-START (192k RAM. 3072k Flash)",
+  "name": "GD32307C-EVAL (48k RAM. 256k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 131072,
-    "closely_coupled_ram_size": 65536,
-    "maximum_size": 3145728,
+    "maximum_ram_size": 49152,
+    "maximum_size": 262144,
     "protocol": "cmsis-dap",
     "protocols": [
       "jlink",
@@ -43,6 +42,6 @@
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f407vkt6/",
+  "url": "https://www.gigadevice.com/microcontroller/gd32f303vct6/",
   "vendor": "GigaDevice"
 }
