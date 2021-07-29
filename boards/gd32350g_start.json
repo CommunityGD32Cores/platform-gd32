@@ -1,0 +1,41 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F3x0 -DGD32F350",
+    "f_cpu": "108000000L",
+    "mcu": "gd32f350g8u6",
+    "product_line": "GD32F350x8",
+    "spl_series": "GD32F3x0"
+  },
+  "connectivity": [],
+  "debug": {
+    "default_tools": [
+      "cmsis-dap"
+    ],
+    "jlink_device": "GD32F350G8",
+    "onboard_tools": [
+      "cmsis-dap"
+    ],
+    "openocd_target": "stm32f3x",
+    "svd_path": "GD32F3x0.svd"
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32350G-START",
+  "upload": {
+    "maximum_ram_size": 8192,
+    "maximum_size": 65536,
+    "protocol": "cmsis-dap",
+    "protocols": [
+      "jlink",
+      "stlink",
+      "blackmagic",
+      "mbed",
+      "cmsis-dap"
+    ]
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f350g8u6/",
+  "vendor": "GigaDevice"
+}
