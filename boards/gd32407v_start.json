@@ -6,18 +6,13 @@
     "f_cpu": "168000000L",
     "hwids": [
       [
-        "0x1EAF",
-        "0x0003"
-      ],
-      [
-        "0x1EAF",
-        "0x0004"
+        "0x28E9",
+        "0x0189"
       ]
     ],
     "mcu": "gd32f407vkt6",
     "product_line": "GD32F407xK",
-    "variant": "GD32407V_START",
-    "spl_series": "GD32F40x"
+    "spl_series": "GD32F40x",
   },
   "debug": {
     "jlink_device": "GD32F407VK",
@@ -27,7 +22,6 @@
 	"default_tools" : ["cmsis-dap"]
   },
   "frameworks": [
-    "arduino",
     "spl"
   ],
   "name": "GD32407V-START (192k RAM. 3072k Flash)",

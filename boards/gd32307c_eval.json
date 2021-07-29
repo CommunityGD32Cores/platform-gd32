@@ -6,17 +6,12 @@
     "f_cpu": "120000000L",
     "hwids": [
       [
-        "0x1EAF",
-        "0x0003"
-      ],
-      [
-        "0x1EAF",
-        "0x0004"
+        "0x28E9",
+        "0x0189"
       ]
     ],
     "mcu": "gd32f307vct6",
-    "product_line": "GD32F307xG",
-    "variant": "GD32F307VG_MBED",
+    "product_line": "GD32F307xC",
     "spl_series": "GD32F30x"
   },
   "debug": {
@@ -27,7 +22,6 @@
 	"default_tools" : ["cmsis-dap"]
   },
   "frameworks": [
-    "arduino",
     "spl"
   ],
   "name": "GD32307C-EVAL (48k RAM. 256k Flash)",
@@ -35,7 +29,7 @@
     "disable_flushing": false,
     "maximum_ram_size": 49152,
     "maximum_size": 262144,
-    "protocol": "stlink",
+    "protocol": "cmsis-dap",
     "protocols": [
       "jlink",
       "cmsis-dap",
