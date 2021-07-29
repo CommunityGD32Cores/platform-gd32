@@ -2,7 +2,7 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F307xC -DGD32F3 -DGD32F30x -DGD32F30X_CL",
+    "extra_flags": "-DGD32F307xC -DGD32F3 -DGD32F30x -DGD32F307 -DGD32307C_EVAL -DGD32F30X_CL",
     "f_cpu": "120000000L",
     "hwids": [
       [
@@ -16,7 +16,7 @@
   },
   "debug": {
     "jlink_device": "GD32F307VC",
-    "openocd_target": "gd32f30x",
+    "openocd_target": "gd32f3x0",
     "svd_path": "GD32F30x_CL.svd",
 	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
 	"default_tools" : ["cmsis-dap"]
@@ -28,6 +28,7 @@
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 49152,
+    "closely_coupled_ram_size": 0,
     "maximum_size": 262144,
     "protocol": "cmsis-dap",
     "protocols": [
