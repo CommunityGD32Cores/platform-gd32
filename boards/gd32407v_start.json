@@ -12,7 +12,7 @@
     ],
     "mcu": "gd32f407vkt6",
     "product_line": "GD32F407xK",
-    "spl_series": "GD32F40x",
+    "spl_series": "GD32F40x"
   },
   "debug": {
     "jlink_device": "GD32F407VK",
