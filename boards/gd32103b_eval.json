@@ -2,10 +2,10 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m3",
-        "extra_flags": "-DGD32F103xC -DGD32F1 -DGD32F10x -DGD32103C_START -DGD32F10X_HD",
+        "extra_flags": "-DGD32F103xB -DGD32F1 -DGD32F10x -DGD32103B_EVAL -DGD32F10X_MD",
         "f_cpu": "108000000L",
-        "mcu": "gd32f103vct6",
-        "product_line": "GD32F103xC",
+        "mcu": "gd32f103vbt6",
+        "product_line": "GD32F103xB",
         "spl_series": "GD32F10x"
     },
     "connectivity": [],
@@ -13,7 +13,7 @@
         "default_tools": [
             "cmsis-dap"
         ],
-        "jlink_device": "GD32F103VC",
+        "jlink_device": "GD32F103VB",
         "onboard_tools": [
             "cmsis-dap"
         ],
@@ -23,10 +23,10 @@
     "frameworks": [
         "spl"
     ],
-    "name": "GD32103C_START",
+    "name": "GD32103B_EVAL",
     "upload": {
-        "maximum_ram_size": 49152,
-        "maximum_size": 262144,
+        "maximum_ram_size": 20480,
+        "maximum_size": 131072,
         "protocol": "cmsis-dap",
         "protocols": [
             "jlink",
@@ -36,6 +36,6 @@
             "mbed"
         ]
     },
-    "url": "https://www.gigadevice.com/microcontroller/gd32f103vct6/",
+    "url": "https://www.gigadevice.com/microcontroller/gd32f103vbt6/",
     "vendor": "GigaDevice"
 }
