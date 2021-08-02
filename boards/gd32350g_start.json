@@ -2,7 +2,7 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F3x0 -DGD32F350",
+    "extra_flags": "-DGD32F3x0 -DGD32F350 -DGD32350G_START",
     "f_cpu": "108000000L",
     "mcu": "gd32f350g8u6",
     "product_line": "GD32F350x8",
