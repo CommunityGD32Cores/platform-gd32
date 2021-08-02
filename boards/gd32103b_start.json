@@ -2,7 +2,7 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m3",
-        "extra_flags": "-DGD32F103xB -DGD32F1 -DGD32F10x -DGD32103B_START -DGD32F10X_MD",
+        "extra_flags": "-DGD32F103xB -DGD32F1 -DGD32F10x -DGD32F10X_MD",
         "f_cpu": "108000000L",
         "mcu": "gd32f103vbt6",
         "product_line": "GD32F103xB",
@@ -17,7 +17,7 @@
         "onboard_tools": [
             "cmsis-dap"
         ],
-        "openocd_target": "gd32f10x",
+        "openocd_target": "stm32f1x",
         "svd_path": "GD32F10x.svd"
     },
     "frameworks": [

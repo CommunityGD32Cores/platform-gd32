@@ -2,7 +2,7 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m4",
-        "extra_flags": "-DGD32F307xC -DGD32F3 -DGD32F30x -DGD32F307 -DGD32F30X_CL",
+        "extra_flags": "-DGD32F303xC -DGD32F3 -DGD32F30x -DGD32F303 -DGD32F30X_HD",
         "f_cpu": "120000000L",
         "hwids": [
             [
@@ -10,26 +10,26 @@
                 "0x0189"
             ]
         ],
-        "mcu": "gd32f307vct6",
-        "product_line": "GD32F307xC",
+        "mcu": "gd32f303vct6",
+        "product_line": "GD32F303xC",
         "spl_series": "GD32F30x"
     },
     "debug": {
         "default_tools": [
             "cmsis-dap"
         ],
-        "jlink_device": "GD32F307VC",
+        "jlink_device": "GD32F303VC",
         "onboard_tools": [
             "cmsis-dap"
         ],
         "openocd_target": "stm32f1x",
         "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
-        "svd_path": "GD32F30x_CL.svd"
+        "svd_path": "GD32F30x_HD.svd",
     },
     "frameworks": [
         "spl"
     ],
-    "name": "GD32307C-EVAL (48k RAM. 256k Flash)",
+    "name": "GD32303C-EVAL (48k RAM. 256k Flash)",
     "upload": {
         "disable_flushing": false,
         "maximum_ram_size": 49152,
