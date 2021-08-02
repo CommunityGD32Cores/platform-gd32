@@ -148,3 +148,15 @@ libs.append(env.BuildLibrary(
 ))
 
 env.Append(LIBS=libs)
+
+# include optional SPL libraries into the library search path for the LDF
+# can be put in board def file, or overridden in the platformio.ini with
+# board_build.spl_libs = no
+LIBRARIES_PATH = join(FRAMEWORK_DIR, spl_chip_type, "spl", "libraries", spl_series)
+should_include_libs = board.get("build.spl_libs", True)
+should_include_libs = str(should_include_libs).lower() in ("1", "yes", "true")
+print("SPL libraries are included: " + str(should_include_libs))
+if isdir(LIBRARIES_PATH) and should_include_libs:
+    env.Append(
+        LIBSOURCE_DIRS = LIBRARIES_PATH
+    )
