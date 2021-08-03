@@ -25,7 +25,7 @@
         ],
         "openocd_target": "stm32f1x",
         "svd_path": "GD32F30x_HD.svd",
-        "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+        "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"]
     },
     "frameworks": [
         "arduino",
