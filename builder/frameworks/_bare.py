@@ -37,7 +37,9 @@ env.Append(
     ],
 
     CPPDEFINES=[
-        ("F_CPU", "$BOARD_F_CPU")
+        ("F_CPU", "$BOARD_F_CPU"),
+        ("BOARD_NAME", '\\"%s\\"' % env.subst("$BOARD").upper()),
+        env.subst("$BOARD").upper()
     ],
 
     LINKFLAGS=[
