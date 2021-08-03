@@ -1,53 +1,54 @@
 {
-  "build": {
-    "core": "gd32",
-    "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F350x8 -DGD32F3 -DGD32F3x0 -DGD32F350 -DGD32350C_START",
-    "f_cpu": "108000000L",
-    "hwids": [
-      [
-        "0x1EAF",
-        "0x0003"
-      ],
-      [
-        "0x1EAF",
-        "0x0004"
-      ]
+    "build": {
+        "core": "gd32",
+        "cpu": "cortex-m4",
+        "extra_flags": "-DGD32F350x8 -DGD32F3 -DGD32F3x0 -DGD32F350",
+        "f_cpu": "108000000L",
+        "hwids": [
+            [
+                "0x28E9",
+                "0x0189"
+            ]
+        ],
+        "mcu": "gd32f350c8t6",
+        "product_line": "GD32F350x8",
+        "variant": "GD32350C_START",
+        "spl_series": "GD32F3x0"
+    },
+    "debug": {
+        "default_tools": [
+            "cmsis-dap"
+        ],
+        "jlink_device": "GD32F350C8",
+        "onboard_tools": [
+            "cmsis-dap"
+        ],
+        "openocd_target": "stm32f1x",
+        "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+        "svd_path": "GD32F3x0.svd",
+    },
+    "frameworks": [
+        "arduino",
+        "spl"
     ],
-    "mcu": "gd32f350c8t6",
-    "product_line": "GD32F350x8",
-    "variant": "GD32350C_START",
-    "spl_series": "GD32F3x0"
-  },
-  "debug": {
-    "jlink_device": "GD32F350C8",
-    "openocd_target": "gd32f3x0",
-    "svd_path": "GD32F3x0.svd",
-	"openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
-	"default_tools" : ["cmsis-dap"]
-  },
-  "frameworks": [
-    "arduino",
-    "spl"
-  ],
-  "name": "GD32350C-START (8k RAM. 64k Flash)",
-  "upload": {
-    "disable_flushing": false,
-    "maximum_ram_size": 8192,
-    "maximum_size": 65536,
-    "protocol": "cmsis-dap",
-    "protocols": [
-      "jlink",
-      "cmsis-dap",
-      "stlink",
-      "blackmagic",
-      "serial",
-      "dfu"
-    ],
-    "require_upload_port": true,
-    "use_1200bps_touch": false,
-    "wait_for_upload_port": false
-  },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f350c8t6/",
-  "vendor": "GigaDevice"
+    "name": "GD32350C-START (8k RAM. 64k Flash)",
+    "upload": {
+        "disable_flushing": false,
+        "maximum_ram_size": 8192,
+        "maximum_size": 65536,
+        "protocol": "cmsis-dap",
+        "protocols": [
+            "jlink",
+            "cmsis-dap",
+            "stlink",
+            "blackmagic",
+            "serial",
+            "dfu"
+        ],
+        "require_upload_port": true,
+        "use_1200bps_touch": false,
+        "wait_for_upload_port": false
+    },
+    "url": "https://www.gigadevice.com/microcontroller/gd32f350c8t6/",
+    "vendor": "GigaDevice"
 }
