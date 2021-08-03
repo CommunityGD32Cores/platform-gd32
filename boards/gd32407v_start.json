@@ -24,7 +24,7 @@
         ],
         "openocd_target": "stm32f4x",
         "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
-        "svd_path": "GD32F40x.svd",   
+        "svd_path": "GD32F40x.svd"   
     },
     "frameworks": [
         "spl"
