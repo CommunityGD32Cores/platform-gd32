@@ -10,7 +10,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.7]
         example:
-          - "examples/gd32-arduino-blink"
+          - "examples/gd32-arduino-blinky"
           - "examples/gd32-spl-blinky"
     runs-on: ${{ matrix.os }}
     steps:
