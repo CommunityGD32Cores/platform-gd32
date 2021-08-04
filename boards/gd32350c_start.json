@@ -24,7 +24,7 @@
             "cmsis-dap"
         ],
         "openocd_target": "stm32f1x",
-        "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
+        "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477", "-c", "set FLASH_SIZE 0x10000"],
         "svd_path": "GD32F3x0.svd"
     },
     "frameworks": [
