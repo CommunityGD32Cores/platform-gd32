@@ -35,7 +35,14 @@ env.SConscript("_bare.py")
 # by default, add newlibnano into linker flags.
 # otherwise many standard C functions won't be accessible without using a own syscall
 # implementation.
-env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
+# but we also check if need to add semhosting here
+activate_semihosting = board.get("debug.semihosting", False)
+activate_semihosting = str(activate_semihosting).lower() in ("1", "yes", "true")
+if activate_semihosting:
+    env.Append(LINKFLAGS=["--specs=rdimon.specs", "--specs=nano.specs"])
+    env.Append(LIBS=["rdimon"])
+else:
+    env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
 assert isdir(FRAMEWORK_DIR)
