@@ -1,44 +1,44 @@
 {
-    "build": {
-        "core": "gd32",
-        "cpu": "cortex-m4",
-        "extra_flags": "-DGD32E103xB -DGD32E1 -DGD32E10X",
-        "f_cpu": "120000000L",
-        "mcu": "gd32e103cbt6",
-        "product_line": "GD32E103xB",
-        "spl_series": "GD32E10x"
-    },
-    "connectivity": [],
-    "debug": {
-        "default_tools": [
-            "stlink"
-        ],
-        "jlink_device": "GD32E103CB",
-        "onboard_tools": [
-            "stlink"
-        ],
-        "openocd_target": "stm32f1x",
-        "svd_path": "GD32E10x.svd",
-        "openocd_extra_pre_target_args": [
-            "-c",
-            "set CPUTAPID 0"
-        ]
-    },
-    "frameworks": [
-        "spl"
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32E1 -DGD32E103 -DGD32E10X -DHXTAL_VALUE=8000000U -DHXTAL_VALUE_8M=HXTAL_VALUE",
+    "f_cpu": "120000000L",
+    "mcu": "gd32e103cbt6",
+    "spl_series": "GD32E10X"
+  },
+  "debug": {
+    "jlink_device": "GD32E103CB",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32E10X.svd",
+    "default_tools": [
+      "stlink"
     ],
-    "name": "Generic GD32E103CBT6",
-    "upload": {
-        "maximum_ram_size": 32768,
-        "maximum_size": 131072,
-        "protocol": "stlink",
-        "protocols": [
-            "jlink",
-            "stlink",
-            "blackmagic",
-            "mbed"
-        ]
-    },
-    "url": "https://www.gigadevice.com/microcontroller/gd32e103cbt6/",
-    "vendor": "GigaDevice"
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32E103CB (32k RAM, 128k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 32768,
+    "maximum_size": 131072,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32e103cbt6/",
+  "vendor": "GigaDevice"
 }
