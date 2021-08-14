@@ -1,0 +1,44 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F4 -DGD32F405 -DGD32F4xx",
+    "f_cpu": "168000000L",
+    "mcu": "gd32f405ikh6",
+    "spl_series": "GD32F4xx"
+  },
+  "debug": {
+    "jlink_device": "GD32F405IK",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32F4xx.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32F405IK (192k RAM, 3072k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 196608,
+    "maximum_size": 3145728,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f405ikh6/",
+  "vendor": "GigaDevice"
+}

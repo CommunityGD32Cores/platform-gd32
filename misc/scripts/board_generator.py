@@ -3,6 +3,7 @@ import csv
 import os
 import json
 from typing import Tuple, List
+import shutil
 
 # This script converts CSV files, obtainable from the "Export to CSV" 
 # button at e.g. https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m3/ 
@@ -37,6 +38,7 @@ class GD32MCUInfo:
         self.arduino_variant = None
         self.usb_dfu_supported = False
         self.openocd_target = None
+        self.hwids = None
         self.infer_missing_info()
     
     def __str__(self) -> str:
@@ -73,6 +75,18 @@ class GD32MCUInfo:
     known_arduino_variants = {
         "GD32F303CCT6": "GD32F303CC_GENERIC"
     }
+
+    # stm32duino bootloader hwid's PID/VID
+    leaf_hwids = [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ]
 
     def infer_sub_series(self):
         sub_series = None
@@ -134,7 +148,11 @@ class GD32MCUInfo:
             self.name.startswith("GD32F303"), # STM32Duino bootloader
             self.name.startswith("GD32F305"), # native DFU
             self.name.startswith("GD32F307"), # native DFU
-        ]) 
+        ])
+        # assume for now all USB DFU enabled boards have the PID/VID of the 
+        # leafpad / STM32Duino bootloader.
+        if self.usb_dfu_supported: 
+            self.hwids = GD32MCUInfo.leaf_hwids
         pass
 
     def infer_missing_info(self):
@@ -184,7 +202,7 @@ class GD32MCUInfo:
             "frameworks": [
                 "spl"
             ],
-            "name": self.name,
+            "name": f"{self.name_no_package} ({self.sram_kb}k RAM, {self.flash_kb}k Flash)",
             "upload": {
                 "disable_flushing": False,
                 "maximum_ram_size": self.sram_kb * 1024,
@@ -205,6 +223,7 @@ class GD32MCUInfo:
             "url": self.mcu_url,
             "vendor": "GigaDevice"
         }
+        self.set_val_if_exists(board["build"], "hwids", self.hwids)
         self.set_val_if_exists(board["build"], "spl_sub_series", self.sub_series)
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
         self.add_val_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
@@ -249,5 +268,15 @@ def main():
         print(output_filename + ":")
         print(board_def)
  
+    if os.path.exists("generated_output"):
+        shutil.rmtree("generated_output")
+    os.mkdir("generated_output")
+    for x in mcus:  
+        output_filename, board_def = x.generate_board_def()
+        with open(os.path.join("generated_output", output_filename), "w") as fp:
+            fp.write(board_def)
+
+    print("Done writing %d board defs." % len(mcus))
+
 if __name__ == '__main__':
     main()
