@@ -36,6 +36,7 @@ class GD32MCUInfo:
         self.compile_flags = None
         self.arduino_variant = None
         self.usb_dfu_supported = False
+        self.openocd_target = None
         self.infer_missing_info()
     
     def __str__(self) -> str:
@@ -54,7 +55,18 @@ class GD32MCUInfo:
         "GD32F405": "GD32F4xx",
         "GD32F407": "GD32F4xx",
         "GD32F450": "GD32F4xx",
-        "GD32E103": "GD32E10x"
+        "GD32E103": "GD32E10x",
+        "GD32F190": "GD32F1x0"
+    }
+
+    spl_series_to_openocd_target = {
+        "GD32F10x": "stm32f1x",
+        "GD32F1x0": "stm32f1x",
+        "GD32F30x": "stm32f1x",
+        "GD32F3x0": "stm32f1x",
+        "GD32F20x": "stm32f2x",
+        "GD32F4xx": "stm32f4x",
+        "GD32F450": "stm32f4x"
     }
 
     known_arduino_variants = {
@@ -87,14 +99,17 @@ class GD32MCUInfo:
 
     def infer_compile_flags(self):
         compile_flags = [] 
+        compile_flags += ["-D" + self.series[0:6]]
         compile_flags += ["-D" + self.series]
         compile_flags += ["-D" + self.spl_series]
         if self.sub_series is not None:
             compile_flags += ["-D" + self.spl_series.upper() + "_" + self.sub_series]
-        # todo add series specific compile flags
-        # fpr genericGD32F190C8 -DGD32F130_150 -D__GD32F130_SUBFAMILY -D__GD32F1x0_FAMILY
-        # for genericGD32F130C8 -DGD32F130_150 -D__GD32F130_SUBFAMILY -D__GD32F1x0_FAMILY
-        # double check if these are used in SPL
+        # todo add more series specific compile flags
+        if self.series == "GD32F1x0":
+            if self.name.startswith("GD32F170") or self.name.startswith("GD32F190"):
+                compile_flags += ["-DGD32F170_190"]
+            else:
+                compile_flags += ["-DGD32F130_150"]
         self.compile_flags = compile_flags
 
     def infer_arduino_variant(self):
@@ -102,8 +117,8 @@ class GD32MCUInfo:
             self.arduino_variant =  GD32MCUInfo.known_arduino_variants[self.name]
 
     def infer_openocd_target(self):
-        # TODO
-        pass
+        if self.spl_series in GD32MCUInfo.spl_series_to_openocd_target:
+            self.openocd_target = GD32MCUInfo.spl_series_to_openocd_target[self.spl_series]
 
     def infer_usb_dfu_supported(self):
         # TODO better logic. 
@@ -153,13 +168,17 @@ class GD32MCUInfo:
             },
             "debug": {
                 "jlink_device": self.name_no_package.upper(),
-                "openocd_target": "unknown",
+                "openocd_target": self.openocd_target if self.openocd_target != None else "unknown",
                 "svd_path": self.svd_path,
                 "default_tools": [
                     "stlink"
+                ],
+                # todo: think about how to handle set CPUTAPID better.. just set to 0 for "ignore". 
+                # for the gd32f30x series it is known to be 0x2ba01477
+                "openocd_extra_pre_target_args": [
+                    "-c",
+                    "set CPUTAPID %s" % ("0x2ba01477" if self.spl_series == "GD32F30x" else "0")
                 ]
-                # todo: think about how to handle set CPUTAPID better.. just set to 0
-                # openocd_extra_pre_target_args
             },
             "frameworks": [
                 "spl"
@@ -185,6 +204,7 @@ class GD32MCUInfo:
             "url": self.mcu_url,
             "vendor": "GigaDevice"
         }
+        self.set_val_if_exists(board["build"], "spl_sub_series", self.sub_series)
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
         self.add_val_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
         self.add_val_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
@@ -221,15 +241,12 @@ def main():
     print(get_info_for_mcu_name("GD32F303CC", mcus))
     print(get_info_for_mcu_name("GD32F350CB", mcus))
 
-    output_filename, board_def = get_info_for_mcu_name("GD32F303CC", mcus).generate_board_def()
-    print(output_filename + ":")
-    print(board_def)
+    print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG"]
 
-    output_filename, board_def = get_info_for_mcu_name("GD32F350CB", mcus).generate_board_def()
-    print(output_filename + ":")
-    print(board_def)
-
-    pass
-
+    for mcu in print_board_files_mcus:
+        output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
+        print(output_filename + ":")
+        print(board_def)
+ 
 if __name__ == '__main__':
     main()
