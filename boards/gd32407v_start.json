@@ -2,7 +2,7 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m4",
-        "extra_flags": "-DGD32F407xK -DGD32F4 -DGD32F40x -DGD32F407",
+        "extra_flags": "-DGD32F407xK -DGD32F4 -DGD32F4xx -DGD32F407",
         "f_cpu": "168000000L",
         "hwids": [
             [
@@ -12,7 +12,7 @@
         ],
         "mcu": "gd32f407vkt6",
         "product_line": "GD32F407xK",
-        "spl_series": "GD32F40x"
+        "spl_series": "GD32F4xx"
     },
     "debug": {
         "default_tools": [
@@ -24,7 +24,7 @@
         ],
         "openocd_target": "stm32f4x",
         "openocd_extra_pre_target_args" : ["-c", "set CPUTAPID 0x2ba01477"],
-        "svd_path": "GD32F40x.svd"   
+        "svd_path": "GD32F4xx.svd"   
     },
     "frameworks": [
         "spl"
