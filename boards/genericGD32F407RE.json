@@ -2,15 +2,15 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F3 -DGD32F350 -DGD32F3x0",
-    "f_cpu": "108000000L",
-    "mcu": "gd32f350cbt6",
-    "spl_series": "GD32F3x0"
+    "extra_flags": "-DGD32F4 -DGD32F407 -DGD32F4xx",
+    "f_cpu": "168000000L",
+    "mcu": "gd32f407ret6",
+    "spl_series": "GD32F4xx"
   },
   "debug": {
-    "jlink_device": "GD32F350CB",
-    "openocd_target": "stm32f1x",
-    "svd_path": "GD32F3x0.svd",
+    "jlink_device": "GD32F407RE",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32F4xx.svd",
     "default_tools": [
       "stlink"
     ],
@@ -22,11 +22,11 @@
   "frameworks": [
     "spl"
   ],
-  "name": "GD32F350CB (16k RAM, 128k Flash)",
+  "name": "GD32F407RE (192k RAM, 512k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 16384,
-    "maximum_size": 131072,
+    "maximum_ram_size": 196608,
+    "maximum_size": 524288,
     "protocol": "stlink",
     "protocols": [
       "jlink",
@@ -39,6 +39,6 @@
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f350cbt6/",
+  "url": "https://www.gigadevice.com/microcontroller/gd32f407ret6/",
   "vendor": "GigaDevice"
 }

@@ -2,9 +2,9 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F3 -DGD32F303 -DGD32F30x -DGD32F30X_HD",
+    "extra_flags": "-DGD32F3 -DGD32F303 -DGD32F30x -DGD32F30X_XD",
     "f_cpu": "120000000L",
-    "mcu": "gd32f303cct6",
+    "mcu": "gd32f303zkt6",
     "spl_series": "GD32F30x",
     "hwids": [
       [
@@ -16,13 +16,12 @@
         "0x0004"
       ]
     ],
-    "spl_sub_series": "HD",
-    "variant": "GD32F303CC_GENERIC"
+    "spl_sub_series": "XD"
   },
   "debug": {
-    "jlink_device": "GD32F303CC",
+    "jlink_device": "GD32F303ZK",
     "openocd_target": "stm32f1x",
-    "svd_path": "GD32F30x_HD.svd",
+    "svd_path": "GD32F30x_XD.svd",
     "default_tools": [
       "stlink"
     ],
@@ -32,14 +31,13 @@
     ]
   },
   "frameworks": [
-    "spl",
-    "arduino"
+    "spl"
   ],
-  "name": "GD32F303CC (48k RAM, 256k Flash)",
+  "name": "GD32F303ZK (96k RAM, 3072k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 49152,
-    "maximum_size": 262144,
+    "maximum_ram_size": 98304,
+    "maximum_size": 3145728,
     "protocol": "stlink",
     "protocols": [
       "jlink",
@@ -53,6 +51,6 @@
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f303cct6/",
+  "url": "https://www.gigadevice.com/microcontroller/gd32f303zkt6/",
   "vendor": "GigaDevice"
 }
