@@ -120,11 +120,14 @@ class GD32MCUInfo:
         if self.sub_series is not None:
             compile_flags += ["-D" + self.spl_series.upper() + "_" + self.sub_series]
         # todo add more series specific compile flags
-        if self.series == "GD32F1x0":
+        if self.spl_series == "GD32F1x0":
             if self.name.startswith("GD32F170") or self.name.startswith("GD32F190"):
                 compile_flags += ["-DGD32F170_190"]
             else:
                 compile_flags += ["-DGD32F130_150"]
+        if self.spl_series == "GD32E10X":
+            # SPL needs to know about crystal setup, else #error
+            compile_flags += ["-DHXTAL_VALUE=8000000U" ,"-DHXTAL_VALUE_8M=HXTAL_VALUE"]
         self.compile_flags = compile_flags
 
     def infer_arduino_variant(self):
