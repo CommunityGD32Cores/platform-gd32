@@ -51,11 +51,11 @@ class GD32MCUInfo:
         "GD32F307": "GD32F30x",
         "GD32F330": "GD32F3x0",
         "GD32F350": "GD32F3x0",
-        "GD32F403": "GD32F403", #yes, this is correct. special SPL package for only that chip.
+        "GD32F403": "GD32F403", # yes, this is correct. special SPL package for only that chip.
         "GD32F405": "GD32F4xx",
         "GD32F407": "GD32F4xx",
         "GD32F450": "GD32F4xx",
-        "GD32E103": "GD32E10x",
+        "GD32E103": "GD32E10X", # uppercase X here is *wanted*.
         "GD32F190": "GD32F1x0"
     }
 
@@ -64,6 +64,7 @@ class GD32MCUInfo:
         "GD32F1x0": "stm32f1x",
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
+        "GD32E10X": "stm32f1x",
         "GD32F20x": "stm32f2x",
         "GD32F4xx": "stm32f4x",
         "GD32F450": "stm32f4x"
@@ -241,7 +242,7 @@ def main():
     print(get_info_for_mcu_name("GD32F303CC", mcus))
     print(get_info_for_mcu_name("GD32F350CB", mcus))
 
-    print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG"]
+    print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
