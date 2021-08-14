@@ -2,7 +2,7 @@
     "build": {
         "core": "gd32",
         "cpu": "cortex-m4",
-        "extra_flags": "-DGD32E103xB -DGD32E1 -DGD32E10X -DGD32E103V_EVAL",
+        "extra_flags": "-DGD32E103xB -DGD32E1 -DGD32E10X",
         "f_cpu": "120000000L",
         "mcu": "gd32e103vbt6",
         "product_line": "GD32E103xB",
@@ -11,11 +11,11 @@
     "connectivity": [],
     "debug": {
         "default_tools": [
-            "stlink"
+            "cmsis-dap"
         ],
         "jlink_device": "GD32E103VB",
         "onboard_tools": [
-            "stlink"
+            "cmsis-dap"
         ],
         "openocd_target": "stm32f1x",
         "svd_path": "GD32E10x.svd"
