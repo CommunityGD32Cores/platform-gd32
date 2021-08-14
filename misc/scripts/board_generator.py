@@ -93,9 +93,9 @@ class GD32MCUInfo:
     def infer_svd_path(self):
         svd = None
         if self.sub_series is None:
-            svd = f"{self.series}.svd"
+            svd = f"{self.spl_series}.svd"
         else:
-            svd = f"{self.series}_{self.sub_series}.svd"
+            svd = f"{self.spl_series}_{self.sub_series}.svd"
         self.svd_path = svd
 
     def infer_compile_flags(self):
