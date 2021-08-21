@@ -13,7 +13,7 @@
         "default_tools": [
             "cmsis-dap"
         ],
-        "jlink_device": "GD32F350G8",
+        "jlink_device": "GD32F350R8",
         "onboard_tools": [
             "cmsis-dap"
         ],
