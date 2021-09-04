@@ -71,12 +71,16 @@ class GD32MCUInfo:
         "GD32F407": "GD32F4xx",
         "GD32F450": "GD32F4xx",
         "GD32E103": "GD32E10X", # uppercase X here is *wanted*.
+        "GD32E230": "GD32E23x",
+        "GD32E231": "GD32E23x",
+        "GD32E232": "GD32E23x"  # MCU not yet available
     }
 
     spl_series_to_openocd_target = {
         "GD32F10x": "stm32f1x",
         "GD32F1x0": "stm32f1x",
         "GD32F20x": "stm32f2x", # guess
+        "GD32E23x": "stm32f2x", # guess
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
@@ -135,6 +139,9 @@ class GD32MCUInfo:
             svd = f"{self.spl_series}.svd"
         else:
             svd = f"{self.spl_series}_{self.sub_series}.svd"
+        # special case for E23x series
+        if self.spl_series == "GD32E23x":
+            svd = f"{self.series}.svd"
         self.svd_path = svd
 
     def infer_compile_flags(self):
@@ -304,25 +311,33 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
 def main():
     this_script_path = os.path.dirname(os.path.realpath(__file__))
     mcus = []
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
+    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
+    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
 
     #print(mcus)
     for x in mcus:
         print(repr(x))
 
+    # special case: GD32E232 MCUs are listed in the CSV file but have no released datasheet or SPL support yet
+    # (the GD32E23x.h only accepts E230 or E231, not E232).
+    # these are probabl "upcoming" MCUs. 
+    # filter them from the list for now.
+    mcus = list(filter(lambda x: x.series != "GD32E232", mcus))
+
     print(get_info_for_mcu_name("GD32F303CC", mcus))
     print(get_info_for_mcu_name("GD32F350CB", mcus))
     print(get_info_for_mcu_name("GD32F103C8", mcus))
     print(get_info_for_mcu_name("GD32F205RE", mcus))
+    print(get_info_for_mcu_name("GD32E230C4", mcus))
 
     #return
     #print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
     #print(get_info_for_mcu_name("GD32F450IG", mcus))
     #print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
-    print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
+    #print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
+    print_board_files_mcus = ["GD32E231C8T6"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
