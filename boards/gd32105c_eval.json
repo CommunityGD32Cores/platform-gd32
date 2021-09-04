@@ -7,7 +7,8 @@
         "mcu": "gd32f105vct6",
         "product_line": "GD32F105xC",
         "spl_series": "GD32F10x",
-        "series": "GD32F105"
+        "series": "GD32F105",
+        "spl_sub_series": "CL"
     },
     "connectivity": [],
     "debug": {

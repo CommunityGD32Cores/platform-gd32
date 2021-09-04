@@ -14,7 +14,8 @@
         "product_line": "GD32F307xG",
         "variant": "GD32F307VG_MBED",
         "spl_series": "GD32F30x",
-        "series": "GD32F307"
+        "series": "GD32F307",
+        "spl_sub_series": "CL"
     },
     "debug": {
         "default_tools": [

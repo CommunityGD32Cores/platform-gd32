@@ -7,7 +7,8 @@
         "mcu": "gd32f105rbt6",
         "product_line": "GD32F105xB",
         "spl_series": "GD32F10x",
-        "series": "GD32F105"
+        "series": "GD32F105",
+        "spl_sub_series": "CL"
     },
     "connectivity": [],
     "debug": {

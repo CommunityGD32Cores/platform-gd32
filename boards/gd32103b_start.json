@@ -7,7 +7,8 @@
         "mcu": "gd32f103vbt6",
         "product_line": "GD32F103xB",
         "spl_series": "GD32F10x",
-        "series": "GD32F103"
+        "series": "GD32F103",
+        "spl_sub_series": "MD"
     },
     "connectivity": [],
     "debug": {

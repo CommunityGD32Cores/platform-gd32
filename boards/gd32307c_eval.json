@@ -13,7 +13,8 @@
         "mcu": "gd32f307vct6",
         "product_line": "GD32F307xC",
         "spl_series": "GD32F30x",
-        "series": "GD32F307"
+        "series": "GD32F307",
+        "spl_sub_series": "CL"
     },
     "debug": {
         "default_tools": [

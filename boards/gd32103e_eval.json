@@ -7,7 +7,8 @@
         "mcu": "gd32f103zet6",
         "product_line": "GD32F103xE",
         "spl_series": "GD32F10x",
-        "series": "GD32F103"
+        "series": "GD32F103",
+        "spl_sub_series": "HD"
     },
     "connectivity": [],
     "debug": {
