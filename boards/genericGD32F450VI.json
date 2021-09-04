@@ -5,7 +5,8 @@
     "extra_flags": "-DGD32F4 -DGD32F450 -DGD32F4xx",
     "f_cpu": "200000000L",
     "mcu": "gd32f450vit6",
-    "spl_series": "GD32F4xx"
+    "spl_series": "GD32F4xx",
+    "series": "GD32F450"
   },
   "debug": {
     "jlink_device": "GD32F450VI",

@@ -5,7 +5,8 @@
     "extra_flags": "-DGD32E1 -DGD32E103 -DGD32E10X -DHXTAL_VALUE=8000000U -DHXTAL_VALUE_8M=HXTAL_VALUE",
     "f_cpu": "120000000L",
     "mcu": "gd32e103r8t6",
-    "spl_series": "GD32E10X"
+    "spl_series": "GD32E10X",
+    "series": "GD32E103"
   },
   "debug": {
     "jlink_device": "GD32E103R8",

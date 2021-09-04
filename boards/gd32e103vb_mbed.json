@@ -6,7 +6,8 @@
         "f_cpu": "120000000L",
         "mcu": "gd32e103vbt6",
         "product_line": "GD32E103xB",
-        "spl_series": "GD32E10x"
+        "spl_series": "GD32E10x",
+        "series": "GD32E103"
     },
     "connectivity": [],
     "debug": {

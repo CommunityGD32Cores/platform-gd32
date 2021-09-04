@@ -12,7 +12,8 @@
         ],
         "mcu": "gd32f407vkt6",
         "product_line": "GD32F407xK",
-        "spl_series": "GD32F4xx"
+        "spl_series": "GD32F4xx",
+        "series": "GD32F407"
     },
     "debug": {
         "default_tools": [

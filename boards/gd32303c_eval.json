@@ -12,7 +12,8 @@
         ],
         "mcu": "gd32f303vct6",
         "product_line": "GD32F303xC",
-        "spl_series": "GD32F30x"
+        "spl_series": "GD32F30x",
+        "series": "GD32F303"
     },
     "debug": {
         "default_tools": [

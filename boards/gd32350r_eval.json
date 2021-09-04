@@ -6,7 +6,8 @@
         "f_cpu": "108000000L",
         "mcu": "gd32f350r8t6",
         "product_line": "GD32F350x8",
-        "spl_series": "GD32F3x0"
+        "spl_series": "GD32F3x0",
+        "series": "GD32F350"
     },
     "connectivity": [],
     "debug": {

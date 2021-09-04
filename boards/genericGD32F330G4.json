@@ -5,7 +5,8 @@
     "extra_flags": "-DGD32F3 -DGD32F330 -DGD32F3x0",
     "f_cpu": "84000000L",
     "mcu": "gd32f330g4u6",
-    "spl_series": "GD32F3x0"
+    "spl_series": "GD32F3x0",
+    "series": "GD32F330"
   },
   "debug": {
     "jlink_device": "GD32F330G4",

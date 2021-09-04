@@ -257,7 +257,8 @@ class GD32MCUInfo:
                 "extra_flags": " ".join(self.compile_flags),
                 "f_cpu": str(self.speed_mhz * 1_000_000) + "L",
                 "mcu": self.name.lower(),
-                "spl_series": self.spl_series
+                "spl_series": self.spl_series,
+                "series": self.series
             },
             "debug": {
                 "jlink_device": self.name_no_package.upper(),
@@ -325,9 +326,9 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
 def main():
     this_script_path = os.path.dirname(os.path.realpath(__file__))
     mcus = []
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
 
     #print(mcus)

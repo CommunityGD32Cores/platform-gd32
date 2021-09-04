@@ -6,6 +6,7 @@
     "f_cpu": "180000000L",
     "mcu": "gd32e505zct6",
     "spl_series": "GD32E50X",
+    "series": "GD32E505",
     "spl_sub_series": "CL"
   },
   "debug": {

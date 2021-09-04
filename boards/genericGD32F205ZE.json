@@ -6,6 +6,7 @@
     "f_cpu": "120000000L",
     "mcu": "gd32f205zet6",
     "spl_series": "GD32F20x",
+    "series": "GD32F205",
     "spl_sub_series": "CL"
   },
   "debug": {

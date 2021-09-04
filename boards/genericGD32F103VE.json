@@ -6,6 +6,7 @@
     "f_cpu": "108000000L",
     "mcu": "gd32f103vet6",
     "spl_series": "GD32F10x",
+    "series": "GD32F103",
     "hwids": [
       [
         "0x1EAF",

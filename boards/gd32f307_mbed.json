@@ -13,7 +13,8 @@
         "mcu": "gd32f307vgt6",
         "product_line": "GD32F307xG",
         "variant": "GD32F307VG_MBED",
-        "spl_series": "GD32F30x"
+        "spl_series": "GD32F30x",
+        "series": "GD32F307"
     },
     "debug": {
         "default_tools": [
