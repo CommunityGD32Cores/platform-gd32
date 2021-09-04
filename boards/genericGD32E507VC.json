@@ -1,0 +1,45 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32E5 -DGD32E507 -DGD32E50X -DGD32E50X_CL",
+    "f_cpu": "180000000L",
+    "mcu": "gd32e507vct6",
+    "spl_series": "GD32E50X",
+    "spl_sub_series": "CL"
+  },
+  "debug": {
+    "jlink_device": "GD32E507VC",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32E50X_CL.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32E507VC (96k RAM, 256k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 98304,
+    "maximum_size": 262144,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32e507vct6/",
+  "vendor": "GigaDevice"
+}

@@ -133,7 +133,14 @@ class GD32MCUInfo:
                 # >512kByte: XD
                 sub_series = "MD" if self.flash_kb <= 128 else "HD" if self.flash_kb <= 512 else "XD"
         if self.spl_series == "GD32E50X":
-            pass
+            # there are GD32EPRT, GD32E50X_HD, GD32E50X_XD, GD32E50X_CL and GD32E508..
+            # however, only CL, XD and HD are explained
+            if self.name.startswith("GD32E505") or self.name.startswith("GD32E507"):
+                sub_series = "CL"
+            elif not self.name.startswith("GD32E508"):
+                # 256-512kByte: HD
+                # >512kByte: XD
+                sub_series = "HD" if self.flash_kb <= 512 else "XD"
         self.sub_series = sub_series
 
     def infer_spl_series(self):

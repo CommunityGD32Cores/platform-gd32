@@ -1,0 +1,45 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32E5 -DGD32E503 -DGD32E50X -DGD32E50X_HD",
+    "f_cpu": "180000000L",
+    "mcu": "gd32e503zet6",
+    "spl_series": "GD32E50X",
+    "spl_sub_series": "HD"
+  },
+  "debug": {
+    "jlink_device": "GD32E503ZE",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32E50X_HD.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32E503ZE (128k RAM, 512k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 131072,
+    "maximum_size": 524288,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32e503zet6/",
+  "vendor": "GigaDevice"
+}
