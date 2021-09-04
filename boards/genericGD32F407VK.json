@@ -25,7 +25,7 @@
   "name": "GD32F407VK (192k RAM, 3072k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 196608,
+    "maximum_ram_size": 131072,
     "maximum_size": 3145728,
     "protocol": "stlink",
     "protocols": [
@@ -37,7 +37,8 @@
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
-    "wait_for_upload_port": false
+    "wait_for_upload_port": false,
+    "closely_coupled_ram_size": 65536
   },
   "url": "https://www.gigadevice.com/microcontroller/gd32f407vkt6/",
   "vendor": "GigaDevice"

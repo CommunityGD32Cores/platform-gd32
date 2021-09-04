@@ -15,6 +15,8 @@ import shutil
 # 0x2000 0000 - 0x2001 BFFF   SRAM0(112KB)
 # 0x2001 C000 - 0x2001 FFFF   SRAM1(16KB)
 # 0x2002 0000 - 0x2002 FFFF   SRAM2(64KB)
+# 0x2003 0000 - 0x2006 FFFF   ADDSRAM(256KB)
+# 0x4002 4000 - 0x4002 4FFF   BKP SRAM (4KB) [Backup/RTC Mem]
 
 # -> we can treat all SRAMx sections as one continuous SRAM section
 # however tightly-coupled memory SRAM (TCMSRAM) needs to be separated from that.
@@ -30,6 +32,7 @@ class GD32MCUInfo:
         self.sram_kb = sram_kb
         self.core_type = core_type
         # information that will be filled out later
+        self.core_coupled_memory_kb = 0
         self.spl_series = None 
         self.sub_series = None
         self.mcu_url = None
@@ -158,7 +161,30 @@ class GD32MCUInfo:
             self.hwids = GD32MCUInfo.leaf_hwids
         pass
 
+    def infer_correct_sram_allocation(self):
+        # the reported "SRAM" size from the CSV file is not the full truth.
+        # SRAM is split into many regions, non-contiguous in some cases.
+        # PlatformIO (and the linker script generator) assumes the "upload.maximum_ram_size"
+        # is the length of contiguous SRAM and sets the initial stack pointer (SP) at the end
+        # of RAM. 
+        # However, for some series (GD32F4xx), the MCU has special "core-coupled memory" (CCM), 
+        # or also called "tightly-coupled memory" (TCM), which is not contiguous with the normal 
+        # SRAM banks (SRAM0, SRAM1, etc.)
+        # Hence we need to adjust the upoad.maximum_ram_size so that the linker script doesn't
+        # set the SP into memory that doesn't exist.
+        # the only F4 series that does not have TCMSRAM is GD32F403xx.
+        if self.series == "GD32F405" or self.series == "GD32F407" or self.series == "GD32F450":
+            # subtract size of TCM SRAM
+            # SRAM0 and SRAM1 are contiguous (112 + 16 kB)
+            # from GD32F407xx_Datasheet_Rev2.1.pdf page 71
+            # or GD32F405xx_Datasheet_Rev2.1.pdf page 52 respectively
+            # GD32F450xx_Datasheet_Rev2.1.pdf pages 56, 17
+            # SRAM0,1,2 and ADDSRAM are contiguous, TCSRAM (64Kbyte is not)
+            self.sram_kb -= 64
+            self.core_coupled_memory_kb += 64
+
     def infer_missing_info(self):
+        self.infer_correct_sram_allocation()
         self.infer_spl_series()
         self.infer_sub_series()
         self.infer_svd_path()
@@ -172,7 +198,7 @@ class GD32MCUInfo:
         if val is not None:
             d[key] = val
     
-    def add_val_if_true(self, d, key, check_value, add_value):
+    def add_val_to_arr_if_true(self, d, key, check_value, add_value):
         if check_value is True:
             d[key] += [add_value]
 
@@ -205,7 +231,7 @@ class GD32MCUInfo:
             "frameworks": [
                 "spl"
             ],
-            "name": f"{self.name_no_package} ({self.sram_kb}k RAM, {self.flash_kb}k Flash)",
+            "name": f"{self.name_no_package} ({self.sram_kb + self.core_coupled_memory_kb}k RAM, {self.flash_kb}k Flash)",
             "upload": {
                 "disable_flushing": False,
                 "maximum_ram_size": self.sram_kb * 1024,
@@ -229,8 +255,9 @@ class GD32MCUInfo:
         self.set_val_if_exists(board["build"], "hwids", self.hwids)
         self.set_val_if_exists(board["build"], "spl_sub_series", self.sub_series)
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
-        self.add_val_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
-        self.add_val_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
+        self.add_val_to_arr_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
+        self.add_val_to_arr_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
+        self.set_val_if_exists(board["upload"], "closely_coupled_ram_size", self.core_coupled_memory_kb * 1024 if self.core_coupled_memory_kb != 0 else None)
 
         board_def = json.dumps(board, indent=2)
         return output_filename, board_def
@@ -264,13 +291,16 @@ def main():
     print(get_info_for_mcu_name("GD32F303CC", mcus))
     print(get_info_for_mcu_name("GD32F350CB", mcus))
 
-    print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
+    #return
+    #print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
+    print(get_info_for_mcu_name("GD32F450IG", mcus))
+    print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
         print(output_filename + ":")
         print(board_def)
- 
+    #return
     if os.path.exists("generated_output"):
         shutil.rmtree("generated_output")
     os.mkdir("generated_output")

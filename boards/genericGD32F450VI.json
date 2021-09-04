@@ -25,7 +25,7 @@
   "name": "GD32F450VI (512k RAM, 2048k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 524288,
+    "maximum_ram_size": 458752,
     "maximum_size": 2097152,
     "protocol": "stlink",
     "protocols": [
@@ -37,7 +37,8 @@
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
-    "wait_for_upload_port": false
+    "wait_for_upload_port": false,
+    "closely_coupled_ram_size": 65536
   },
   "url": "https://www.gigadevice.com/microcontroller/gd32f450vit6/",
   "vendor": "GigaDevice"
