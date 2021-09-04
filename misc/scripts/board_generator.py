@@ -173,9 +173,11 @@ class GD32MCUInfo:
         # see user manual page 41.
         self.usb_dfu_supported = any( [
             self.name.startswith("GD32F103"), # STM32Duino bootloader
+            self.name.startswith("GD32F105"), # native DFU (CL)
+            self.name.startswith("GD32F107"), # native DFU (CL)
             self.name.startswith("GD32F303"), # STM32Duino bootloader
-            self.name.startswith("GD32F305"), # native DFU
-            self.name.startswith("GD32F307"), # native DFU
+            self.name.startswith("GD32F305"), # native DFU (CL)
+            self.name.startswith("GD32F307"), # native DFU (CL)
         ])
         # assume for now all USB DFU enabled boards have the PID/VID of the 
         # leafpad / STM32Duino bootloader.
@@ -302,7 +304,7 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
 def main():
     this_script_path = os.path.dirname(os.path.realpath(__file__))
     mcus = []
-    #mcus = read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")

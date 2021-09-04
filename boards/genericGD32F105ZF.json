@@ -6,6 +6,16 @@
     "f_cpu": "108000000L",
     "mcu": "gd32f105zft6",
     "spl_series": "GD32F10x",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
     "spl_sub_series": "CL"
   },
   "debug": {
@@ -34,7 +44,8 @@
       "cmsis-dap",
       "stlink",
       "blackmagic",
-      "serial"
+      "serial",
+      "dfu"
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
