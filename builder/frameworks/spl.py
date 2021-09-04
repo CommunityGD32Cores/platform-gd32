@@ -21,7 +21,7 @@ The idea is to save the user (the new user, in particular) having to deal
 directly with the registers.
 """
 
-from os.path import isdir, isfile, join
+from os.path import isdir, isfile, join, dirname, realpath
 from string import Template
 
 from SCons.Script import DefaultEnvironment
@@ -98,6 +98,30 @@ def get_linker_script(mcu):
 
     return default_ldscript
 
+def get_startup_filename(board):
+    # try to figure out which built-in startup file to use.
+    startup_file = None
+    # series and SPL series are always present.
+    series = board.get("build.series", "")
+    spl_series = board.get("build.spl_series", "")
+    if series == "":
+        print("Error: build.series was not defined in the board manifest.")
+        env.Exit(-1)
+    if spl_series == "":
+        print("Error: build.spl_series was not defined in the board manifest.")
+        env.Exit(-1)
+    # some have a SPL subseries.
+    spl_sub_series = board.get("build.spl_sub_series", "")
+    if spl_sub_series != "":
+        # all boards which have a sub-series follow a common patter 
+        startup_file = f"startup_{spl_series.lower()}_{spl_sub_series.lower()}.S" 
+    else:
+        # all others are either jsut the SPL series or the original series name
+        startup_file = f"startup_{series.lower()}.S" 
+        if not isfile(join(FRAMEWORK_DIR, "gd32", "cmsis", "startup_files", startup_file)):
+            startup_file = f"startup_{spl_series.lower()}.S" 
+    return startup_file
+
 env.Append(
     CPPPATH=[
         join(FRAMEWORK_DIR, spl_chip_type,
@@ -146,6 +170,29 @@ libs.append(env.BuildLibrary(
         "variants", spl_series
     )
 ))
+
+# Build built-in startup file if wanted
+use_builtin_startup_file = board.get("build.spl_build_startup_file", True)
+use_builtin_startup_file = str(use_builtin_startup_file).lower() in ("1", "yes", "true")
+
+if use_builtin_startup_file:
+    startup_file = get_startup_filename(board)
+    startup_file_filter = "-<*> +<%s>" % startup_file
+    startup_file_path =  join(
+            FRAMEWORK_DIR, spl_chip_type, "cmsis",
+            "startup_files", startup_file)
+    print("==== STARTUP FILE: %s ======" % startup_file)
+    if not isfile(startup_file_path):
+        print("Error: Startup file not found at expected place (%s)" % startup_file_path)
+        env.Exit(-1)
+    env.BuildSources(
+        join("$BUILD_DIR", "FrameworkCMSISStartup"),
+        join(
+            FRAMEWORK_DIR, spl_chip_type, "cmsis",
+            "startup_files"
+        ),
+        startup_file_filter
+    )
 
 libs.append(env.BuildLibrary(
     join("$BUILD_DIR", "FrameworkSPL"),
