@@ -73,14 +73,19 @@ class GD32MCUInfo:
         "GD32E103": "GD32E10X", # uppercase X here is *wanted*.
         "GD32E230": "GD32E23x",
         "GD32E231": "GD32E23x",
-        "GD32E232": "GD32E23x"  # MCU not yet available
+        "GD32E232": "GD32E23x", # MCU not yet available
+        "GD32E503": "GD32E50X", # uppercase X here is *wanted*.
+        "GD32E505": "GD32E50X",
+        "GD32E507": "GD32E50X",
+        "GD32E508": "GD32E50X"  # listed in SPL header but no chip listed yet..
     }
 
     spl_series_to_openocd_target = {
         "GD32F10x": "stm32f1x",
         "GD32F1x0": "stm32f1x",
         "GD32F20x": "stm32f2x", # guess
-        "GD32E23x": "stm32f2x", # guess
+        "GD32E23x": "stm32f2x", # guess, these are cortex-m23. probably needs https://github.com/GigaDevice-Semiconductor/openocd/blob/xpack/tcl/target/gd32e23x.cfg
+        "GD32E50X": "stm32f4x", # guess, these are cortex-m33. will likely not work, needs custom OpenOCD expansion..
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
@@ -127,6 +132,8 @@ class GD32MCUInfo:
                 # 256-512kByte: HD
                 # >512kByte: XD
                 sub_series = "MD" if self.flash_kb <= 128 else "HD" if self.flash_kb <= 512 else "XD"
+        if self.spl_series == "GD32E50X":
+            pass
         self.sub_series = sub_series
 
     def infer_spl_series(self):
@@ -313,8 +320,8 @@ def main():
     mcus = []
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
+    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
 
     #print(mcus)
     for x in mcus:
@@ -337,7 +344,8 @@ def main():
     #print(get_info_for_mcu_name("GD32F450IG", mcus))
     #print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
     #print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
-    print_board_files_mcus = ["GD32E231C8T6"]
+    #print_board_files_mcus = ["GD32E231C8T6"]
+    print_board_files_mcus = ["GD32E507ZE"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
