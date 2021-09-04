@@ -126,6 +126,8 @@ env.Append(
     CPPPATH=[
         join(FRAMEWORK_DIR, spl_chip_type,
              "cmsis", "cores", spl_chip_type),
+        join(FRAMEWORK_DIR, spl_chip_type,
+             "cmsis", "startup_files"),
         join(FRAMEWORK_DIR, spl_chip_type, "cmsis",
              "variants", spl_series),
         join(FRAMEWORK_DIR, spl_chip_type, "spl",
