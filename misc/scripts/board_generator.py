@@ -51,6 +51,16 @@ class GD32MCUInfo:
         return "GD32MCUInfo(%s)" % ",".join(["%s=\"%s\"" % (key,val) for key,val in list(self.__dict__.items())])
 
     series_to_spl_series = {
+        "GD32F101": "GD32F10x",
+        "GD32F103": "GD32F10x",
+        "GD32F105": "GD32F10x",
+        "GD32F107": "GD32F10x",
+        "GD32F130": "GD32F1x0",
+        "GD32F150": "GD32F1x0",
+        "GD32F170": "GD32F1x0",
+        "GD32F190": "GD32F1x0",
+        "GD32F205": "GD32F20x",
+        "GD32F207": "GD32F20x",
         "GD32F303": "GD32F30x",
         "GD32F305": "GD32F30x",
         "GD32F307": "GD32F30x",
@@ -61,12 +71,12 @@ class GD32MCUInfo:
         "GD32F407": "GD32F4xx",
         "GD32F450": "GD32F4xx",
         "GD32E103": "GD32E10X", # uppercase X here is *wanted*.
-        "GD32F190": "GD32F1x0"
     }
 
     spl_series_to_openocd_target = {
         "GD32F10x": "stm32f1x",
         "GD32F1x0": "stm32f1x",
+        "GD32F20x": "stm32f2x", # guess
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
@@ -100,7 +110,19 @@ class GD32MCUInfo:
             # else HD (high-density)
             sub_series = "CL" if self.name.startswith("GD32F305") or self.name.startswith(
                 "GD32F307") else "HD" if self.flash_kb <= 512 else "XD"
-        # todo: GD32F10x logic
+        if self.spl_series == "GD32F20x":
+            # all GD32F20x parts are CL parts, evident by the gd32f20x.h header file.
+            sub_series = "CL"
+        if self.spl_series == "GD32F10x":
+            # determine whether it's a CL, HD, MD or XD series chip.
+            # per GD32F10x_User_Manual_EN_V2.3-3.pdf page 112.
+            if self.name.startswith("GD32F105") or self.name.startswith("GD32F107"):
+                sub_series = "CL"
+            else:
+                # 16-128kByte: MD
+                # 256-512kByte: HD
+                # >512kByte: XD
+                sub_series = "MD" if self.flash_kb <= 128 else "HD" if self.flash_kb <= 512 else "XD"
         self.sub_series = sub_series
 
     def infer_spl_series(self):
@@ -279,8 +301,9 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
 
 def main():
     this_script_path = os.path.dirname(os.path.realpath(__file__))
-    mcus = read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
-    #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
+    mcus = []
+    #mcus = read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     #mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
 
@@ -290,11 +313,14 @@ def main():
 
     print(get_info_for_mcu_name("GD32F303CC", mcus))
     print(get_info_for_mcu_name("GD32F350CB", mcus))
+    print(get_info_for_mcu_name("GD32F103C8", mcus))
+    print(get_info_for_mcu_name("GD32F205RE", mcus))
 
     #return
     #print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
-    print(get_info_for_mcu_name("GD32F450IG", mcus))
-    print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
+    #print(get_info_for_mcu_name("GD32F450IG", mcus))
+    #print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
+    print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()

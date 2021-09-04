@@ -1,40 +1,44 @@
 {
-    "build": {
-        "core": "gd32",
-        "cpu": "cortex-m3",
-        "extra_flags": "-DGD32F1x0 -DGD32F170_190",
-        "f_cpu": "72000000L",
-        "mcu": "gd32f190c8t6",
-        "product_line": "GD32F190x8",
-        "spl_series": "GD32F1x0"
-    },
-    "connectivity": [],
-    "debug": {
-        "default_tools": [
-            "stlink"
-        ],
-        "jlink_device": "GD32F190C8",
-        "onboard_tools": [
-            "stlink"
-        ],
-        "openocd_target": "stm32f1x",
-        "svd_path": "GD32F1x0.svd"
-    },
-    "frameworks": [
-        "spl"
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m3",
+    "extra_flags": "-DGD32F1 -DGD32F190 -DGD32F1x0 -DGD32F170_190",
+    "f_cpu": "72000000L",
+    "mcu": "gd32f190c8t6",
+    "spl_series": "GD32F1x0"
+  },
+  "debug": {
+    "jlink_device": "GD32F190C8",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32F1x0.svd",
+    "default_tools": [
+      "stlink"
     ],
-    "name": "Generic GD32F190C8T6",
-    "upload": {
-        "maximum_ram_size": 8192,
-        "maximum_size": 65536,
-        "protocol": "stlink",
-        "protocols": [
-            "jlink",
-            "stlink",
-            "blackmagic",
-            "mbed"
-        ]
-    },
-    "url": "https://www.gigadevice.com/microcontroller/gd32f190c8t6/",
-    "vendor": "GigaDevice"
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32F190C8 (8k RAM, 64k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 8192,
+    "maximum_size": 65536,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "serial"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f190c8t6/",
+  "vendor": "GigaDevice"
 }

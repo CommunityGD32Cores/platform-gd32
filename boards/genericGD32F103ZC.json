@@ -4,7 +4,7 @@
     "cpu": "cortex-m3",
     "extra_flags": "-DGD32F1 -DGD32F103 -DGD32F10x -DGD32F10X_HD",
     "f_cpu": "108000000L",
-    "mcu": "gd32f103rct6",
+    "mcu": "gd32f103zct6",
     "spl_series": "GD32F10x",
     "hwids": [
       [
@@ -19,7 +19,7 @@
     "spl_sub_series": "HD"
   },
   "debug": {
-    "jlink_device": "GD32F103RC",
+    "jlink_device": "GD32F103ZC",
     "openocd_target": "stm32f1x",
     "svd_path": "GD32F10x_HD.svd",
     "default_tools": [
@@ -33,7 +33,7 @@
   "frameworks": [
     "spl"
   ],
-  "name": "GD32F103RC (48k RAM, 256k Flash)",
+  "name": "GD32F103ZC (48k RAM, 256k Flash)",
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 49152,
@@ -51,6 +51,6 @@
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f103rct6/",
+  "url": "https://www.gigadevice.com/microcontroller/gd32f103zct6/",
   "vendor": "GigaDevice"
 }

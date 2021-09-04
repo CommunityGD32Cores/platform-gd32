@@ -2,15 +2,26 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m3",
-    "extra_flags": "-DGD32F1 -DGD32F130 -DGD32F1x0 -DGD32F130_150",
-    "f_cpu": "48000000L",
-    "mcu": "gd32f130c6t6",
-    "spl_series": "GD32F1x0"
+    "extra_flags": "-DGD32F1 -DGD32F103 -DGD32F10x -DGD32F10X_MD",
+    "f_cpu": "108000000L",
+    "mcu": "gd32f103t6u6",
+    "spl_series": "GD32F10x",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
+    "spl_sub_series": "MD"
   },
   "debug": {
-    "jlink_device": "GD32F130C6",
+    "jlink_device": "GD32F103T6",
     "openocd_target": "stm32f1x",
-    "svd_path": "GD32F1x0.svd",
+    "svd_path": "GD32F10x_MD.svd",
     "default_tools": [
       "stlink"
     ],
@@ -22,10 +33,10 @@
   "frameworks": [
     "spl"
   ],
-  "name": "GD32F130C6 (4k RAM, 32k Flash)",
+  "name": "GD32F103T6 (10k RAM, 32k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 4096,
+    "maximum_ram_size": 10240,
     "maximum_size": 32768,
     "protocol": "stlink",
     "protocols": [
@@ -33,12 +44,13 @@
       "cmsis-dap",
       "stlink",
       "blackmagic",
-      "serial"
+      "serial",
+      "dfu"
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/microcontroller/gd32f130c6t6/",
+  "url": "https://www.gigadevice.com/microcontroller/gd32f103t6u6/",
   "vendor": "GigaDevice"
 }
