@@ -6,7 +6,8 @@
     "f_cpu": "120000000L",
     "mcu": "gd32e103vbt6",
     "spl_series": "GD32E10X",
-    "series": "GD32E103"
+    "series": "GD32E103",
+    "mbed_variant": "GD32_E103VB"
   },
   "debug": {
     "jlink_device": "GD32E103VB",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "mbed"
   ],
   "name": "GD32E103VB (32k RAM, 128k Flash)",
   "upload": {

@@ -15,7 +15,8 @@
         "variant": "GD32F307VG_MBED",
         "spl_series": "GD32F30x",
         "series": "GD32F307",
-        "spl_sub_series": "CL"
+        "spl_sub_series": "CL",
+        "mbed_variant": "GD32_F307VG"
     },
     "debug": {
         "default_tools": [
@@ -31,7 +32,8 @@
     },
     "frameworks": [
         "arduino",
-        "spl"
+        "spl",
+        "mbed"
     ],
     "name": "GD32F307VG-mbed (96k RAM. 1024k Flash)",
     "upload": {

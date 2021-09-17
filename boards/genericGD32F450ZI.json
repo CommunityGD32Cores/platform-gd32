@@ -6,7 +6,8 @@
     "f_cpu": "200000000L",
     "mcu": "gd32f450zit6",
     "spl_series": "GD32F4xx",
-    "series": "GD32F450"
+    "series": "GD32F450",
+    "mbed_variant": "GD32_F450ZI"
   },
   "debug": {
     "jlink_device": "GD32F450ZI",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "mbed"
   ],
   "name": "GD32F450ZI (512k RAM, 2048k Flash)",
   "upload": {

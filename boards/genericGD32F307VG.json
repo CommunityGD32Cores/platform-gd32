@@ -17,7 +17,8 @@
         "0x0004"
       ]
     ],
-    "spl_sub_series": "CL"
+    "spl_sub_series": "CL",
+    "mbed_variant": "GD32_F307VG"
   },
   "debug": {
     "jlink_device": "GD32F307VG",
@@ -32,7 +33,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "mbed"
   ],
   "name": "GD32F307VG (96k RAM, 1024k Flash)",
   "upload": {

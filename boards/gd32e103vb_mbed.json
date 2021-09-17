@@ -7,7 +7,8 @@
         "mcu": "gd32e103vbt6",
         "product_line": "GD32E103xB",
         "spl_series": "GD32E10x",
-        "series": "GD32E103"
+        "series": "GD32E103",
+        "mbed_variant": "GD32_E103VB"
     },
     "connectivity": [],
     "debug": {
@@ -22,7 +23,8 @@
         "svd_path": "GD32E10x.svd"
     },
     "frameworks": [
-        "spl"
+        "spl",
+        "mbed"
     ],
     "name": "GD32-E103VB-mbed",
     "upload": {

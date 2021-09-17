@@ -39,6 +39,7 @@ class GD32MCUInfo:
         self.svd_path = None
         self.compile_flags = None
         self.arduino_variant = None
+        self.mbedos_variant = None
         self.usb_dfu_supported = False
         self.openocd_target = None
         self.hwids = None
@@ -97,6 +98,12 @@ class GD32MCUInfo:
     known_arduino_variants = {
         "GD32F303CCT6": "GD32F303CC_GENERIC"
     }
+
+    known_mbedos_variants = {
+        "GD32F450ZIT6": "GD32_F450ZI",
+        "GD32E103VBT6": "GD32_E103VB",
+        "GD32F307VGT6": "GD32_F307VG"
+    }   
 
     # stm32duino bootloader hwid's PID/VID
     leaf_hwids = [
@@ -180,6 +187,10 @@ class GD32MCUInfo:
         if self.name in GD32MCUInfo.known_arduino_variants:
             self.arduino_variant =  GD32MCUInfo.known_arduino_variants[self.name]
 
+    def infer_mbedos_variant(self):
+        if self.name in GD32MCUInfo.known_mbedos_variants:
+            self.mbedos_variant =  GD32MCUInfo.known_mbedos_variants[self.name]
+
     def infer_openocd_target(self):
         if self.spl_series in GD32MCUInfo.spl_series_to_openocd_target:
             self.openocd_target = GD32MCUInfo.spl_series_to_openocd_target[self.spl_series]
@@ -235,6 +246,7 @@ class GD32MCUInfo:
         self.infer_svd_path()
         self.infer_compile_flags()
         self.infer_arduino_variant()
+        self.infer_mbedos_variant()
         self.infer_openocd_target()
         self.infer_usb_dfu_supported()
         self.mcu_url = f"https://www.gigadevice.com/microcontroller/{self.name.lower()}/"
@@ -302,6 +314,8 @@ class GD32MCUInfo:
         self.set_val_if_exists(board["build"], "spl_sub_series", self.sub_series)
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
         self.add_val_to_arr_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
+        self.add_val_to_arr_if_true(board, "frameworks", self.mbedos_variant != None, "mbed")
+        self.set_val_if_exists(board["build"], "mbed_variant", self.mbedos_variant)
         self.add_val_to_arr_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
         self.set_val_if_exists(board["upload"], "closely_coupled_ram_size", self.core_coupled_memory_kb * 1024 if self.core_coupled_memory_kb != 0 else None)
 
