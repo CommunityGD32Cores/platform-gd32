@@ -35,6 +35,15 @@ class Gd32Platform(PlatformBase):
                 self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
                 if build_core == "gd32":
                     self.packages["framework-arduinogd32"]["optional"] = False
+        if "mbed" in frameworks:
+            deprecated_boards_file = os.path.join(
+                self.get_dir(), "misc", "mbed_deprecated_boards.json")
+            if os.path.isfile(deprecated_boards_file):
+                with open(deprecated_boards_file) as fp:
+                    if board in json.load(fp):
+                        self.packages["framework-mbed"]["version"] = "~6.51506.0"
+            self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
+
         # include or exclude other packages for different frameworks.. 
 
         default_protocol = board_config.get("upload.protocol") or ""
