@@ -33,7 +33,8 @@
     ]
   },
   "frameworks": [
-    "arduino"
+    "arduino",
+    "spl"
   ],
   "name": "Keyboardio Model 100",
   "upload": {
