@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from genericpath import isfile
 import sys
 from platform import system
 from os import makedirs
-from os.path import basename, isdir, join
+from os.path import basename, isdir, join, isfile
 
 from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
                           Builder, Default, DefaultEnvironment)
