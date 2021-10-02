@@ -7,7 +7,8 @@
         "mcu": "gd32f350g8u6",
         "product_line": "GD32F350x8",
         "spl_series": "GD32F3x0",
-        "series": "GD32F350"
+        "series": "GD32F350",
+        "variant": "GD32350G_START"
     },
     "connectivity": [],
     "debug": {
@@ -23,6 +24,7 @@
         "svd_path": "GD32F3x0.svd"
     },
     "frameworks": [
+        "arduino",
         "spl"
     ],
     "name": "GD32350G-START",
