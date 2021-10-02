@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from genericpath import isfile
 import sys
 from platform import system
 from os import makedirs
@@ -41,6 +42,21 @@ def BeforeUpload(target, source, env):  # pylint: disable=W0613,W0621
     if bool(upload_options.get("wait_for_upload_port", False)):
         env.Replace(UPLOAD_PORT=env.WaitForNewSerialPort(before_ports))
 
+def check_debugger_config_file():
+    global platform
+    expected_filepath = join(platform.get_package_dir("tool-openocd"), "scripts", "interface", "ftdi", "sipeed-rv-debugger.cfg")
+    expected_filecontents = """adapter driver ftdi
+ftdi_device_desc "JTAG Debugger"
+ftdi_vid_pid 0x0403 0x6010
+
+transport select jtag
+ftdi_layout_init 0x0008 0x001b
+ftdi_layout_signal nSRST -oe 0x0020 -data 0x0020
+"""
+    if not isfile(expected_filepath):
+        print("Writing config to %s" % expected_filepath)
+        with open(expected_filepath, "w") as fp:
+            fp.write(expected_filecontents)
 
 env = DefaultEnvironment()
 env.SConscript("compat.py", exports="env")
@@ -293,6 +309,11 @@ elif upload_protocol == "hid":
     ]
 
 elif upload_protocol in debug_tools:
+
+    # quick fix: add config file on-the-fly
+    if upload_protocol == "sipeed-rv-debugger":
+        check_debugger_config_file()
+
     openocd_args = [
         "-d%d" % (2 if int(ARGUMENTS.get("PIOVERBOSE", 0)) else 1)
     ]

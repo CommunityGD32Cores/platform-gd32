@@ -85,8 +85,10 @@ class Gd32Platform(PlatformBase):
         if "tools" not in debug:
             debug["tools"] = {}
 
-        # BlackMagic, J-Link, ST-Link
-        for link in ("blackmagic", "jlink", "stlink", "cmsis-dap"):
+        ftdi_based_links = ["sipeed-rv-debugger"]
+
+        # BlackMagic, J-Link, ST-Link, Sipeed RV Debugger
+        for link in ("blackmagic", "jlink", "stlink", "cmsis-dap", "sipeed-rv-debugger"):
             if link not in upload_protocols or link in debug["tools"]:
                 continue
             if link == "blackmagic":
@@ -121,11 +123,18 @@ class Gd32Platform(PlatformBase):
                 else:
                     assert debug.get("openocd_target"), (
                         "Missed target configuration for %s" % board.id)
-                    server_args.extend([
-                        "-f", "interface/%s.cfg" % link,
-                        "-c", "transport select %s" % (
-                            "hla_swd" if link == "stlink" else "swd"),
-                    ])
+                    if link in ftdi_based_links:
+                        server_args.extend([
+                            "-f", "interface/ftdi/%s.cfg" % link,
+                            # JTAG protocol already pre-selected in .cfg file
+                            # ..probably allow overriding to SWD based link too?
+                        ])
+                    else:
+                        server_args.extend([
+                            "-f", "interface/%s.cfg" % link,
+                            "-c", "transport select %s" % (
+                                "hla_swd" if link == "stlink" else "swd"),
+                        ])
                     # for GD32 chips we need to be able to insert a -c "set CPUTAPID .." command
                     # *before* the target cfg is loaded.                    
                     server_args.extend(debug.get("openocd_extra_pre_target_args", []))
