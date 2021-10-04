@@ -8,6 +8,10 @@ except ImportError:
     print("Could not import pdfminer. Please 'pip install pdfminer.six' first!")
     exit(-1)
 
+# ToDo: Use this info to recognize the PDF and its parsing quirks.
+# Every PDF will probably need different parsing quirks, like only
+# scanning a range of pages at a time, different footnotes for device
+# availability, the type of SPL family it belongs to (GD32F30x vs GD32F3x0 etc)
 known_datasheets_infos = {
     "GD32F190xx_Datasheet_Rev2.1.pdf" : {
         "alternate_funcs": { 
@@ -17,7 +21,8 @@ known_datasheets_infos = {
                 "2": ["GD32F190x8", "GD32F190x6"],
                 "3": ["GD32F190x8"],
             }
-        }
+        },
+        "family_type": "B"
     }
 }
 
