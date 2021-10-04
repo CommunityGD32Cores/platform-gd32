@@ -75,9 +75,11 @@ def filter_string(input_str_or_float: str):
 
         # domain specific cleanup
         if "SPI" in input_str_or_float and "I2S" in input_str_or_float:
-            input_str_or_float = input_str_or_float.replace("I2S", "/I2S")
+            input_str_or_float = input_str_or_float.replace("I2S", "_I2S")
+            input_str_or_float = input_str_or_float.replace("/I2S", "_I2S")
             # cleanup for double forward slash
             input_str_or_float = input_str_or_float.replace("//", "/")
+            input_str_or_float = input_str_or_float.replace("/_", "_")
             #input_str_or_float = input_str_or_float.replace("/,", ",")
 
         return input_str_or_float
