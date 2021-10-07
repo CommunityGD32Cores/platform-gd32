@@ -104,7 +104,7 @@ class GD32PinMapGenerator:
         for pin, func in all_uart_pins:
             print("Found UART pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
-        all_can_rx_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, ("CAN", "RX"))
+        all_can_rx_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "RX"))
         for pin, func in all_can_rx_pins:
             print("Found CAN RX pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
@@ -280,18 +280,13 @@ def main_func():
                 af_map[af_name].extend(af_list)
             #print(af_map)
             parser_result["pins"][pin_name] = GD32Pin(pin_name, af_map)
-            #for pin_func in pin_alternate_funcs:
-            #    print(pin_func)
-            #if i == 3:
-            #    exit(0)
-            #for x in j:
-            #    print(x)
     print("Parsed all %d pins." % len(parser_result["pins"]))
     as_json = json.dumps(parser_result["pins"], indent=2, default=lambda o: o.__dict__)
     # string is large, breaks console. print block-wise
     n = 5*1024
     for x in [as_json[i:i+n] for i in range(0, len(as_json), n)]:
         print(x, end="", flush=True)
+        sys.stdout.flush()
     print("")
     print("Done.")
 
