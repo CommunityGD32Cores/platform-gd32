@@ -2,6 +2,9 @@ import math
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 import pandas as pd
+from typing import Dict
+import json
+import sys
 try:
     import tabula as tb
 except ImportError:
@@ -25,6 +28,35 @@ known_datasheets_infos = {
         "family_type": "B"
     }
 }
+
+class GD32AlternateFunc:
+    def __init__(self, signal_name, footnote) -> None:
+        self.signal_name = signal_name
+        self.footnote = footnote
+        try:
+            if "_" in self.signal_name:
+                self.peripheral = self.signal_name.split("_")[0]
+                self.subfunction = "_".join(self.signal_name.split("_")[1:])
+            else:
+                self.peripheral = None
+        except Exception as exc:
+            print("Failed to decode peripheral name: " + str(exc))
+    def __repr__(self) -> str:
+        ret = ""
+        if self.peripheral is not None:
+            ret += f"({self.peripheral}) "
+        ret += f"{self.signal_name}"
+        if self.footnote is not None:
+            ret += f" ({self.footnote})"
+        return "Func(" + ret + ")"
+
+class GD32Pin:
+    def __init__(self, pin_name, af_functions_map: Dict[str, GD32AlternateFunc]) -> None:
+        self.pin_name = pin_name
+        self.af_functions_map = af_functions_map
+    def __repr__(self) -> str:
+        return f"GD32Pin(pin={self.pin_name}, funcs={str(self.af_functions_map)}"
+
 
 def is_nan(number_or_obj):
     return type(number_or_obj) == float and math.isnan(number_or_obj)
@@ -106,10 +138,26 @@ def main_func():
         exit(0)
     # cleanup garbage columns (parser is not perfect...)
     #dfs = dfs.dropna(axis=1, how='all')
-    combine_duplicate_columns = False
     if len(dfs.columns) > 11:
         print("Need cleanup") 
-        combine_duplicate_columns = True
+        # the data for one AF is spread over two columsn. 
+        # the left columns has the pin function, the right column has only "AFx" at the first row
+        # and then only NaNs. 
+        # We combine the two columns and drop the unneeded one.
+        orig_len = len(dfs.columns)
+        for i in range(1, len(dfs.columns), 2):
+            left_col_name = "Unnamed: %d" % (i)
+            right_col_name = "Unnamed: %d" % (i+1)
+            if right_col_name not in dfs.columns:
+                continue
+            dfs[left_col_name] = dfs.apply(lambda row: row[left_col_name] if not pd.isna(row[left_col_name]) else row[right_col_name], axis=1)
+            dfs = dfs.drop([right_col_name], axis=1)
+        # combine the pin column too
+        dfs["Pin"] = dfs.apply(lambda row: row["Unnamed: 0"] if not pd.isna(row["Unnamed: 0"]) else row["Pin"], axis=1)
+        dfs = dfs.drop(["Unnamed: 0"], axis=1)
+        # last column is all NaNs
+        dfs = dfs.drop([dfs.columns[-1]], axis=1)
+
         # source_col_loc = dfs.columns.get_loc('Unnamed: 1') # column position starts from 0
         #dfs['Unnamed: 1'] = dfs.iloc[:,source_col_loc+1:source_col_loc+2].apply(
         #    lambda x: " BLAH ".join(x.astype(str)), axis=1)
@@ -118,10 +166,11 @@ def main_func():
     # for special pages where the parser fails: combine columns
     print(dfs)
     print(type(dfs))
+    #return
 
     parser_result = {
         "alternate_functions": [],
-        "pins": []
+        "pins": dict()
     }
 
     # iterating over rows using iterrows() function
@@ -143,30 +192,54 @@ def main_func():
             #print("got data row")
             pin_row = list(j)
             pin_name = pin_row[0]
-            if is_nan(pin_name):
+            if is_nan(pin_name) or pin_name == "Name":
                 print("Skipping empty line because pin is not there.")
                 continue
-            if combine_duplicate_columns:
-                pin_alternate_funcs = pin_row[2::]
-            else:
-                pin_alternate_funcs = pin_row[1::]
+            pin_alternate_funcs = pin_row[1::]
             pin_alternate_funcs = [filter_string(x) for x in pin_alternate_funcs]
             #print("[Before adjustment] Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
-            if combine_duplicate_columns:
-                new_list = []
-                # delete every even element - they are all "None" and were duplicated / stretched by the parser
-                for i in range(0, len(pin_alternate_funcs), 2):
-                    left_elem = pin_alternate_funcs[i]
-                    if i + 1 < len(pin_alternate_funcs):
-                        right_elem = pin_alternate_funcs[i + 1]
-                        new_list.append(left_elem if left_elem != None else right_elem)
-                pin_alternate_funcs = new_list
             print("Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
+            af_map = dict()
+            for ind, func in enumerate(pin_alternate_funcs):
+                # check if individual breakup is needed
+                funcs = None
+                if func is None: 
+                    continue
+                if "/" in func:
+                    funcs = func.split("/")
+                else:
+                    funcs = [func]
+                af_list = list()
+                for f_idx, f in enumerate(funcs):
+                    # check if we need to extra footnotes
+                    sig_name = f 
+                    footnote = None
+                    if "(" in f and ")" in f:
+                        sig_name = f[0:f.index("(")]
+                        func_footnode_part = f[f.index("("):]
+                        # strip first and last char
+                        footnote = func_footnode_part[1:-1]
+                        #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
+                    af_list.append(GD32AlternateFunc(sig_name, footnote))
+                af_name = parser_result["alternate_functions"][ind]
+                if af_name not in af_map:
+                    af_map[af_name] = list()
+                af_map[af_name].extend(af_list)
+            #print(af_map)
+            parser_result["pins"][pin_name] = GD32Pin(pin_name, af_map)
             #for pin_func in pin_alternate_funcs:
             #    print(pin_func)
             #if i == 3:
             #    exit(0)
             #for x in j:
             #    print(x)
+    print("Parsed all %d pins." % len(parser_result["pins"]))
+    as_json = json.dumps(parser_result["pins"], indent=2, default=lambda o: o.__dict__)
+    # string is large, breaks console. print block-wise
+    n = 5*1024
+    for x in [as_json[i:i+n] for i in range(0, len(as_json), n)]:
+        print(x, end="", flush=True)
+    print("")
+    print("Done.")
 if __name__ == "__main__":
     main_func()
