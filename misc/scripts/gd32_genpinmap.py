@@ -2,14 +2,20 @@ import math
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 import pandas as pd
-from typing import Dict
+from typing import Dict, Tuple, List
 import json
 import sys
+from os import path
+import re
 try:
     import tabula as tb
 except ImportError:
     print("Could not import pdfminer. Please 'pip install pdfminer.six' first!")
     exit(-1)
+
+def get_trailing_number(s):
+    m = re.search(r'\d+$', s)
+    return int(m.group()) if m else None
 
 # ToDo: Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
@@ -25,20 +31,22 @@ known_datasheets_infos = {
                 "3": ["GD32F190x8"],
             }
         },
+        "series": "GD32F190",
         "family_type": "B"
     }
 }
 
 class GD32AlternateFunc:
-    def __init__(self, signal_name, footnote) -> None:
+    def __init__(self, signal_name:str, af_number:int, footnote:str) -> None:
         self.signal_name = signal_name
         self.footnote = footnote
+        self.peripheral:str = ""
+        self.subfunction:str = None
+        self.af_number:int = af_number
         try:
             if "_" in self.signal_name:
                 self.peripheral = self.signal_name.split("_")[0]
                 self.subfunction = "_".join(self.signal_name.split("_")[1:])
-            else:
-                self.peripheral = None
         except Exception as exc:
             print("Failed to decode peripheral name: " + str(exc))
     def __repr__(self) -> str:
@@ -51,12 +59,48 @@ class GD32AlternateFunc:
         return "Func(" + ret + ")"
 
 class GD32Pin:
-    def __init__(self, pin_name, af_functions_map: Dict[str, GD32AlternateFunc]) -> None:
+    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc]) -> None:
         self.pin_name = pin_name
         self.af_functions_map = af_functions_map
     def __repr__(self) -> str:
         return f"GD32Pin(pin={self.pin_name}, funcs={str(self.af_functions_map)}"
 
+class GD32PinMap:
+    def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin]) -> None:
+        self.series = series
+        self.datasheet_info = datasheet_info
+        self.pin_map = pin_map
+
+    CRITERIA_PERIPHERAL_STARTS_WITH = 0
+    CRITERIA_PIN_SUB_FUNCTION = 0
+
+    def search_pins(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
+        results = list()
+        for p in self.pin_map.values():
+            # search through all alternate functions pins
+            for alternate_funcs in p.af_functions_map.values():
+                for alternate_func in alternate_funcs:
+                    if criteria_type == GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH:
+                        if alternate_func.peripheral.startswith(criteria_value):
+                            results.append((p, alternate_func))
+                    if criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
+                        if alternate_func.subfunction is not None and criteria_value in alternate_func.subfunction:
+                            results.append((p, alternate_func))
+        return results
+        
+class GD32PinMapGenerator:
+    @staticmethod
+    def generate_from_pinmap(pinmap: GD32PinMap):
+        all_i2c_sda_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
+        for pin, func in all_i2c_sda_pins:
+            print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+
+        all_uart_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "UART")
+        all_uart_pins.extend(pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
+        for pin, func in all_uart_pins:
+            print("Found UART pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+
+        pass
 
 def is_nan(number_or_obj):
     return type(number_or_obj) == float and math.isnan(number_or_obj)
@@ -201,6 +245,7 @@ def main_func():
             print("Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
             af_map = dict()
             for ind, func in enumerate(pin_alternate_funcs):
+                af_name = parser_result["alternate_functions"][ind]
                 # check if individual breakup is needed
                 funcs = None
                 if func is None: 
@@ -220,8 +265,7 @@ def main_func():
                         # strip first and last char
                         footnote = func_footnode_part[1:-1]
                         #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
-                    af_list.append(GD32AlternateFunc(sig_name, footnote))
-                af_name = parser_result["alternate_functions"][ind]
+                    af_list.append(GD32AlternateFunc(sig_name, get_trailing_number(af_name), footnote))
                 if af_name not in af_map:
                     af_map[af_name] = list()
                 af_map[af_name].extend(af_list)
@@ -241,5 +285,11 @@ def main_func():
         print(x, end="", flush=True)
     print("")
     print("Done.")
+
+    datasheet_info = known_datasheets_infos[path.basename(datasheet_pdf_path)]
+    device_pinmap = GD32PinMap(datasheet_info["series"], datasheet_info, parser_result["pins"])
+    print(device_pinmap)
+
+    GD32PinMapGenerator.generate_from_pinmap(device_pinmap)
 if __name__ == "__main__":
     main_func()
