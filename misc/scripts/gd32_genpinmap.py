@@ -72,7 +72,8 @@ class GD32PinMap:
         self.pin_map = pin_map
 
     CRITERIA_PERIPHERAL_STARTS_WITH = 0
-    CRITERIA_PIN_SUB_FUNCTION = 0
+    CRITERIA_PIN_SUB_FUNCTION = 1
+    CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION = 2
 
     def search_pins(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
         results = list()
@@ -83,8 +84,11 @@ class GD32PinMap:
                     if criteria_type == GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH:
                         if alternate_func.peripheral.startswith(criteria_value):
                             results.append((p, alternate_func))
-                    if criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
+                    elif criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
                         if alternate_func.subfunction is not None and criteria_value in alternate_func.subfunction:
+                            results.append((p, alternate_func))
+                    elif criteria_type == GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION:
+                        if alternate_func.peripheral.startswith(criteria_value[0]) and (alternate_func.subfunction is not None and criteria_value[1] in alternate_func.subfunction):
                             results.append((p, alternate_func))
         return results
         
@@ -99,6 +103,11 @@ class GD32PinMapGenerator:
         all_uart_pins.extend(pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
         for pin, func in all_uart_pins:
             print("Found UART pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+
+        all_can_rx_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, ("CAN", "RX"))
+        for pin, func in all_can_rx_pins:
+            print("Found CAN RX pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+
 
         pass
 
