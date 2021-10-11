@@ -72,6 +72,9 @@ class GD32AlternateFunc:
         self.signal_name = signal_name
         self.footnote = footnote
         self.footnote_device_availability = footnote_device_availability
+        self.footnote_resolved = None
+        if self.footnote in self.footnote_device_availability:
+            self.footnote_resolved = self.footnote_device_availability[self.footnote]
         self.peripheral:str = ""
         self.subfunction:str = None
         self.af_number:int = af_number
@@ -129,7 +132,7 @@ class GD32PinMapGenerator:
     def generate_from_pinmap(pinmap: GD32PinMap):
         all_i2c_sda_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
         for pin, func in all_i2c_sda_pins:
-            print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+            print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
         all_uart_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "UART")
         all_uart_pins.extend(pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
