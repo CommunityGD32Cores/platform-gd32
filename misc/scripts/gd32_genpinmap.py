@@ -27,23 +27,34 @@ class OverwritePinAlternateInfoQuirk(DatasheetPageParsingQuirk):
         self.pin_name = pin_name
         self.alternate_funcs = alternate_funcs
 
-class ParseUsingArea(DatasheetPageParsingQuirk):
+class ParseUsingAreaQuirk(DatasheetPageParsingQuirk):
     def __init__(self, area) -> None:
         super().__init__()
         self.area = area
 
 class DatasheetPageParsingInfo:
-    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+    def __init__(self, page_range: List[int], quirks:List[DatasheetPageParsingQuirk]=[]):
         self.page_range = page_range
-        self.footnotes_device_availability = footnotes_device_availablity
         self.quirks = quirks
 
     def get_quirks_of_type(self, wanted_type) -> List[DatasheetPageParsingQuirk]:
         return list(filter(lambda q: isinstance(q, wanted_type), self.quirks))
 
+class DatasheetAFPageParsingInfo(DatasheetPageParsingInfo):
+    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+        super().__init__(page_range, quirks)
+        self.footnotes_device_availability = footnotes_device_availablity
+
+class DatasheetPinDefPageParsingInfo(DatasheetPageParsingInfo):
+    def __init__(self, page_range: List[int], subseries:str, package:str, quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+        super().__init__(page_range, quirks)
+        self.subseries = subseries
+        self.package = package
+
 class DatasheetParsingInfo:
-    def __init__(self, alternate_funcs: List[DatasheetPageParsingInfo], series:str, family_type:str) -> None:
+    def __init__(self, alternate_funcs: List[DatasheetAFPageParsingInfo], pin_defs: List[DatasheetPinDefPageParsingInfo], series:str, family_type:str) -> None:
         self.alternate_funcs = alternate_funcs
+        self.pin_defs = pin_defs
         self.series = series 
         self.family_type = family_type
 
@@ -51,21 +62,52 @@ class DatasheetParsingInfo:
 # Every PDF will probably need different parsing quirks, like only
 # scanning a range of pages at a time, different footnotes for device
 # availability, the type of SPL family it belongs to (GD32F30x vs GD32F3x0 etc)
-known_datasheets_infos: Dict[str, DatasheetPageParsingInfo] = {
+known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     "GD32F190xx_Datasheet_Rev2.1.pdf" : DatasheetParsingInfo(
-        [ 
-            DatasheetPageParsingInfo([28,29], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
-            DatasheetPageParsingInfo([30,31], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
-            DatasheetPageParsingInfo([32],    { "1": ["GD32F190x4"], "2": ["GD32F190x8"]}, quirks=[
-                ParseUsingArea((95.623,123.157,766.102,533.928)),
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([28,29], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
+            DatasheetAFPageParsingInfo([30,31], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
+            DatasheetAFPageParsingInfo([32],    { "1": ["GD32F190x4"], "2": ["GD32F190x8"]}, quirks=[
+                ParseUsingAreaQuirk((95.623,123.157,766.102,533.928)),
                 OverwritePinAlternateInfoQuirk("PF7", ["I2C0_SDA(1)/I2C1_SDA(2)", None, None, None, None, None, None, None, None, "SEG31"])
             ])
             #33rd page only has half of the PF7 line  -- parsed by using a quirk on the page before.
-        ], 
-        "GD32F190", # series
-        "B" # family type
+        ],
+        pin_defs = [
+            DatasheetPinDefPageParsingInfo([16], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((176.736,125.389,767.591,531.695))]),
+            DatasheetPinDefPageParsingInfo([17,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
+            DatasheetPinDefPageParsingInfo([18,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,458.024,533.183))]),
+            #DatasheetPinDefPageParsingInfo([21,24], "GD32F190Cx", "LQFP48", []),
+            #DatasheetPinDefPageParsingInfo([25,27], "GD32F190Tx", "QFN36", [])
+        ],
+        series = "GD32F190", # series
+        family_type = "B" # family type
     )
 }
+
+class GD32AdditionalFunc:
+    def __init__(self, signal_name:str) -> None:
+        self.signal_name = signal_name
+        self.peripheral:str = ""
+        self.subfunction:str = None
+        try:
+            if "_" in self.signal_name:
+                self.peripheral = self.signal_name.split("_")[0]
+                self.subfunction = "_".join(self.signal_name.split("_")[1:])
+        except Exception as exc:
+            print("Failed to decode peripheral name: " + str(exc))
+    def __repr__(self) -> str:
+        ret = ""
+        if self.peripheral is not None:
+            ret += f"({self.peripheral}) "
+        ret += f"{self.signal_name}"
+        return "AdditionalFunc(" + ret + ")"
+
+class GD32AdditionalFuncFamiliy:
+    def __init__(self, subseries:str, package:str, additional_funcs: Dict[str, List[GD32AdditionalFunc]]) -> None:
+        self.subseries = subseries
+        self.package = package
+        self.additional_funcs = additional_funcs
 
 class GD32AlternateFunc:
     def __init__(self, signal_name:str, af_number:int, footnote:str, footnote_device_availability:Dict[str,str]) -> None:
@@ -94,11 +136,12 @@ class GD32AlternateFunc:
         return "Func(" + ret + ")"
 
 class GD32Pin:
-    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc]) -> None:
+    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc], additional_functions: List[GD32AdditionalFunc]=[]) -> None:
         self.pin_name = pin_name
         self.af_functions_map = af_functions_map
+        self.additional_functions = additional_functions
     def __repr__(self) -> str:
-        return f"GD32Pin(pin={self.pin_name}, funcs={str(self.af_functions_map)}"
+        return f"GD32Pin(pin={self.pin_name}, funcs={str(self.af_functions_map)}, add_funcs={str(self.additional_functions)}"
 
 class GD32PinMap:
     def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin]) -> None:
@@ -207,7 +250,7 @@ def filter_string(input_str_or_float: str):
         # convert float NaN to more easily handable python None value
         return None if is_nan(input_str_or_float) else input_str_or_float
 
-def get_pinmap_for_pdf(datasheet_pdf_path: str):
+def get_pinmap_for_pdf(datasheet_pdf_path: str) -> GD32PinMap:
     # go through all alternate function pages as descriped
     datasheet_info = identify_datasheet(datasheet_pdf_path)
     if datasheet_info is None: 
@@ -215,19 +258,27 @@ def get_pinmap_for_pdf(datasheet_pdf_path: str):
         print("Known datasheets: " + ",".join(known_datasheets_infos.keys()))
     pinmaps: List[GD32PinMap] = list()
     for af_page in datasheet_info.alternate_funcs:
-        pinmaps.append(get_pinmap_for_pdf_pages(datasheet_pdf_path, datasheet_info, af_page))
+        dataframe = get_dataframe_for_pdf_pages(datasheet_pdf_path, af_page)
+        pin_map = process_af_dataframe(dataframe, datasheet_info, af_page)
+        pinmaps.append(pin_map)
+    additional_functions: List[GD32AdditionalFuncFamiliy] = list()
+    for pindef_page in datasheet_info.pin_defs:
+        dataframe = get_dataframe_for_pdf_pages(datasheet_pdf_path, pindef_page)
+        add_func_family = process_add_funcs_dataframe(dataframe, datasheet_info, pindef_page)
+        additional_functions.append(add_func_family)
     # merge all pinmap dictionary into the first object
     first_pinmap = pinmaps[0]
     for i in range(1, len(pinmaps)):
         first_pinmap.pin_map.update(pinmaps[i].pin_map)
     print(pinmaps)
+    print("Parsed PDF \"%s\" and extracted %d pin infos." % (path.basename(datasheet_pdf_path), len(first_pinmap.pin_map)))
     return first_pinmap
 
-def get_pinmap_for_pdf_pages(datasheet_pdf_path: str, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPageParsingInfo) -> GD32PinMap:
+def get_dataframe_for_pdf_pages(datasheet_pdf_path: str, pages_info: DatasheetPageParsingInfo) -> DataFrame:
     # lattice is important, can't correctly parse data otherwise
-    area_quirk = pages_info.get_quirks_of_type(ParseUsingArea)
+    area_quirk = pages_info.get_quirks_of_type(ParseUsingAreaQuirk)
     area = None
-    if area_quirk != None and len(area_quirk) == 1:
+    if len(area_quirk) == 1:
         area = area_quirk[0].area
     dfs : DataFrame = tb.read_pdf(datasheet_pdf_path, pages=pages_info.page_range, lattice=True, stream=False, area=area) 
     if len(dfs) >= 1:
@@ -239,8 +290,7 @@ def get_pinmap_for_pdf_pages(datasheet_pdf_path: str, datasheet_info: DatasheetP
 
     print(dfs)
     print(type(dfs))
-
-    return process_dataframe(dfs, datasheet_info, pages_info)
+    return dfs
 
 def cleanup_dataframe(dfs: DataFrame) -> DataFrame:
     if len(dfs.columns) > 11:
@@ -275,8 +325,46 @@ def print_parsing_result_json(res:dict):
         print(x, end="", flush=True)
         sys.stdout.flush()
 
+def remove_newlines(inp):
+    if isinstance(inp, str):
+        return inp.replace("\r", "")
+    else:
+        return inp
 
-def process_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPageParsingInfo) -> GD32PinMap:
+def analyze_additional_funcs_string(inp:str) -> List[str]: 
+    # find where it says "additional"
+    add_start = inp.find("Additional: ")
+    # check if anyhting was found
+    if add_start == -1:
+        return list()
+    # get the rest of the string after that
+    inp = inp[add_start + len("Additional: "):]
+    arr = inp.split(",")
+    arr = [x.strip() for x in arr]
+    return arr
+
+def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> GD32AdditionalFuncFamiliy:
+    additional_funcs: Dict[str, List[GD32AdditionalFunc]] = dict()
+    for i, j in dfs.iterrows():
+        if i == 0:
+            # ignore row 
+            continue 
+        else: 
+            # data row
+            pin_row = list(j)
+            pin_name = remove_newlines(pin_row[0])
+            if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
+                print("Skipping empty line because pin is not there.")
+                continue
+            last_column: str = j[len(j) - 1]
+            last_column = last_column.replace("\r", " ")
+            add_funcs_arr = analyze_additional_funcs_string(last_column)
+            print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
+            additional_funcs[pin_name] = [GD32AdditionalFunc(sig) for sig in add_funcs_arr]
+    #print(additional_funcs)
+    return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
+
+def process_af_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetAFPageParsingInfo) -> GD32PinMap:
     parser_result = {
         "alternate_functions": [],
         "pins": dict()
