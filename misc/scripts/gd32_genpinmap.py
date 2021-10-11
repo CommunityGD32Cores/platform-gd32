@@ -17,29 +17,61 @@ def get_trailing_number(s):
     m = re.search(r'\d+$', s)
     return int(m.group()) if m else None
 
-# ToDo: Use this info to recognize the PDF and its parsing quirks.
+class DatasheetPageParsingQuirk:
+    def apply_to_pinmap(self, pinmap):
+        raise NotImplementedError("Subclass did not implement function")
+
+class OverwritePinAlternateInfoQuirk(DatasheetPageParsingQuirk):
+    def __init__(self, pin_name:str, alternate_funcs: List[str]) -> None:
+        super().__init__()
+        self.pin_name = pin_name
+        self.alternate_funcs = alternate_funcs
+
+class ParseUsingArea(DatasheetPageParsingQuirk):
+    def __init__(self, area) -> None:
+        super().__init__()
+        self.area = area
+
+class DatasheetPageParsingInfo:
+    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+        self.page_range = page_range
+        self.footnotes_device_availability = footnotes_device_availablity
+        self.quirks = quirks
+
+    def get_quirks_of_type(self, wanted_type) -> List[DatasheetPageParsingQuirk]:
+        return list(filter(lambda q: isinstance(q, wanted_type), self.quirks))
+
+class DatasheetParsingInfo:
+    def __init__(self, alternate_funcs: List[DatasheetPageParsingInfo], series:str, family_type:str) -> None:
+        self.alternate_funcs = alternate_funcs
+        self.series = series 
+        self.family_type = family_type
+
+# Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
 # scanning a range of pages at a time, different footnotes for device
 # availability, the type of SPL family it belongs to (GD32F30x vs GD32F3x0 etc)
-known_datasheets_infos = {
-    "GD32F190xx_Datasheet_Rev2.1.pdf" : {
-        "alternate_funcs": { 
-            "pages": [[28,29],[30,31],[32],[33]], #33rd page only has half of the PF7 line 
-            "footnotes_device_availability": {
-                "1": ["GD32F190x4"],
-                "2": ["GD32F190x8", "GD32F190x6"],
-                "3": ["GD32F190x8"],
-            }
-        },
-        "series": "GD32F190",
-        "family_type": "B"
-    }
+known_datasheets_infos: Dict[str, DatasheetPageParsingInfo] = {
+    "GD32F190xx_Datasheet_Rev2.1.pdf" : DatasheetParsingInfo(
+        [ 
+            DatasheetPageParsingInfo([28,29], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
+            DatasheetPageParsingInfo([30,31], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
+            DatasheetPageParsingInfo([32],    { "1": ["GD32F190x4"], "2": ["GD32F190x8"]}, quirks=[
+                ParseUsingArea((95.623,123.157,766.102,533.928)),
+                OverwritePinAlternateInfoQuirk("PF7", ["I2C0_SDA(1)/I2C1_SDA(2)", None, None, None, None, None, None, None, None, "SEG31"])
+            ])
+            #33rd page only has half of the PF7 line  -- parsed by using a quirk on the page before.
+        ], 
+        "GD32F190", # series
+        "B" # family type
+    )
 }
 
 class GD32AlternateFunc:
-    def __init__(self, signal_name:str, af_number:int, footnote:str) -> None:
+    def __init__(self, signal_name:str, af_number:int, footnote:str, footnote_device_availability:Dict[str,str]) -> None:
         self.signal_name = signal_name
         self.footnote = footnote
+        self.footnote_device_availability = footnote_device_availability
         self.peripheral:str = ""
         self.subfunction:str = None
         self.af_number:int = af_number
@@ -172,32 +204,52 @@ def filter_string(input_str_or_float: str):
         # convert float NaN to more easily handable python None value
         return None if is_nan(input_str_or_float) else input_str_or_float
 
+def get_pinmap_for_pdf(datasheet_pdf_path: str):
+    # go through all alternate function pages as descriped
+    datasheet_info = identify_datasheet(datasheet_pdf_path)
+    if datasheet_info is None: 
+        print(f"Failed to find datasheet info for filename {path.basename(datasheet_pdf_path)}.")
+        print("Known datasheets: " + ",".join(known_datasheets_infos.keys()))
+    pinmaps: List[GD32PinMap] = list()
+    for af_page in datasheet_info.alternate_funcs:
+        pinmaps.append(get_pinmap_for_pdf_pages(datasheet_pdf_path, datasheet_info, af_page))
+    # merge all pinmap dictionary into the first object
+    first_pinmap = pinmaps[0]
+    for i in range(1, len(pinmaps)):
+        first_pinmap.pin_map.update(pinmaps[i].pin_map)
+    print(pinmaps)
+    return first_pinmap
 
-def main_func():
-    print("Pinmap generator started.")
-    # temporary static path
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
-    #datasheet_af_pages = [28, 29, 30, 31, 32, 33]
-    #datasheet_af_pages = [28, 29]
-    datasheet_af_pages = [30, 31]
-    #datasheet_af_pages = [32, 33]
-    dfs : DataFrame = tb.read_pdf(datasheet_pdf_path, pages=datasheet_af_pages, stream=True, lattice=True) # lattice is important, can't correctly parse data otherwise
-    print("Extract %d tables." % len(dfs))
-    # if we just extract multiple tables from multiple pages, merge them together to one.
+def get_pinmap_for_pdf_pages(datasheet_pdf_path: str, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPageParsingInfo) -> GD32PinMap:
+    # lattice is important, can't correctly parse data otherwise
+    area_quirk = pages_info.get_quirks_of_type(ParseUsingArea)
+    area = None
+    if area_quirk != None and len(area_quirk) == 1:
+        area = area_quirk[0].area
+    dfs : DataFrame = tb.read_pdf(datasheet_pdf_path, pages=pages_info.page_range, lattice=True, stream=False, area=area) 
     if len(dfs) >= 1:
         dfs = pd.concat(dfs)
     else:
         print("Failed to extract one datatable from PDF")
-        exit(0)
-    # cleanup garbage columns (parser is not perfect...)
-    #dfs = dfs.dropna(axis=1, how='all')
+        return False
+    dfs = cleanup_dataframe(dfs)
+
+    print(dfs)
+    print(type(dfs))
+
+    return process_dataframe(dfs, datasheet_info, pages_info)
+
+def cleanup_dataframe(dfs: DataFrame) -> DataFrame:
     if len(dfs.columns) > 11:
+        print("Before cleanup:")
+        pd.set_option('display.expand_frame_repr', False)
+        print(dfs)
+        pd.set_option('display.expand_frame_repr', True)
         print("Need cleanup") 
         # the data for one AF is spread over two columsn. 
         # the left columns has the pin function, the right column has only "AFx" at the first row
         # and then only NaNs. 
         # We combine the two columns and drop the unneeded one.
-        orig_len = len(dfs.columns)
         for i in range(1, len(dfs.columns), 2):
             left_col_name = "Unnamed: %d" % (i)
             right_col_name = "Unnamed: %d" % (i+1)
@@ -210,23 +262,22 @@ def main_func():
         dfs = dfs.drop(["Unnamed: 0"], axis=1)
         # last column is all NaNs
         dfs = dfs.drop([dfs.columns[-1]], axis=1)
+    return dfs
 
-        # source_col_loc = dfs.columns.get_loc('Unnamed: 1') # column position starts from 0
-        #dfs['Unnamed: 1'] = dfs.iloc[:,source_col_loc+1:source_col_loc+2].apply(
-        #    lambda x: " BLAH ".join(x.astype(str)), axis=1)
+def print_parsing_result_json(res:dict):
+    as_json = json.dumps(res, indent=2, default=lambda o: o.__dict__)
+    # string is large, breaks console. print block-wise
+    n = 5*1024
+    for x in [as_json[i:i+n] for i in range(0, len(as_json), n)]:
+        print(x, end="", flush=True)
+        sys.stdout.flush()
 
-    #print(dfs["Unnamed: 1"])
-    # for special pages where the parser fails: combine columns
-    print(dfs)
-    print(type(dfs))
-    #return
 
+def process_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPageParsingInfo) -> GD32PinMap:
     parser_result = {
         "alternate_functions": [],
         "pins": dict()
     }
-
-    # iterating over rows using iterrows() function
     for i, j in dfs.iterrows():
         # debug info
         if False:
@@ -236,19 +287,22 @@ def main_func():
             print(j)
         # first row gives us list of alternate functions (AF0..AF11) in the table!
         if i == 0:
-            #print("Detected first row")
             alternate_funcs = filter_nans(j)
             print(alternate_funcs)
-            #print(type(alternate_funcs))
             parser_result["alternate_functions"] = alternate_funcs
         else: 
-            #print("got data row")
+            # data row
             pin_row = list(j)
             pin_name = pin_row[0]
             if is_nan(pin_name) or pin_name == "Name":
                 print("Skipping empty line because pin is not there.")
                 continue
             pin_alternate_funcs = pin_row[1::]
+            # apply possibly Overwrite pin alternate info quirk
+            pin_override_quirks: List[OverwritePinAlternateInfoQuirk] = pages_info.get_quirks_of_type(OverwritePinAlternateInfoQuirk)
+            for pin_override_quirk in pin_override_quirks:
+                if pin_override_quirk.pin_name == pin_name:
+                    pin_alternate_funcs = pin_override_quirk.alternate_funcs
             pin_alternate_funcs = [filter_string(x) for x in pin_alternate_funcs]
             #print("[Before adjustment] Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
             print("Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
@@ -274,26 +328,29 @@ def main_func():
                         # strip first and last char
                         footnote = func_footnode_part[1:-1]
                         #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
-                    af_list.append(GD32AlternateFunc(sig_name, get_trailing_number(af_name), footnote))
+                    af_list.append(GD32AlternateFunc(sig_name, get_trailing_number(af_name), footnote, pages_info.footnotes_device_availability))
                 if af_name not in af_map:
                     af_map[af_name] = list()
                 af_map[af_name].extend(af_list)
             #print(af_map)
             parser_result["pins"][pin_name] = GD32Pin(pin_name, af_map)
     print("Parsed all %d pins." % len(parser_result["pins"]))
-    as_json = json.dumps(parser_result["pins"], indent=2, default=lambda o: o.__dict__)
-    # string is large, breaks console. print block-wise
-    n = 5*1024
-    for x in [as_json[i:i+n] for i in range(0, len(as_json), n)]:
-        print(x, end="", flush=True)
-        sys.stdout.flush()
-    print("")
-    print("Done.")
+    #print_parsing_result_json(parser_result["pins"])
+    device_pinmap = GD32PinMap(datasheet_info.series, datasheet_info, parser_result["pins"])
+    return device_pinmap
 
-    datasheet_info = known_datasheets_infos[path.basename(datasheet_pdf_path)]
-    device_pinmap = GD32PinMap(datasheet_info["series"], datasheet_info, parser_result["pins"])
-    print(device_pinmap)
+def identify_datasheet(datasheet_pdf_path: str) -> DatasheetParsingInfo:
+    global known_datasheets_infos
+    if path.basename(datasheet_pdf_path) in known_datasheets_infos:
+        return known_datasheets_infos[path.basename(datasheet_pdf_path)]
+    else:
+        return None
 
+def main_func():
+    print("Pinmap generator started.")
+    # temporary static path
+    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
+    device_pinmap = get_pinmap_for_pdf(datasheet_pdf_path)
     GD32PinMapGenerator.generate_from_pinmap(device_pinmap)
 if __name__ == "__main__":
     main_func()
