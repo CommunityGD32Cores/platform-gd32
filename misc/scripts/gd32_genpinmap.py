@@ -82,11 +82,25 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             #33rd page only has half of the PF7 line  -- parsed by using a quirk on the page before.
         ],
         pin_defs = [
+            # GD32F190Rx
             DatasheetPinDefPageParsingInfo([16], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((176.736,125.389,767.591,531.695))]),
             DatasheetPinDefPageParsingInfo([17,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
             DatasheetPinDefPageParsingInfo([18,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,458.024,533.183))]),
-            #DatasheetPinDefPageParsingInfo([21,24], "GD32F190Cx", "LQFP48", []),
-            #DatasheetPinDefPageParsingInfo([25,27], "GD32F190Tx", "QFN36", [])
+            # GD32F190Cx
+            DatasheetPinDefPageParsingInfo([21], "GD32F190Cx", "LQFP48", [
+                ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
+                OverwritePinAdditionalInfoQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5, DAC1_OUT, CANH")
+            ]),
+            # PB15 cut off on page 23 too but no *additional* functions are cut-off, so no need to correct it 
+            DatasheetPinDefPageParsingInfo([22,23], "GD32F190Cx", "LQFP48", [
+                ParseUsingAreaQuirk((79.996,124.645,766.847,533.183)),
+                OverwritePinAdditionalInfoQuirk("PB15", "Additional: RTC_REFIN")
+            ]),
+            DatasheetPinDefPageParsingInfo([24], "GD32F190Cx", "LQFP48", [ParseUsingAreaQuirk((81.484,125.389,385.098,531.695))]),
+            # GD32F190Tx
+            DatasheetPinDefPageParsingInfo([25], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((176.736,125.389,767.591,531.695))]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
+            DatasheetPinDefPageParsingInfo([27], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((81.484,124.645,514.58,533.183))]),
         ],
         series = "GD32F190", # series
         family_type = "B" # family type
@@ -422,6 +436,12 @@ def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsing
             pin_name = strip_pinname(pin_name)
             last_column: str = j[len(j) - 1]
             last_column = last_column.replace("\r", " ")
+            # apply overwrite quirk
+            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinAdditionalInfoQuirk)
+            if len(overwrite_quirk) == 1:
+                overwrite_quirk: OverwritePinAdditionalInfoQuirk = overwrite_quirk[0]
+                if overwrite_quirk.pin_name == pin_name:
+                    last_column = overwrite_quirk.additional_funcs_str
             add_funcs_arr = analyze_additional_funcs_string(last_column)
             print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
             additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
