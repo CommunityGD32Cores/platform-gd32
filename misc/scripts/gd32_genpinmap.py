@@ -27,6 +27,12 @@ class OverwritePinAlternateInfoQuirk(DatasheetPageParsingQuirk):
         self.pin_name = pin_name
         self.alternate_funcs = alternate_funcs
 
+class OverwritePinAdditionalInfoQuirk(DatasheetPageParsingQuirk):
+    def __init__(self, pin_name:str, additional_funcs_str: str) -> None:
+        super().__init__()
+        self.pin_name = pin_name
+        self.additional_funcs_str = additional_funcs_str
+
 class ParseUsingAreaQuirk(DatasheetPageParsingQuirk):
     def __init__(self, area) -> None:
         super().__init__()
@@ -140,9 +146,9 @@ class GD32AlternateFunc:
         return "Func(" + ret + ")"
 
 class GD32Pin:
-    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc], additional_functions: List[GD32AdditionalFunc]=None) -> None:
+    def __init__(self, pin_name: str, af_functions_map: Dict[str, List[GD32AlternateFunc]], additional_functions: List[GD32AdditionalFunc]=None) -> None:
         self.pin_name = pin_name
-        self.af_functions_map = af_functions_map
+        self.af_functions_map: Dict[str, List[GD32AlternateFunc]] = af_functions_map
         if additional_functions is None:
             additional_functions = list()
         self.additional_functions: List[GD32AdditionalFunc] = additional_functions
@@ -170,7 +176,7 @@ class GD32PinMap:
             # search through all additional functions
             for additional_func in p.additional_functions:
                 if criteria_type == GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH:
-                    if additional_func.peripheral.startswith(criteria_value):
+                    if (additional_func.peripheral == "" and additional_func.signal_name.startswith(criteria_value)) or additional_func.peripheral.startswith(criteria_value):
                         results.append((p, additional_func))
                 elif criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
                     if additional_func.subfunction is not None and criteria_value in additional_func.subfunction:
@@ -213,10 +219,18 @@ class GD32PinMapGenerator:
         for pin, func in all_can_rx_pins:
             print("Found CAN RX pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
+        all_can_pins = pinmap.search_pins_for_any_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "CAN")
+        for pin, func in all_can_pins:
+            if isinstance(func, GD32AlternateFunc):
+                print("Found CAN pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
+            elif isinstance(func, GD32AdditionalFunc):
+                print("Found CAN pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
+
         all_adc_pins = pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC")
         for pin, func in all_adc_pins:
             print("Found ADC pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
 
+        #print(pinmap.pin_map["PB7"])
         pass
 
 def is_nan(number_or_obj):
