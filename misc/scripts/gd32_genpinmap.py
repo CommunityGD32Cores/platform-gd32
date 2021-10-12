@@ -33,20 +33,22 @@ class ParseUsingAreaQuirk(DatasheetPageParsingQuirk):
         self.area = area
 
 class DatasheetPageParsingInfo:
-    def __init__(self, page_range: List[int], quirks:List[DatasheetPageParsingQuirk]=[]):
+    def __init__(self, page_range: List[int], quirks:List[DatasheetPageParsingQuirk]=None):
         self.page_range = page_range
+        if quirks is None:
+            quirks = list()
         self.quirks = quirks
 
     def get_quirks_of_type(self, wanted_type) -> List[DatasheetPageParsingQuirk]:
         return list(filter(lambda q: isinstance(q, wanted_type), self.quirks))
 
 class DatasheetAFPageParsingInfo(DatasheetPageParsingInfo):
-    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=None) -> None:
         super().__init__(page_range, quirks)
         self.footnotes_device_availability = footnotes_device_availablity
 
 class DatasheetPinDefPageParsingInfo(DatasheetPageParsingInfo):
-    def __init__(self, page_range: List[int], subseries:str, package:str, quirks:List[DatasheetPageParsingQuirk]=[]) -> None:
+    def __init__(self, page_range: List[int], subseries:str, package:str, quirks:List[DatasheetPageParsingQuirk]=None) -> None:
         super().__init__(page_range, quirks)
         self.subseries = subseries
         self.package = package
@@ -86,7 +88,9 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
 }
 
 class GD32AdditionalFunc:
-    def __init__(self, signal_name:str) -> None:
+    def __init__(self, signal_name:str, subseries:str, package:str,) -> None:
+        self.subseries = subseries
+        self.package = package
         self.signal_name = signal_name
         self.peripheral:str = ""
         self.subfunction:str = None
@@ -136,10 +140,12 @@ class GD32AlternateFunc:
         return "Func(" + ret + ")"
 
 class GD32Pin:
-    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc], additional_functions: List[GD32AdditionalFunc]=[]) -> None:
+    def __init__(self, pin_name: str, af_functions_map: Dict[str, GD32AlternateFunc], additional_functions: List[GD32AdditionalFunc]=None) -> None:
         self.pin_name = pin_name
         self.af_functions_map = af_functions_map
-        self.additional_functions = additional_functions
+        if additional_functions is None:
+            additional_functions = list()
+        self.additional_functions: List[GD32AdditionalFunc] = additional_functions
     def __repr__(self) -> str:
         return f"GD32Pin(pin={self.pin_name}, funcs={str(self.af_functions_map)}, add_funcs={str(self.additional_functions)}"
 
@@ -147,13 +153,34 @@ class GD32PinMap:
     def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin]) -> None:
         self.series = series
         self.datasheet_info = datasheet_info
-        self.pin_map = pin_map
+        self.pin_map: Dict[str, GD32Pin] = pin_map
 
     CRITERIA_PERIPHERAL_STARTS_WITH = 0
     CRITERIA_PIN_SUB_FUNCTION = 1
     CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION = 2
 
-    def search_pins(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
+    def search_pins_for_any_func(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, object]]:
+        results_af = self.search_pins_for_af(criteria_type, criteria_value)
+        results_ad = self.search_pins_for_add_func(criteria_type, criteria_value)
+        return results_af + results_ad
+
+    def search_pins_for_add_func(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, GD32AdditionalFunc]]:
+        results = list()
+        for p in self.pin_map.values():
+            # search through all additional functions
+            for additional_func in p.additional_functions:
+                if criteria_type == GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH:
+                    if additional_func.peripheral.startswith(criteria_value):
+                        results.append((p, additional_func))
+                elif criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
+                    if additional_func.subfunction is not None and criteria_value in additional_func.subfunction:
+                        results.append((p, additional_func))
+                elif criteria_type == GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION:
+                    if additional_func.peripheral.startswith(criteria_value[0]) and (additional_func.subfunction is not None and criteria_value[1] in additional_func.subfunction):
+                        results.append((p, additional_func))
+        return results
+
+    def search_pins_for_af(self, criteria_type, criteria_value) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
         results = list()
         for p in self.pin_map.values():
             # search through all alternate functions pins
@@ -173,19 +200,22 @@ class GD32PinMap:
 class GD32PinMapGenerator:
     @staticmethod
     def generate_from_pinmap(pinmap: GD32PinMap):
-        all_i2c_sda_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
+        all_i2c_sda_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
-        all_uart_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "UART")
-        all_uart_pins.extend(pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
+        all_uart_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "UART")
+        all_uart_pins.extend(pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
         for pin, func in all_uart_pins:
             print("Found UART pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
-        all_can_rx_pins = pinmap.search_pins(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "RX"))
+        all_can_rx_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "RX"))
         for pin, func in all_can_rx_pins:
             print("Found CAN RX pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
+        all_adc_pins = pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC")
+        for pin, func in all_adc_pins:
+            print("Found ADC pin %s (func %s, periph %s)" % (pin.pin_name, func.signal_name, func.peripheral))  
 
         pass
 
@@ -270,7 +300,11 @@ def get_pinmap_for_pdf(datasheet_pdf_path: str) -> GD32PinMap:
     first_pinmap = pinmaps[0]
     for i in range(1, len(pinmaps)):
         first_pinmap.pin_map.update(pinmaps[i].pin_map)
+    # merge all additional funcs families into first pinmap
+    for add_func in additional_functions:
+        merge_additional_funcs_into_pinmap(add_func, first_pinmap)
     print(pinmaps)
+    #print_parsing_result_json(first_pinmap.pin_map)
     print("Parsed PDF \"%s\" and extracted %d pin infos." % (path.basename(datasheet_pdf_path), len(first_pinmap.pin_map)))
     return first_pinmap
 
@@ -343,6 +377,21 @@ def analyze_additional_funcs_string(inp:str) -> List[str]:
     arr = [x.strip() for x in arr]
     return arr
 
+def strip_pinname(pin_name:str):
+    if "-" in pin_name:
+        return pin_name[0 : pin_name.index("-")]
+    return pin_name
+
+def merge_additional_funcs_into_pinmap(add_funcs_fam:GD32AdditionalFuncFamiliy, gd32_pin_map:GD32PinMap):
+    for pin in add_funcs_fam.additional_funcs.keys():
+        add_funcs = add_funcs_fam.additional_funcs[pin]
+        if pin not in gd32_pin_map.pin_map:
+            print("Setting new pin %s with add funcs %s" % (pin, str(add_funcs)))
+            gd32_pin_map.pin_map[pin] = GD32Pin(pin, dict(), add_funcs)
+        else:
+            print("Extending pin %s by funcs %s" % (pin, str(add_funcs)))
+            gd32_pin_map.pin_map[pin].additional_functions.extend(add_funcs)
+
 def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> GD32AdditionalFuncFamiliy:
     additional_funcs: Dict[str, List[GD32AdditionalFunc]] = dict()
     for i, j in dfs.iterrows():
@@ -356,11 +405,12 @@ def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsing
             if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
                 print("Skipping empty line because pin is not there.")
                 continue
+            pin_name = strip_pinname(pin_name)
             last_column: str = j[len(j) - 1]
             last_column = last_column.replace("\r", " ")
             add_funcs_arr = analyze_additional_funcs_string(last_column)
             print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
-            additional_funcs[pin_name] = [GD32AdditionalFunc(sig) for sig in add_funcs_arr]
+            additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
     #print(additional_funcs)
     return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
 
