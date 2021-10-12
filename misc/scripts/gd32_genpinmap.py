@@ -215,7 +215,7 @@ class GD32PinMapGenerator:
 
         all_adc_pins = pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC")
         for pin, func in all_adc_pins:
-            print("Found ADC pin %s (func %s, periph %s)" % (pin.pin_name, func.signal_name, func.peripheral))  
+            print("Found ADC pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
 
         pass
 
