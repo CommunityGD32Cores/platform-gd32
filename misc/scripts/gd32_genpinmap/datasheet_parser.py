@@ -9,7 +9,7 @@ import sys
 try:
     import tabula as tb
 except ImportError:
-    print("Could not import pdfminer. Please 'pip install pdfminer.six' first!")
+    print("Could not import tabula. Please 'pip install tabula-py' first!")
     exit(-1)
 
 from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk
