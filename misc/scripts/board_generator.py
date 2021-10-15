@@ -96,7 +96,9 @@ class GD32MCUInfo:
     }
 
     known_arduino_variants = {
-        "GD32F303CCT6": "GD32F303CC_GENERIC"
+        "GD32F303CCT6": "GD32F303CC_GENERIC",
+        "GD32F190C8T6": "GD32F190C8_GENERIC",
+        "GD32F350G8U6": "GD32350G_START"
     }
 
     known_mbedos_variants = {
