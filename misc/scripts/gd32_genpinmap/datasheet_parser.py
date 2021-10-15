@@ -108,6 +108,7 @@ class GD32DatasheetParser:
                 pins_per_subdev_family_dict[subfam] = add_func
             else:
                 pins_per_subdev_family_dict[subfam].additional_funcs.update(add_func.additional_funcs)
+        first_pinmap.pins_per_subdevice_family = pins_per_subdev_family_dict
         for k in pins_per_subdev_family_dict:
             fam = pins_per_subdev_family_dict[k]
             print("Subfamiliy \"%s\" (%s) has %s GPIO pins" %(fam.subseries, fam.package, len(fam.additional_funcs)))

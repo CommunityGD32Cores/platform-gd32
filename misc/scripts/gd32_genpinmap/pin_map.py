@@ -23,6 +23,23 @@ class GD32PinMap:
         results_ad = self.search_pins_for_add_func(criteria_type, criteria_value)
         return results_af + results_ad
 
+    def pin_is_available_for_device(self, pin_name:str, device_name:str):
+        if device_name == None:
+            # do not apply any filter
+            return True
+        # try to identify the family name
+        matching_subfamilies = list(filter(
+            lambda fam_name: GD32PinMap.devicename_matches_constraint(device_name, fam_name),
+            self.pins_per_subdevice_family.keys()
+        ))
+        if len(matching_subfamilies) == 0:
+            print("Failed to identify device \"%s\" to be in %s" % (device_name, str(self.pins_per_subdevice_family.keys())))
+            return False
+        matching_subfamiliy = self.pins_per_subdevice_family[matching_subfamilies[0]]
+        ret = pin_name in matching_subfamiliy.additional_funcs.keys()
+        print("Pin %s in family %s (%s) --> %s" % (pin_name, matching_subfamiliy.subseries, matching_subfamiliy.package, ret))
+        return ret
+
     # Examples: devicename = GS32F190T6, constraint = GD32F190T8 => false
     #           devicename = GS32F190T6, constraint = GD32F190T6 => true
     #           devicename = GS32F190T6, constraint = GD32F190Rx => false
@@ -73,6 +90,7 @@ class GD32PinMap:
                     if additional_func.peripheral.startswith(criteria_value[0]) and (additional_func.subfunction is not None and criteria_value[1] in additional_func.subfunction):
                         results.append((p, additional_func))
         results = list(filter(lambda p_func_tuple: GD32PinMap.does_ad_pass_filter(p_func_tuple[1], filter_device_name), results))
+        results = list(filter(lambda p_func_tuple: self.pin_is_available_for_device(p_func_tuple[0].pin_name, filter_device_name), results))
         return results
 
     def search_pins_for_af(self, criteria_type, criteria_value,filter_device_name:str=None) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
@@ -91,4 +109,5 @@ class GD32PinMap:
                         if alternate_func.peripheral.startswith(criteria_value[0]) and (alternate_func.subfunction is not None and criteria_value[1] in alternate_func.subfunction):
                             results.append((p, alternate_func))
         results = list(filter(lambda p_func_tuple: GD32PinMap.does_af_pass_filter(p_func_tuple[1], filter_device_name), results))
+        results = list(filter(lambda p_func_tuple: self.pin_is_available_for_device(p_func_tuple[0].pin_name, filter_device_name), results))
         return results
