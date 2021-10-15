@@ -40,10 +40,10 @@ class GD32PinMap:
         print("Pin %s in family %s (%s) --> %s" % (pin_name, matching_subfamiliy.subseries, matching_subfamiliy.package, ret))
         return ret
 
-    # Examples: devicename = GS32F190T6, constraint = GD32F190T8 => false
-    #           devicename = GS32F190T6, constraint = GD32F190T6 => true
-    #           devicename = GS32F190T6, constraint = GD32F190Rx => false
-    #           devicename = GS32F190T6, constraint = GD32F190Tx => true
+    # Examples: devicename = GD32F190T6, constraint = GD32F190T8 => false
+    #           devicename = GD32F190T6, constraint = GD32F190T6 => true
+    #           devicename = GD32F190T6, constraint = GD32F190Rx => false
+    #           devicename = GD32F190T6, constraint = GD32F190Tx => true
     @staticmethod
     def devicename_matches_constraint(device_name:str, constraint:str) -> bool:
         if "x" not in constraint:
