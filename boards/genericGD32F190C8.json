@@ -6,8 +6,7 @@
     "f_cpu": "72000000L",
     "mcu": "gd32f190c8t6",
     "spl_series": "GD32F1x0",
-    "series": "GD32F190",
-    "variant": "GD32F190C8_GENERIC"
+    "series": "GD32F190"
   },
   "debug": {
     "jlink_device": "GD32F190C8",
@@ -22,7 +21,6 @@
     ]
   },
   "frameworks": [
-    "arduino",
     "spl"
   ],
   "name": "GD32F190C8 (8k RAM, 64k Flash)",
@@ -36,6 +34,7 @@
       "cmsis-dap",
       "stlink",
       "blackmagic",
+      "sipeed-rv-debugger",
       "serial"
     ],
     "require_upload_port": true,

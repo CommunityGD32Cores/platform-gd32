@@ -300,6 +300,7 @@ class GD32MCUInfo:
                     "cmsis-dap",
                     "stlink",
                     "blackmagic",
+                    "sipeed-rv-debugger",
                     "serial"
                 ],
                 # todo check if these make sense...

@@ -47,6 +47,7 @@
       "cmsis-dap",
       "stlink",
       "blackmagic",
+      "sipeed-rv-debugger",
       "serial",
       "dfu"
     ],

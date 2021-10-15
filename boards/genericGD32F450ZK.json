@@ -34,6 +34,7 @@
       "cmsis-dap",
       "stlink",
       "blackmagic",
+      "sipeed-rv-debugger",
       "serial"
     ],
     "require_upload_port": true,
