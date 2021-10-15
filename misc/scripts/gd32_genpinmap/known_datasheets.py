@@ -22,8 +22,8 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         pin_defs = [
             # GD32F190Rx
             DatasheetPinDefPageParsingInfo([16], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((176.736,125.389,767.591,531.695))]),
-            DatasheetPinDefPageParsingInfo([17,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
-            DatasheetPinDefPageParsingInfo([18,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,458.024,533.183))]),
+            DatasheetPinDefPageParsingInfo([17,18,19], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
+            DatasheetPinDefPageParsingInfo([20], "GD32F190Rx", "LQFP64", [ParseUsingAreaQuirk((79.996,124.645,458.024,533.183))]),
             # GD32F190Cx
             DatasheetPinDefPageParsingInfo([21], "GD32F190Cx", "LQFP48", [
                 ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),

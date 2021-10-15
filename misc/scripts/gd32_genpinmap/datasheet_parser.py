@@ -100,6 +100,18 @@ class GD32DatasheetParser:
         # merge all additional funcs families into first pinmap
         for add_func in additional_functions:
             GD32DatasheetParser.merge_additional_funcs_into_pinmap(add_func, first_pinmap)
+        # merge all additional funcs families into a full one for the subfamiliy
+        pins_per_subdev_family_dict: Dict[str, GD32AdditionalFuncFamiliy] = dict()
+        for add_func in additional_functions:
+            subfam = add_func.subseries
+            if subfam not in pins_per_subdev_family_dict:
+                pins_per_subdev_family_dict[subfam] = add_func
+            else:
+                pins_per_subdev_family_dict[subfam].additional_funcs.update(add_func.additional_funcs)
+        for k in pins_per_subdev_family_dict:
+            fam = pins_per_subdev_family_dict[k]
+            print("Subfamiliy \"%s\" (%s) has %s GPIO pins" %(fam.subseries, fam.package, len(fam.additional_funcs)))
+            print(",".join(fam.additional_funcs.keys()))
         print(pinmaps)
         #print_parsing_result_json(first_pinmap.pin_map)
         print("Parsed PDF \"%s\" and extracted %d pin infos." % (path.basename(datasheet_pdf_path), len(first_pinmap.pin_map)))
@@ -111,6 +123,7 @@ class GD32DatasheetParser:
         area = None
         if len(area_quirk) == 1:
             area = area_quirk[0].area
+        print("Parsing PDF \"%s\" pages %s.." % (datasheet_pdf_path, str(pages_info.page_range)))
         dfs : DataFrame = tb.read_pdf(datasheet_pdf_path, pages=pages_info.page_range, lattice=True, stream=False, area=area) 
         if len(dfs) >= 1:
             dfs = pd.concat(dfs)
@@ -192,28 +205,24 @@ class GD32DatasheetParser:
     def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> GD32AdditionalFuncFamiliy:
         additional_funcs: Dict[str, List[GD32AdditionalFunc]] = dict()
         for i, j in dfs.iterrows():
-            if i == 0:
-                # ignore row 
-                continue 
-            else: 
-                # data row
-                pin_row = list(j)
-                pin_name = GD32DatasheetParser.remove_newlines(pin_row[0])
-                if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
-                    print("Skipping empty line because pin is not there.")
-                    continue
-                pin_name = GD32DatasheetParser.strip_pinname(pin_name)
-                last_column: str = j[len(j) - 1]
-                last_column = last_column.replace("\r", " ")
-                # apply overwrite quirk
-                overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinAdditionalInfoQuirk)
-                if len(overwrite_quirk) == 1:
-                    overwrite_quirk: OverwritePinAdditionalInfoQuirk = overwrite_quirk[0]
-                    if overwrite_quirk.pin_name == pin_name:
-                        last_column = overwrite_quirk.additional_funcs_str
-                add_funcs_arr = GD32DatasheetParser.analyze_additional_funcs_string(last_column)
-                print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
-                additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
+            # data row
+            pin_row = list(j)
+            pin_name = GD32DatasheetParser.remove_newlines(pin_row[0])
+            if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
+                print("Skipping empty line because pin is not there.")
+                continue
+            pin_name = GD32DatasheetParser.strip_pinname(pin_name)
+            last_column: str = j[len(j) - 1]
+            last_column = last_column.replace("\r", " ")
+            # apply overwrite quirk
+            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinAdditionalInfoQuirk)
+            if len(overwrite_quirk) == 1:
+                overwrite_quirk: OverwritePinAdditionalInfoQuirk = overwrite_quirk[0]
+                if overwrite_quirk.pin_name == pin_name:
+                    last_column = overwrite_quirk.additional_funcs_str
+            add_funcs_arr = GD32DatasheetParser.analyze_additional_funcs_string(last_column)
+            print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
+            additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
         #print(additional_funcs)
         return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
 

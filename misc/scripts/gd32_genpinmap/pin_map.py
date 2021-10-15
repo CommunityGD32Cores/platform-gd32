@@ -1,12 +1,18 @@
 from typing import Dict, List, Tuple
 import re
-from pin_definitions import GD32AdditionalFunc, GD32AlternateFunc, GD32Pin
+from pin_definitions import GD32AdditionalFunc, GD32AlternateFunc, GD32Pin, GD32AdditionalFuncFamiliy
 
 class GD32PinMap:
-    def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin]) -> None:
+    def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin], pins_per_subdevice_family=None) -> None:
         self.series = series
         self.datasheet_info = datasheet_info
         self.pin_map: Dict[str, GD32Pin] = pin_map
+        # maps from e.g. "GD32F190Cx" to all total pins available
+        # usually parsed from the section that also additional functions 
+        # are parsed from.
+        if pins_per_subdevice_family is None: 
+            pins_per_subdevice_family = dict()
+        self.pins_per_subdevice_family: Dict[str, GD32AdditionalFuncFamiliy] = pins_per_subdevice_family
 
     CRITERIA_PERIPHERAL_STARTS_WITH = 0
     CRITERIA_PIN_SUB_FUNCTION = 1
