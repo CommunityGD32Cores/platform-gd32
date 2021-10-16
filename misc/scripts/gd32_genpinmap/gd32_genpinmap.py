@@ -94,16 +94,27 @@ class GD32PinMapGenerator:
         return "PORT%s_%s" % (port_ident, pin_num)
 
     @staticmethod
-    def add_ad_pin(pin: GD32Pin, func: GD32AdditionalFunc, function_bits:str, commented_out:bool = False):
+    def add_pin(pin_and_port:str, periph:str, function_bits:str, signal_name:str, commented_out:bool = False, width:int = 50):
         temp = "%s    {%s, %s, %s}," % (
             "" if commented_out is False else "//",
-            GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name),
-            func.peripheral,
+            pin_and_port,
+            periph,
             function_bits
         )
-        temp = temp.ljust(50) # padding with spaces
-        temp += "/* %s */\n" % func.signal_name
+        temp = temp.ljust(width) # padding with spaces
+        temp += "/* %s */\n" % signal_name
         return temp 
+
+    @staticmethod
+    def add_ad_pin(pin: GD32Pin, func: GD32AdditionalFunc, function_bits:str, commented_out:bool = False, width:int = 50):
+        return GD32PinMapGenerator.add_pin(
+            GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name),
+            func.peripheral,
+            function_bits,
+            func.signal_name,
+            commented_out,
+            width
+        )
 
     @staticmethod
     def add_adc_pin(pin: GD32Pin, func: GD32AdditionalFunc) -> str: 
@@ -120,8 +131,14 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.begin_pinmap("ADC")
         for p, f in GD32PinMapGenerator.get_adc_pins(pinmap, device_name):
             output += GD32PinMapGenerator.add_adc_pin(p, f)
-        # .. all other peripherals..
+        # ToDo: The "ADC" might actaully be "ADC0" ("ADC1"?) for some chips.
+        # Channel 16 and 17 should be correct.
+        output += GD32PinMapGenerator.add_pin(
+            "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
+        output += GD32PinMapGenerator.add_pin(
+            "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
         output += GD32PinMapGenerator.end_pinmap()
+        # .. all other peripherals..
         return output
 
     @staticmethod
