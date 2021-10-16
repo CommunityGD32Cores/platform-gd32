@@ -1,3 +1,4 @@
+from os import device_encoding
 from typing import Dict, List, Tuple
 import re
 from pin_definitions import GD32AdditionalFunc, GD32AlternateFunc, GD32Pin, GD32AdditionalFuncFamiliy
@@ -23,10 +24,7 @@ class GD32PinMap:
         results_ad = self.search_pins_for_add_func(criteria_type, criteria_value)
         return results_af + results_ad
 
-    def pin_is_available_for_device(self, pin_name:str, device_name:str):
-        if device_name == None:
-            # do not apply any filter
-            return True
+    def get_subfamily_for_device_name(self, device_name: str) -> str:
         # try to identify the family name
         matching_subfamilies = list(filter(
             lambda fam_name: GD32PinMap.devicename_matches_constraint(device_name, fam_name),
@@ -34,8 +32,18 @@ class GD32PinMap:
         ))
         if len(matching_subfamilies) == 0:
             print("Failed to identify device \"%s\" to be in %s" % (device_name, str(self.pins_per_subdevice_family.keys())))
+            return None
+        return matching_subfamilies[0]
+
+    def pin_is_available_for_device(self, pin_name:str, device_name:str):
+        if device_name == None:
+            # do not apply any filter
+            return True
+        # try to identify the family name
+        matching_subfamiliy_name = self.get_subfamily_for_device_name(device_name)
+        if matching_subfamiliy_name == None: 
             return False
-        matching_subfamiliy = self.pins_per_subdevice_family[matching_subfamilies[0]]
+        matching_subfamiliy = self.pins_per_subdevice_family[matching_subfamiliy_name]
         ret = pin_name in matching_subfamiliy.additional_funcs.keys()
         print("Pin %s in family %s (%s) --> %s" % (pin_name, matching_subfamiliy.subseries, matching_subfamiliy.package, ret))
         return ret

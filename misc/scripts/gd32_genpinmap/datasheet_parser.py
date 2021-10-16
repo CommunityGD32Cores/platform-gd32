@@ -13,7 +13,7 @@ except ImportError:
     exit(-1)
 
 from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk
-from func_utils import get_trailing_number, filter_nans, is_nan
+from func_utils import get_trailing_number, filter_nans, is_nan, print_big_str
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPageParsingInfo, DatasheetParsingInfo, DatasheetPinDefPageParsingInfo
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
 from pin_map import GD32PinMap
@@ -164,11 +164,7 @@ class GD32DatasheetParser:
 
     def print_parsing_result_json(res:dict):
         as_json = json.dumps(res, indent=2, default=lambda o: o.__dict__)
-        # string is large, breaks console. print block-wise
-        n = 5*1024
-        for x in [as_json[i:i+n] for i in range(0, len(as_json), n)]:
-            print(x, end="", flush=True)
-            sys.stdout.flush()
+        print_big_str(as_json)
 
     def remove_newlines(inp):
         if isinstance(inp, str):
