@@ -187,18 +187,21 @@ class GD32PinMapGenerator:
     @staticmethod
     def add_gpio_ports(pinmap:GD32PinMap, device_name:str) -> str:
         temp = "const uint32_t gpio_port[] = {\n"
-        # get all actually used GPIO ports
-        matching_subfamiliy_name = pinmap.get_subfamily_for_device_name(device_name)
-        if matching_subfamiliy_name == None: 
-            return
-        matching_subfamiliy = pinmap.pins_per_subdevice_family[matching_subfamiliy_name]
-        all_ports = [pin[1] for pin in matching_subfamiliy.additional_funcs.keys()]
-        #print("all ports: %s" % str(all_ports))
-        all_ports = sorted(set(all_ports))
-        #print("all ports: %s" % str(all_ports))
-        all_ports = ["    GPIO" + p.upper() for p in all_ports]
-        temp += ",\n".join(all_ports)
-        temp += "\n};\n\n"
+        # correct for all GD32F1x0.
+        # the digitalWrite() logic expects this array to be this
+        # way, even if the package does not provide access
+        # to these pins -- might be worth refactoring.
+        all_ports = ["A","B","C","D","E","F","G","H","I"]
+        for idx, p in enumerate(all_ports):
+            maybe_comma = ""
+            if idx != len(all_ports) - 1:
+                maybe_comma = ","
+            temp += "#ifdef GPIO" + p + "\n"
+            temp += "    GPIO" + p  + maybe_comma + "\n"
+            temp += "#else" + "\n"
+            temp += "    0" + maybe_comma  +  "\n"
+            temp += "#endif\n"
+        temp += "};\n\n"
         return temp
 
     @staticmethod
@@ -295,10 +298,11 @@ class GD32PinMapGenerator:
         for p, f in GD32PinMapGenerator.get_can_td_pins(pinmap, device_name):
             output += GD32PinMapGenerator.add_standard_af_pin(p, f)
         output += GD32PinMapGenerator.end_pinmap()
+        # was refactored to be in core since it's constant data.
         # ports
-        output += GD32PinMapGenerator.add_gpio_ports(pinmap, device_name)
+        #output += GD32PinMapGenerator.add_gpio_ports(pinmap, device_name)
         # pins
-        output += GD32PinMapGenerator.add_all_gpio_pins()
+        #output += GD32PinMapGenerator.add_all_gpio_pins()
         return output
 
     @staticmethod
@@ -346,6 +350,10 @@ class GD32PinMapGenerator:
 
         output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190R8")
         print("PeripheralsPin.c for GD32F190R8:")
+        print_big_str(output)
+
+        output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190C8")
+        print("PeripheralsPin.c for GD32F190C8:")
         print_big_str(output)
 
         #print(pinmap.pin_map["PB7"])
