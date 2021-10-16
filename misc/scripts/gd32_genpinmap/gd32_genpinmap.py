@@ -102,12 +102,23 @@ class GD32PinMapGenerator:
             periph,
             function_bits
         )
-        temp = temp.ljust(width) # padding with spaces
+        temp = temp.ljust(width) + " " # padding with spaces
         temp += "/* %s */\n" % signal_name
         return temp 
 
     @staticmethod
     def add_ad_pin(pin: GD32Pin, func: GD32AdditionalFunc, function_bits:str, commented_out:bool = False, width:int = 50):
+        return GD32PinMapGenerator.add_pin(
+            GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name),
+            func.peripheral,
+            function_bits,
+            func.signal_name,
+            commented_out,
+            width
+        )
+
+    @staticmethod
+    def add_af_pin(pin: GD32Pin, func: GD32AlternateFunc, function_bits:str, commented_out:bool = False, width:int = 50):
         return GD32PinMapGenerator.add_pin(
             GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name),
             func.peripheral,
@@ -131,6 +142,12 @@ class GD32PinMapGenerator:
         return GD32PinMapGenerator.add_ad_pin(
             pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False)
 
+    @staticmethod
+    def add_i2c_pin(pin: GD32Pin, func: GD32AlternateFunc) -> str: 
+        af_num = func.af_number
+        return GD32PinMapGenerator.add_af_pin(
+            pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
+
     # generation methods
     @staticmethod
     def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
@@ -151,6 +168,15 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.begin_pinmap("DAC")
         for p, f in GD32PinMapGenerator.get_dac_pins(pinmap, device_name):
             output += GD32PinMapGenerator.add_dac_pin(p, f)
+        output += GD32PinMapGenerator.end_pinmap()
+        # DAC
+        output += GD32PinMapGenerator.begin_pinmap("I2C_SDA")
+        for p, f in GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name):
+            output += GD32PinMapGenerator.add_i2c_pin(p, f)
+        output += GD32PinMapGenerator.end_pinmap()
+        output += GD32PinMapGenerator.begin_pinmap("I2C_SCL")
+        for p, f in GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name):
+            output += GD32PinMapGenerator.add_i2c_pin(p, f)
         output += GD32PinMapGenerator.end_pinmap()
         # .. all other peripherals..
         return output
