@@ -85,7 +85,7 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def end_pinmap():
-        return "    {NC,   NC,    0}\n};\n"
+        return "    {NC,   NC,    0}\n};\n\n"
 
     @staticmethod
     def format_pin_to_port_pin(pin_name:str) -> str:
@@ -122,6 +122,14 @@ class GD32PinMapGenerator:
         return GD32PinMapGenerator.add_ad_pin(
             pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False)
 
+    @staticmethod
+    def add_dac_pin(pin: GD32Pin, func: GD32AdditionalFunc) -> str: 
+        # expecting signal name "DACn_OUT"
+        sig = get_trailing_number(func.signal_name)
+        chan_num = 0 if sig is None else sig
+        return GD32PinMapGenerator.add_ad_pin(
+            pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False)
+
     # generation methods
     @staticmethod
     def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
@@ -137,6 +145,11 @@ class GD32PinMapGenerator:
             "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
         output += GD32PinMapGenerator.add_pin(
             "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
+        output += GD32PinMapGenerator.end_pinmap()
+        # DAC
+        output += GD32PinMapGenerator.begin_pinmap("DAC")
+        for p, f in GD32PinMapGenerator.get_dac_pins(pinmap, device_name):
+            output += GD32PinMapGenerator.add_dac_pin(p, f)
         output += GD32PinMapGenerator.end_pinmap()
         # .. all other peripherals..
         return output
