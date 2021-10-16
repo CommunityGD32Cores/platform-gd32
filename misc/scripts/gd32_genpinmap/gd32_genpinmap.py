@@ -95,9 +95,10 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def add_pin(pin_and_port:str, periph:str, function_bits:str, signal_name:str, commented_out:bool = False, width:int = 50):
-        temp = "%s    {%s, %s, %s}," % (
+        temp = "%s    {%s,%s %s, %s}," % (
             "" if commented_out is False else "//",
             pin_and_port,
+            " " * (len("PORTA_15") - len(pin_and_port)),
             periph,
             function_bits
         )
