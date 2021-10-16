@@ -24,7 +24,9 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def get_pwm_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
-        return pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "TIMER", filter_device_name=device_name)
+        all_timers = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "TIMER", filter_device_name=device_name)
+        all_timers = list(filter(lambda p_func: "_CH" in p_func[1].signal_name, all_timers))
+        return all_timers
 
     @staticmethod
     def get_uart_tx_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AlternateFunc]]:
@@ -95,11 +97,12 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def add_pin(pin_and_port:str, periph:str, function_bits:str, signal_name:str, commented_out:bool = False, width:int = 50):
-        temp = "%s    {%s,%s %s, %s}," % (
+        temp = "%s    {%s,%s %s,%s%s}," % (
             "" if commented_out is False else "//",
             pin_and_port,
             " " * (len("PORTA_15") - len(pin_and_port)),
             periph,
+            " " if "TIMER" not in periph else " " * (len("TIMER_15") - len(periph)), 
             function_bits
         )
         temp = temp.ljust(width) + " " # padding with spaces
@@ -148,6 +151,26 @@ class GD32PinMapGenerator:
         return GD32PinMapGenerator.add_af_pin(
             pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
 
+    @staticmethod
+    def add_pwm_pin(pin: GD32Pin, func: GD32AlternateFunc) -> str: 
+        chan_num = 0
+        sig_split = func.signal_name.split("TIMER")
+        sig_split = [x.replace(",","") for x in sig_split]
+        # we probably want to remember that "_ON" thing and 
+        # give it in the pinmap? don't fully understand PWM yet, but 
+        # there is the GD_PIN_CHON_GET() macro. 
+        sig_split = [x.replace("_ON","") for x in sig_split]
+        if len(sig_split) >= 2:
+            chan_num = get_trailing_number(sig_split[1])
+        af_num = func.af_number
+        print(pin.pin_name)
+        print(func.signal_name)
+        print(sig_split)
+        print(chan_num)
+        print(af_num)
+        return GD32PinMapGenerator.add_af_pin(
+            pin, func, "GD_PIN_FUNC_PWM(%d, IND_GPIO_AF_%d)" % (chan_num, af_num), False)
+
     # generation methods
     @staticmethod
     def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
@@ -177,6 +200,10 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.begin_pinmap("I2C_SCL")
         for p, f in GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name):
             output += GD32PinMapGenerator.add_i2c_pin(p, f)
+        output += GD32PinMapGenerator.end_pinmap()
+        output += GD32PinMapGenerator.begin_pinmap("PWM")
+        for p, f in GD32PinMapGenerator.get_pwm_pins(pinmap, device_name):
+            output += GD32PinMapGenerator.add_pwm_pin(p, f)
         output += GD32PinMapGenerator.end_pinmap()
         # .. all other peripherals..
         return output
