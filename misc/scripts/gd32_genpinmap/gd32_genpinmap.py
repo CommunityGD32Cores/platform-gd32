@@ -1,10 +1,14 @@
 from typing import Dict, Tuple, List
 from func_utils import get_trailing_number, print_big_str
+from known_datasheets import identify_datasheet
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
 from pin_map import GD32PinMap
 from datasheet_parser import GD32DatasheetParser
 from static_data import *
-        
+import pickle
+from os import mkdir, path
+import sys
+
 class GD32PinMapGenerator:
     @staticmethod
     def get_adc_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AdditionalFunc]]:
@@ -359,11 +363,41 @@ class GD32PinMapGenerator:
         #print(pinmap.pin_map["PB7"])
         pass
 
+# cache previously parsed datasheet for speed reaonss
+def save_pinmap(pinmap: GD32PinMap):
+    this_script = path.dirname(path.realpath(__file__))
+    if not path.isdir(path.join(this_script, "preparsed_datasheets")):
+        mkdir(path.join(this_script, "preparsed_datasheets"))
+    try:
+        pickle.dump( pinmap, open( path.join(this_script, "preparsed_datasheets", pinmap.series + ".p"), "wb" ) )
+    except Exception as exc:
+        print("Saving pinmap failed with error: %s" % str(exc)) 
+
+# return previously loaded instance or None if it doesn't exist
+def load_pinmap(datasheet_pdf_path:str) -> GD32PinMap:
+    datasheet = identify_datasheet(datasheet_pdf_path)
+    if datasheet is None: 
+        return None
+    this_script = path.dirname(path.realpath(__file__))
+    expected_filepath = path.join(this_script, "preparsed_datasheets", datasheet.series + ".p")
+    print("Checking if pre-saved pickle file \"%s\" exists.." % expected_filepath)
+    if path.isfile(expected_filepath):
+        try:
+            pinmap = pickle.load(open(expected_filepath, "rb"))
+            return pinmap
+        except Exception as exc:
+            print("Loading pinmap failed with error: %s" % str(exc))         
+    print("Nope, parsing from PDF.")
+    return None
+
 def main_func():
     print("Pinmap generator started.")
     # temporary static path
     datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
-    device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
+    device_pinmap = load_pinmap(datasheet_pdf_path)
+    if device_pinmap is None or "--no-load-preparsed" in sys.argv:
+        device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
+        save_pinmap(device_pinmap)
     GD32PinMapGenerator.generate_from_pinmap(device_pinmap)
 if __name__ == "__main__":
     main_func()
