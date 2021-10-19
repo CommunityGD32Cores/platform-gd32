@@ -147,3 +147,32 @@ peripheralnames_h_header_end = """
 
 #endif
 """
+
+pinnamesvar_h_empty_header = """#ifndef _PINNAMESVAR_H_
+#define _PINNAMESVAR_H_
+
+#endif /* _PINNAMESVAR_H_ */"""
+
+variant_h_header_start = """#ifndef _VARIANT_
+#define _VARIANT_
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+/* GPIO pins definitions */
+"""
+
+variant_h_header_end = """#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#ifdef __cplusplus
+    /* Port which normally prints to the Arduino Serial Monitor */
+    #define SERIAL_PORT_MONITOR     Serial
+    /* Hardware serial port, physical RX & TX pins. */
+    #define SERIAL_PORT_HARDWARE    Serial1
+#endif
+
+#endif /* _VARIANT_ */
+"""

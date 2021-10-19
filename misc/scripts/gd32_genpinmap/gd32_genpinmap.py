@@ -15,6 +15,17 @@ class GD32PinMapGenerator:
         return pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name=device_name)
 
     @staticmethod
+    def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[GD32Pin]:
+        adc_pins = GD32PinMapGenerator.get_adc_pins(pinmap, device_name)
+        return [x[0].pin_name for x in adc_pins]
+
+    @staticmethod
+    def get_non_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[GD32Pin]:
+        adc_pins = GD32PinMapGenerator.get_adc_pinnames(pinmap, device_name)
+        non_adc_pins = list(filter(lambda p: p.pin_name not in adc_pins, pinmap.pin_map.values()))
+        return [p.pin_name for p in non_adc_pins]
+
+    @staticmethod
     def get_dac_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AdditionalFunc]]:
         return pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "DAC", filter_device_name=device_name)
 
@@ -366,6 +377,148 @@ class GD32PinMapGenerator:
         output += peripheralnames_h_header_end
         return output
 
+    @staticmethod
+    def generate_arduino_pinnamesvar_h(pinmap:GD32PinMap, device_name:str) -> str:
+        output = pinnamesvar_h_empty_header
+        return output
+
+    @staticmethod
+    def add_macro_def(macro_name:str, macro_value, width:int = 35):
+        output = f"#define {macro_name}"
+        output = output.ljust(width) + " "
+        output += str(macro_value) + "\n"
+        return output
+
+    @staticmethod
+    def filter_for_periph(pins: List[Tuple[GD32Pin, object]], periph) -> List[str]:
+        return [p_f[0].pin_name for p_f in pins if p_f[1].peripheral == periph] 
+
+    @staticmethod
+    def get_second_or_fallback_first_pin(pins) -> str:
+        return pins[1] if len(pins) >= 2 else pins[0]
+
+    @staticmethod
+    def generate_arduino_variant_h(pinmap:GD32PinMap, device_name:str) -> str:
+        output = community_copyright_header
+        output += variant_h_header_start
+        # generate all "#define <pin name> <index>" macros
+        # due to pin numbering with ADC pins, we want that the ADC pins
+        # form one *uniform*, uninterrupted block.
+        # so, we place all ADC pins at the end
+        counter = 0
+        for p in GD32PinMapGenerator.get_non_adc_pinnames(pinmap, device_name):
+            output += f"#define {p} {counter}\n"
+            counter += 1
+        num_gpio_pins = counter
+        num_analog_pins = 0
+        all_adc_pins = GD32PinMapGenerator.get_adc_pinnames(pinmap, device_name)
+        output += "/* analog pins */\n"
+        for p in all_adc_pins:
+            output += f"#define {p} {counter}\n"
+            counter += 1
+            num_analog_pins += 1
+        output += "\n/* digital pins and analog pins number definitions */\n"
+        # analog pins can be used as digital pins too
+        output += GD32PinMapGenerator.add_macro_def("DIGITAL_PINS_NUM", counter)
+        output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_NUM", num_analog_pins)
+        output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_START", all_adc_pins[0])
+        output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_LAST", all_adc_pins[-1])
+        output += "\n/* LED definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
+        output += "\n/* user keys definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PA0") # default for now
+        output += "\n/* SPI definitions */\n"
+        # default to the first available SPI (SPI0) but the second available pin for each function
+        # ensures we get the standard MOSI = PB5, MISO = PB4, etc. as known on the standard 
+        # bluepill
+        # first, get all pins for "SPI0"
+        default_spi = "SPI0"
+        spi_mosi = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_spi_mosi_pins(pinmap, device_name),
+                default_spi
+            )
+        )
+        spi_miso = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_spi_miso_pins(pinmap, device_name),
+                default_spi
+            )
+        )
+        spi_sclk = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_spi_sclk_pins(pinmap, device_name),
+                default_spi
+            )
+        )
+        spi_nss = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_spi_nss_pins(pinmap, device_name),
+                default_spi
+            )
+        )
+        # write back
+        output += GD32PinMapGenerator.add_macro_def("PIN_SPI_SS", spi_nss)
+        output += GD32PinMapGenerator.add_macro_def("PIN_SPI_MOSI", spi_mosi)
+        output += GD32PinMapGenerator.add_macro_def("PIN_SPI_MISO", spi_miso)
+        output += GD32PinMapGenerator.add_macro_def("PIN_SPI_SCK", spi_sclk)
+        # same logic for I2C pin
+        default_i2c = "I2C0"
+        i2c_scl = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name),
+                default_i2c
+            )
+        )
+        i2c_sda = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+            GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name),
+                default_i2c
+            )
+        )
+        output += "\n/* I2C definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("PIN_WIRE_SDA", i2c_sda)
+        output += GD32PinMapGenerator.add_macro_def("PIN_WIRE_SCL", i2c_scl)
+        # ToDo: refactor this in the core so that it doesn't become necessary
+        output += GD32PinMapGenerator.add_macro_def("USE_I2C", 1)
+
+        output += "\n/* TIMER or PWM definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("TIMER_TONE", "TIMER5") # defaults
+        output += GD32PinMapGenerator.add_macro_def("TIMER_SERVO", "TIMER6") # defaults
+        output += "\n"
+
+        # generate list of first 5 PWM pins
+        pwm_pins = GD32PinMapGenerator.get_pwm_pins(pinmap, device_name)
+        pwm_pins = list(set([p_f[0].pin_name for p_f in pwm_pins]))
+        pwm_pins = pwm_pins[:5]
+        for idx, p in enumerate(pwm_pins):
+            output += GD32PinMapGenerator.add_macro_def("PWM%d" % idx, p)
+
+        output += "\n/* USART definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("SERIAL_HOWMANY", 1) # defaults
+        output += GD32PinMapGenerator.add_macro_def("USE_USART0_SERIAL", "") # defaults
+        default_uart = "USART0"
+        uart_tx = GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name),
+                default_uart
+        )[0]
+        uart_rx = GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name),
+                default_uart
+        )[0]
+        output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_RX", uart_rx)
+        output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_TX", uart_tx)
+        output += GD32PinMapGenerator.add_macro_def("SERIAL0_RX", uart_rx)
+        output += GD32PinMapGenerator.add_macro_def("SERIAL0_TX", uart_tx)
+
+        output += "\n/* ADC definitions */\n"
+        output += GD32PinMapGenerator.add_macro_def("ADC_RESOLUTION", 10)
+        if len(GD32PinMapGenerator.get_dac_pins(pinmap, device_name)) != 0:
+            output += GD32PinMapGenerator.add_macro_def("DAC_RESOLUTION", 12)
+        output += "\n"
+
+        output += variant_h_header_end
+        return output
 
     @staticmethod
     def generate_from_pinmap(pinmap: GD32PinMap):
@@ -422,6 +575,10 @@ class GD32PinMapGenerator:
         print("PeripheralNames.h for GD32F190C8:")
         print_big_str(output)
 
+        print("ADC pinnames: " + str(GD32PinMapGenerator.get_adc_pinnames(pinmap, "GD32F190C8")))
+        print("Non-ADC pinnames: " + str(GD32PinMapGenerator.get_non_adc_pinnames(pinmap, "GD32F190C8")))
+        output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, "GD32F190C8")
+        print_big_str(output)
         #print(pinmap.pin_map["PB7"])
         pass
 
