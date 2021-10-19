@@ -1,5 +1,5 @@
 from typing import Dict, Tuple, List
-from func_utils import get_trailing_number, print_big_str
+from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma
 from known_datasheets import identify_datasheet
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
 from pin_map import GD32PinMap
@@ -310,6 +310,64 @@ class GD32PinMapGenerator:
         return output
 
     @staticmethod
+    # e.g. "ADC" -> "ADC_0"
+    #      "USART0" -> "UART_0"
+    #      "USART1" -> "UART_1"
+    #      "UART3" -> "UART_3"
+    def convert_periph_name_into_enum_name(periph: str) -> str:
+        orig_periph = periph
+        periph_num_orig = get_trailing_number(periph)
+        periph_num = periph_num_orig
+        if periph_num_orig is None:
+            periph_num = 0
+        if periph.startswith("USART") or periph.startswith("UART"):
+            periph = "UART" + str(periph_num)
+        if periph.startswith("TIMER"):
+            periph = "PWM" + str(periph_num)
+        periph_no_num = periph
+        if periph_num_orig is not None:
+            periph_no_num = periph[0: len(periph) - len(str(periph_num))]
+        left_side = periph_no_num + "_" + str(periph_num)
+        return f"    {left_side} = (int){orig_periph},\n"
+
+    @staticmethod
+    def begin_periphalnames_enum():
+        return "typedef enum {\n" 
+
+    @staticmethod
+    def end_periphalnames_enum(periph: str):
+        return "} %sName;\n\n" % periph
+
+    @staticmethod
+    def add_periphalnames_enum(periph: str, pins: List[Tuple[GD32Pin, object]]) -> str:
+        output = GD32PinMapGenerator.begin_periphalnames_enum()
+        all_periphs = list(set([x[1].peripheral for x in pins]))
+        all_periphs.sort(key=natural_keys)
+        for p in all_periphs:
+            output += GD32PinMapGenerator.convert_periph_name_into_enum_name(p)
+        output += GD32PinMapGenerator.end_periphalnames_enum(periph)
+        output = remove_last_comma(output)
+        return output
+
+    @staticmethod
+    def generate_arduino_peripheralnames_h(pinmap:GD32PinMap, device_name:str) -> str:
+        output = community_copyright_header
+        output += peripheralnames_h_header_start
+        periphs_and_pins = [
+         ("ADC", GD32PinMapGenerator.get_adc_pins(pinmap, device_name)),
+         ("DAC", GD32PinMapGenerator.get_dac_pins(pinmap, device_name)),
+         ("UART", GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name)),
+         ("SPI", GD32PinMapGenerator.get_spi_miso_pins(pinmap, device_name)),
+         ("I2C", GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name)),
+         ("PWM", GD32PinMapGenerator.get_pwm_pins(pinmap, device_name)),
+        ]
+        for periph, pins in periphs_and_pins:
+            output += GD32PinMapGenerator.add_periphalnames_enum(periph, pins)
+        output += peripheralnames_h_header_end
+        return output
+
+
+    @staticmethod
     def generate_from_pinmap(pinmap: GD32PinMap):
         all_i2c_sda_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
         for pin, func in all_i2c_sda_pins:
@@ -349,15 +407,19 @@ class GD32PinMapGenerator:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
         output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190T6")
-        print("PeripheralsPin.c for GD32F190T6:")
+        print("PeripheralPin.c for GD32F190T6:")
         print_big_str(output)
 
         output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190R8")
-        print("PeripheralsPin.c for GD32F190R8:")
+        print("PeripheralPin.c for GD32F190R8:")
         print_big_str(output)
 
         output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190C8")
-        print("PeripheralsPin.c for GD32F190C8:")
+        print("PeripheralPin.c for GD32F190C8:")
+        print_big_str(output)
+
+        output = GD32PinMapGenerator.generate_arduino_peripheralnames_h(pinmap, "GD32F190C8")
+        print("PeripheralNames.h for GD32F190C8:")
         print_big_str(output)
 
         #print(pinmap.pin_map["PB7"])
