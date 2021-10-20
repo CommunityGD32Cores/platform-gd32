@@ -426,7 +426,7 @@ class GD32PinMapGenerator:
         output += "\n/* LED definitions */\n"
         output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
         output += "\n/* user keys definitions */\n"
-        output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PA0") # default for now
+        output += GD32PinMapGenerator.add_macro_def("KEY0", "PA0") # default for now
         output += "\n/* SPI definitions */\n"
         # default to the first available SPI (SPI0) but the second available pin for each function
         # ensures we get the standard MOSI = PB5, MISO = PB4, etc. as known on the standard 
