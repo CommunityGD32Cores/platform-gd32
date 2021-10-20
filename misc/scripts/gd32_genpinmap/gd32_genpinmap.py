@@ -1,5 +1,5 @@
 from typing import Dict, Tuple, List
-from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma
+from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma, write_to_file
 from known_datasheets import identify_datasheet
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
 from pin_map import GD32PinMap
@@ -8,6 +8,16 @@ from static_data import *
 import pickle
 from os import mkdir, path
 import sys
+
+# add directory above us to the python path.
+# needed so that we can sipphon info from the board generator
+import sys
+from pathlib import Path # if you haven't already done so
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+# now we can use absolute imports
+from board_generator import GD32MCUInfo, read_all_known_mcus
 
 class GD32PinMapGenerator:
     @staticmethod
@@ -538,7 +548,7 @@ class GD32PinMapGenerator:
         return output
 
     @staticmethod
-    def generate_from_pinmap(pinmap: GD32PinMap):
+    def print_pinmap_info(pinmap: GD32PinMap):
         all_i2c_sda_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
@@ -576,31 +586,43 @@ class GD32PinMapGenerator:
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
-        output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190T6")
-        print("PeripheralPin.c for GD32F190T6:")
-        print_big_str(output)
+    @staticmethod
+    def generate_from_pinmap(pinmap: GD32PinMap, mcus:List[GD32MCUInfo]):
+        variant_base_folder = path.join(path.dirname(path.realpath(__file__)), "variants")
+        if not path.isdir(variant_base_folder):
+            mkdir(variant_base_folder)
+        for mcu in mcus:
+            mcu_name = mcu.name_no_package
+            print(f"Generating Arduino variant folder for {mcu_name}.")
+            target_base_folder = path.join(variant_base_folder, mcu_name.upper() + "_GENERIC")
+            if not path.isdir(target_base_folder):
+                mkdir(target_base_folder)
+            # PeripheralName.h
+            output = GD32PinMapGenerator.generate_arduino_peripheralnames_h(pinmap, mcu_name)
+            print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "PeripheralNames.h"))
+            # PeripheralPins.c
+            output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, mcu_name)
+            print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "PeripheralPins.c"))
+            # PinNamesVar.h
+            output = GD32PinMapGenerator.generate_arduino_pinnamesvar_h(pinmap, mcu_name)
+            print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "PinNamesVar.h"))
+            # variant.cpp
+            output = GD32PinMapGenerator.generate_arduino_variant_cpp(pinmap, mcu_name)
+            print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "variant.cpp"))
+            # variant.cpp
+            output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu_name)
+            print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "variant.h"))
+        print("Done writing %d variant definitions to %s." % (len(mcus), variant_base_folder))
 
-        output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190R8")
-        print("PeripheralPin.c for GD32F190R8:")
-        print_big_str(output)
-
-        output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, "GD32F190C8")
-        print("PeripheralPin.c for GD32F190C8:")
-        print_big_str(output)
-
-        output = GD32PinMapGenerator.generate_arduino_peripheralnames_h(pinmap, "GD32F190C8")
-        print("PeripheralNames.h for GD32F190C8:")
-        print_big_str(output)
-
-        print("ADC pinnames: " + str(GD32PinMapGenerator.get_adc_pinnames(pinmap, "GD32F190C8")))
-        print("Non-ADC pinnames: " + str(GD32PinMapGenerator.get_non_adc_pinnames(pinmap, "GD32F190C8")))
-        output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, "GD32F190C8")
-        print_big_str(output)
-
-        output = GD32PinMapGenerator.generate_arduino_variant_cpp(pinmap, "GD32F190C8")
-        print_big_str(output)
-        #print(pinmap.pin_map["PB7"])
-        pass
+def get_all_mcus_matching_pinmap(all_mcus:List[GD32MCUInfo], pinmap:GD32PinMap) -> List[GD32MCUInfo]:
+    # e.g., "GD32F190"
+    pinmap_series = pinmap.series
+    return list(filter(lambda m: m.name.startswith(pinmap_series), all_mcus))
 
 # cache previously parsed datasheet for speed reaonss
 def save_pinmap(pinmap: GD32PinMap):
@@ -637,6 +659,8 @@ def main_func():
     if device_pinmap is None or "--no-load-preparsed" in sys.argv:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
         save_pinmap(device_pinmap)
-    GD32PinMapGenerator.generate_from_pinmap(device_pinmap)
+    all_mcus = read_all_known_mcus()
+    all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
+    GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
 if __name__ == "__main__":
     main_func()

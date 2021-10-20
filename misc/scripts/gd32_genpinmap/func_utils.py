@@ -28,3 +28,10 @@ def natural_keys(text:str):
 
 def remove_last_comma(text:str) -> str: 
     return "".join(text.rsplit(",", 1))
+
+def write_to_file(text:str, path:str):
+    try:
+        with open(path, "w") as fp:
+            fp.write(path)
+    except Exception as exc:
+        print("Writing to file \"%s\" failed: %s" % (exc, path))

@@ -340,13 +340,17 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
         if mcu.name.lower().startswith(mcu_name.lower()):
             return mcu
 
-def main():
+def read_all_known_mcus() -> List[GD32MCUInfo]:
     this_script_path = os.path.dirname(os.path.realpath(__file__))
     mcus = []
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
+    return mcus
+
+def main():
+    mcus = read_all_known_mcus()
 
     #print(mcus)
     for x in mcus:
