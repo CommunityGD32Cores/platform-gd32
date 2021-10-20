@@ -6,7 +6,8 @@
     "f_cpu": "72000000L",
     "mcu": "gd32f190r8t6",
     "spl_series": "GD32F1x0",
-    "series": "GD32F190"
+    "series": "GD32F190",
+    "variant": "GD32F190R8_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F190R8",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F190R8 (8k RAM, 64k Flash)",
   "upload": {
