@@ -36,7 +36,10 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             ]),
             DatasheetPinDefPageParsingInfo([24], "GD32F190Cx", "LQFP48", [ParseUsingAreaQuirk((81.484,125.389,385.098,531.695))]),
             # GD32F190Tx
-            DatasheetPinDefPageParsingInfo([25], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((176.736,125.389,767.591,531.695))]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F190Tx", "QFN36", [
+                ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
+                OverwritePinAdditionalInfoQuirk("PA6", "Additional: ADC_IN6, OPA1_VINP, CANL")
+            ]),
             DatasheetPinDefPageParsingInfo([26], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
             DatasheetPinDefPageParsingInfo([27], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((81.484,124.645,514.58,533.183))]),
         ],
