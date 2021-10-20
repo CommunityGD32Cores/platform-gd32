@@ -26,15 +26,17 @@ class GD32PinMapGenerator:
         return pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name=device_name)
 
     @staticmethod
-    def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[GD32Pin]:
+    def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
         adc_pins = GD32PinMapGenerator.get_adc_pins(pinmap, device_name)
         return [x[0].pin_name for x in adc_pins]
 
     @staticmethod
-    def get_non_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[GD32Pin]:
+    def get_non_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
         adc_pins = GD32PinMapGenerator.get_adc_pinnames(pinmap, device_name)
         non_adc_pins = list(filter(lambda p: p.pin_name not in adc_pins, pinmap.pin_map.values()))
-        return [p.pin_name for p in non_adc_pins]
+        l = [p.pin_name for p in non_adc_pins]
+        l = list(filter(lambda p: pinmap.pin_is_available_for_device(p, device_name), l))
+        return l
 
     @staticmethod
     def get_dac_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AdditionalFunc]]:
