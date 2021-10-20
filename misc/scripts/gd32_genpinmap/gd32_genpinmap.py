@@ -437,7 +437,10 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_START", all_adc_pins[0])
         output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_LAST", all_adc_pins[-1])
         output += "\n/* LED definitions */\n"
-        output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
+        if pinmap.pin_is_available_for_device("PC13", device_name):
+            output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
+        else:
+            output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PB2") # default for now
         output += "\n/* user keys definitions */\n"
         output += GD32PinMapGenerator.add_macro_def("KEY0", "PA0") # default for now
         output += "\n/* SPI definitions */\n"
