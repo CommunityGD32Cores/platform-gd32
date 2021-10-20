@@ -32,6 +32,6 @@ def remove_last_comma(text:str) -> str:
 def write_to_file(text:str, path:str):
     try:
         with open(path, "w") as fp:
-            fp.write(path)
+            fp.write(text)
     except Exception as exc:
         print("Writing to file \"%s\" failed: %s" % (exc, path))

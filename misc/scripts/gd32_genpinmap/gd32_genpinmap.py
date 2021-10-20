@@ -8,6 +8,7 @@ from static_data import *
 import pickle
 from os import mkdir, path
 import sys
+import string
 
 # add directory above us to the python path.
 # needed so that we can sipphon info from the board generator
@@ -548,6 +549,20 @@ class GD32PinMapGenerator:
         return output
 
     @staticmethod
+    def generate_arduino_ldscript(mcu: GD32MCUInfo) -> str:
+        ram = mcu.sram_kb
+        flash = mcu.flash_kb
+        template_file = path.join(path.dirname(path.realpath(__file__)), "ldscript.tpl")
+        content = ""
+        with open(template_file) as fp:
+            data = string.Template(fp.read())
+            print(data)
+            content = data.substitute(
+                ram=str(ram) + "K",
+                flash=str(flash) + "K")
+        return content
+
+    @staticmethod
     def print_pinmap_info(pinmap: GD32PinMap):
         all_i2c_sda_pins = pinmap.search_pins_for_af(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
         for pin, func in all_i2c_sda_pins:
@@ -613,10 +628,14 @@ class GD32PinMapGenerator:
             output = GD32PinMapGenerator.generate_arduino_variant_cpp(pinmap, mcu_name)
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.cpp"))
-            # variant.cpp
+            # variant.h
             output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu_name)
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.h"))
+            # ldscript.ld
+            output = GD32PinMapGenerator.generate_arduino_ldscript(mcu)
+            #print_big_str(output)
+            write_to_file(output, path.join(target_base_folder, "ldscript.ld"))
         print("Done writing %d variant definitions to %s." % (len(mcus), variant_base_folder))
 
 def get_all_mcus_matching_pinmap(all_mcus:List[GD32MCUInfo], pinmap:GD32PinMap) -> List[GD32MCUInfo]:
