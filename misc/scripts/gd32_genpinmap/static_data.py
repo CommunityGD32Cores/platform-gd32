@@ -176,3 +176,18 @@ variant_h_header_end = """#ifdef __cplusplus
 
 #endif /* _VARIANT_ */
 """
+
+variant_cpp_start = """#include "pins_arduino.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* digital pins for pinmap list */
+const PinName digital_pins[] = {
+"""
+
+variant_cpp_end = """#ifdef __cplusplus
+}
+#endif
+"""

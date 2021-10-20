@@ -499,12 +499,12 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.add_macro_def("USE_USART0_SERIAL", "") # defaults
         default_uart = "USART0"
         uart_tx = GD32PinMapGenerator.filter_for_periph(
-                GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name),
-                default_uart
+            GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name),
+            default_uart
         )[0]
         uart_rx = GD32PinMapGenerator.filter_for_periph(
-                GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name),
-                default_uart
+            GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name),
+            default_uart
         )[0]
         output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_RX", uart_rx)
         output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_TX", uart_tx)
@@ -518,6 +518,23 @@ class GD32PinMapGenerator:
         output += "\n"
 
         output += variant_h_header_end
+        return output
+
+    @staticmethod
+    def generate_arduino_variant_cpp(pinmap:GD32PinMap, device_name:str) -> str:
+        output = community_copyright_header
+        output += variant_cpp_start
+        for p in GD32PinMapGenerator.get_non_adc_pinnames(pinmap, device_name):
+            output += f"    {GD32PinMapGenerator.format_pin_to_port_pin(p)},\n"
+        output = remove_last_comma(output)
+        output += "};\n"
+        output += "\n/* analog pins for pinmap list */\n"
+        output += "const uint32_t analog_pins[] = {\n"
+        for idx, p in enumerate(GD32PinMapGenerator.get_adc_pinnames(pinmap, device_name)):
+            output += f"    {p}, //A{idx}\n"
+        output = remove_last_comma(output)
+        output += "};\n\n"
+        output += variant_cpp_end
         return output
 
     @staticmethod
@@ -578,6 +595,9 @@ class GD32PinMapGenerator:
         print("ADC pinnames: " + str(GD32PinMapGenerator.get_adc_pinnames(pinmap, "GD32F190C8")))
         print("Non-ADC pinnames: " + str(GD32PinMapGenerator.get_non_adc_pinnames(pinmap, "GD32F190C8")))
         output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, "GD32F190C8")
+        print_big_str(output)
+
+        output = GD32PinMapGenerator.generate_arduino_variant_cpp(pinmap, "GD32F190C8")
         print_big_str(output)
         #print(pinmap.pin_map["PB7"])
         pass
