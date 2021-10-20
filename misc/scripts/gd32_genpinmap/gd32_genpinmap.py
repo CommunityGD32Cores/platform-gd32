@@ -500,7 +500,7 @@ class GD32PinMapGenerator:
 
         # generate list of first 5 PWM pins
         pwm_pins = GD32PinMapGenerator.get_pwm_pins(pinmap, device_name)
-        pwm_pins = list(set([p_f[0].pin_name for p_f in pwm_pins]))
+        pwm_pins = list(dict.fromkeys([p_f[0].pin_name for p_f in pwm_pins]))
         pwm_pins = pwm_pins[:5]
         for idx, p in enumerate(pwm_pins):
             output += GD32PinMapGenerator.add_macro_def("PWM%d" % idx, p)
@@ -536,6 +536,10 @@ class GD32PinMapGenerator:
         output = community_copyright_header
         output += variant_cpp_start
         for p in GD32PinMapGenerator.get_non_adc_pinnames(pinmap, device_name):
+            output += f"    {GD32PinMapGenerator.format_pin_to_port_pin(p)},\n"
+        # analog pins can be used as digital pins too..
+        # todo check the whole pin remapping logic with ADC pins etc.
+        for p in GD32PinMapGenerator.get_adc_pinnames(pinmap, device_name):
             output += f"    {GD32PinMapGenerator.format_pin_to_port_pin(p)},\n"
         output = remove_last_comma(output)
         output += "};\n"
