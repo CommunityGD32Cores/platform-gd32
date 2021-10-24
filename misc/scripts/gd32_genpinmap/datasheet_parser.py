@@ -12,7 +12,7 @@ except ImportError:
     print("Could not import tabula. Please 'pip install tabula-py' first!")
     exit(-1)
 
-from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk
+from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk, OverwriteAdditionFunctionsList
 from func_utils import get_trailing_number, filter_nans, is_nan, print_big_str
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPageParsingInfo, DatasheetParsingInfo, DatasheetPinDefPageParsingInfo
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
@@ -58,7 +58,10 @@ class GD32DatasheetParser:
                     input_str_or_float = input_str_or_float.replace("\n", "/", 1) # use / to indicate an "either/or" relationship
                 input_str_or_float = input_str_or_float.replace("\n", "", 1)
             elif input_str_or_float.count("\n") >= 1:
-                input_str_or_float = input_str_or_float.replace("\n", "", 1)
+                if input_str_or_float.count("(") >= 2 and input_str_or_float.count(")") >= 2:
+                    input_str_or_float = input_str_or_float.replace("\n", "/", 1)
+                else:
+                    input_str_or_float = input_str_or_float.replace("\n", "", 1)
             # remove all still contained newlines.
             input_str_or_float = input_str_or_float.replace("\n", "")
 
@@ -70,7 +73,9 @@ class GD32DatasheetParser:
                 input_str_or_float = input_str_or_float.replace("//", "/")
                 input_str_or_float = input_str_or_float.replace("/_", "_")
                 #input_str_or_float = input_str_or_float.replace("/,", ",")
-
+            # cleanup data error from datasheet ("SPI1_ MOSI(3)")
+            if "_ " in input_str_or_float:
+                input_str_or_float = input_str_or_float.replace("_ ", "_", 1)
             return input_str_or_float
         else: 
             # convert float NaN to more easily handable python None value
@@ -158,8 +163,9 @@ class GD32DatasheetParser:
             # combine the pin column too
             dfs["Pin"] = dfs.apply(lambda row: row["Unnamed: 0"] if not pd.isna(row["Unnamed: 0"]) else row["Pin"], axis=1)
             dfs = dfs.drop(["Unnamed: 0"], axis=1)
-            # last column is all NaNs
-            dfs = dfs.drop([dfs.columns[-1]], axis=1)
+            # drop last column if it's all NaNs
+            if all([is_nan(x) for x in dfs.iloc[:, -1]]):
+                dfs = dfs.drop([dfs.columns[-1]], axis=1)
         return dfs
 
     def print_parsing_result_json(res:dict):
@@ -237,9 +243,16 @@ class GD32DatasheetParser:
                 print(j)
             # first row gives us list of alternate functions (AF0..AF11) in the table!
             if i == 0:
-                alternate_funcs = filter_nans(j)
-                print(alternate_funcs)
-                parser_result["alternate_functions"] = alternate_funcs
+                af_list_quirks: List[OverwriteAdditionFunctionsList] = pages_info.get_quirks_of_type(OverwriteAdditionFunctionsList)
+                if len(af_list_quirks) == 1:
+                    parser_result["alternate_functions"] = af_list_quirks[0].af_list
+                else:
+                    alternate_funcs = filter_nans(j)
+                    print(alternate_funcs)
+                    if any([not x.startswith("AF") for x in alternate_funcs]):
+                        print("Fail: These are not the alternate function descriptions: " + str(alternate_funcs))
+                    else:
+                        parser_result["alternate_functions"] = alternate_funcs
             else: 
                 # data row
                 pin_row = list(j)

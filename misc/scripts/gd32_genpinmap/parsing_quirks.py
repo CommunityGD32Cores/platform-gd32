@@ -20,3 +20,7 @@ class ParseUsingAreaQuirk(DatasheetPageParsingQuirk):
         super().__init__()
         self.area = area
 
+class OverwriteAdditionFunctionsList(DatasheetPageParsingQuirk):
+    def __init__(self, af_list: List[str]) -> None:
+        super().__init__()
+        self.af_list = af_list

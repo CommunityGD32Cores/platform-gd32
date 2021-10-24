@@ -2,6 +2,8 @@ import re
 import math
 from pandas import Series
 import sys
+from typing import Tuple
+from pin_definitions import GD32Pin, GD32AdditionalFunc
 
 def get_trailing_number(s):
     m = re.search(r'\d+$', s)
@@ -25,6 +27,9 @@ def atoi(text:str):
 
 def natural_keys(text:str):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
+
+def natural_key_for_add_func(add_func:Tuple[GD32Pin, GD32AdditionalFunc]):
+    return [ atoi(c) for c in re.split(r'(\d+)', add_func[1].signal_name) ]
 
 def remove_last_comma(text:str) -> str: 
     return "".join(text.rsplit(",", 1))

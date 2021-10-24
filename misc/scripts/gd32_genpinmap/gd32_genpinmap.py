@@ -1,5 +1,5 @@
 from typing import Dict, Tuple, List
-from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma, write_to_file
+from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma, write_to_file, natural_key_for_add_func
 from known_datasheets import identify_datasheet
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
 from pin_map import GD32PinMap
@@ -23,7 +23,9 @@ from board_generator import GD32MCUInfo, read_all_known_mcus
 class GD32PinMapGenerator:
     @staticmethod
     def get_adc_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32AdditionalFunc]]:
-        return pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name=device_name)
+        l = pinmap.search_pins_for_add_func(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name=device_name)
+        l.sort(key=natural_key_for_add_func) # to get that nice ADC_IN0.. ADC_IN11 ordering correct
+        return l
 
     @staticmethod
     def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
@@ -436,8 +438,11 @@ class GD32PinMapGenerator:
         # analog pins can be used as digital pins too
         output += GD32PinMapGenerator.add_macro_def("DIGITAL_PINS_NUM", counter)
         output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_NUM", num_analog_pins)
-        output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_START", all_adc_pins[0])
-        output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_LAST", all_adc_pins[-1])
+        if len(all_adc_pins) != 0:
+            output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_START", all_adc_pins[0])
+            output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_LAST", all_adc_pins[-1])
+        else:
+            output += "/* warning: no ADC pins detected.. */\n"
         output += "\n/* LED definitions */\n"
         if pinmap.pin_is_available_for_device("PC13", device_name):
             output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
@@ -650,9 +655,9 @@ class GD32PinMapGenerator:
         print("Done writing %d variant definitions to %s." % (len(mcus), variant_base_folder))
 
 def get_all_mcus_matching_pinmap(all_mcus:List[GD32MCUInfo], pinmap:GD32PinMap) -> List[GD32MCUInfo]:
-    # e.g., "GD32F190"
-    pinmap_series = pinmap.series
-    return list(filter(lambda m: m.name.startswith(pinmap_series), all_mcus))
+    # check whether device name is matches by any of the sub-families names
+    subfams_name = pinmap.pins_per_subdevice_family.keys()
+    return list(filter(lambda m: any([GD32PinMap.devicename_matches_constraint(m.name_no_package, fam) for fam in subfams_name]), all_mcus))
 
 # cache previously parsed datasheet for speed reaonss
 def save_pinmap(pinmap: GD32PinMap):
@@ -684,11 +689,13 @@ def load_pinmap(datasheet_pdf_path:str) -> GD32PinMap:
 def main_func():
     print("Pinmap generator started.")
     # temporary static path
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
+    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
+    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
     device_pinmap = load_pinmap(datasheet_pdf_path)
-    if device_pinmap is None or "--no-load-preparsed" in sys.argv:
+    if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
         save_pinmap(device_pinmap)
+        #return
     all_mcus = read_all_known_mcus()
     all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
     GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)

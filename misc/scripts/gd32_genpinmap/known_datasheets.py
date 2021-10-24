@@ -1,7 +1,7 @@
 from os import path
 from typing import Dict
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPinDefPageParsingInfo, DatasheetParsingInfo
-from parsing_quirks import ParseUsingAreaQuirk, OverwritePinAdditionalInfoQuirk, OverwritePinAlternateInfoQuirk
+from parsing_quirks import ParseUsingAreaQuirk, OverwritePinAdditionalInfoQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList
 
 # Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
@@ -44,6 +44,28 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([27], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((81.484,124.645,514.58,533.183))]),
         ],
         series = "GD32F190", # series
+        family_type = "B" # family type
+    ), 
+    "GD32F170xx_Datasheet_Rev2.1.pdf" : DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([26], { "1": ["GD32F170x4"], "2": ["GD32F170x8", "GD32F170x6"], "3": ["GD32F170x8"]}),
+            DatasheetAFPageParsingInfo([27], { "1": ["GD32F170x4"], "2": ["GD32F170x8", "GD32F170x6"], "3": ["GD32F170x8"]}),
+            DatasheetAFPageParsingInfo([28], { "1": ["GD32F170x4"], "2": ["GD32F170x8"]}, quirks=[
+                OverwriteAdditionFunctionsList(["AF%d" % x for x in range(10)])
+            ])
+        ],
+        pin_defs = [
+            # GD32F170R8
+            DatasheetPinDefPageParsingInfo([14], "GD32F170R8", "LQFP64", [
+                ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
+                OverwritePinAdditionalInfoQuirk("PA2", "Additional: ADC_IN2")
+            ]),
+            DatasheetPinDefPageParsingInfo([15], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
+            DatasheetPinDefPageParsingInfo([16], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
+            DatasheetPinDefPageParsingInfo([17], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
+
+        ],
+        series = "GD32F170", # series
         family_type = "B" # family type
     )
 }
