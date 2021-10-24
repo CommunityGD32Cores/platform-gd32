@@ -60,10 +60,24 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
                 ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
                 OverwritePinAdditionalInfoQuirk("PA2", "Additional: ADC_IN2")
             ]),
-            DatasheetPinDefPageParsingInfo([15], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
-            DatasheetPinDefPageParsingInfo([16], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
-            DatasheetPinDefPageParsingInfo([17], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881 ))]),
-
+            DatasheetPinDefPageParsingInfo([15], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            DatasheetPinDefPageParsingInfo([16], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            DatasheetPinDefPageParsingInfo([17], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            # GD32F170Cx
+            DatasheetPinDefPageParsingInfo([19], "GD32F170Cx", "LQFP48", [
+                ParseUsingAreaQuirk((127.622,124.645,760.893,533.183)),
+                OverwritePinAdditionalInfoQuirk("PA6", "Additional: ADC_IN6, CANL")
+                ]),
+            DatasheetPinDefPageParsingInfo([20], "GD32F170Cx", "LQFP48", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            DatasheetPinDefPageParsingInfo([21], "GD32F170Cx", "LQFP48", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            DatasheetPinDefPageParsingInfo([22], "GD32F170Cx", "LQFP48", [ParseUsingAreaQuirk((82.229,124.645,270.499,532.439))]),
+            # GD32F170Tx
+            DatasheetPinDefPageParsingInfo([23], "GD32F170Tx", "QFN36", [
+                ParseUsingAreaQuirk((128.366,125.389,770.567,533.183)),
+                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7")
+            ]),
+            DatasheetPinDefPageParsingInfo([24], "GD32F170Tx", "QFN36", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F170Tx", "QFN36", [ParseUsingAreaQuirk((82.229,124.645,401.469,531.695))]),
         ],
         series = "GD32F170", # series
         family_type = "B" # family type

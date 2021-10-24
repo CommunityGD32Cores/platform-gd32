@@ -179,13 +179,21 @@ class GD32DatasheetParser:
             return inp
 
     def analyze_additional_funcs_string(inp:str) -> List[str]: 
-        # find where it says "additional"
-        add_start = inp.find("Additional: ")
+        # find where it says "additional".
+        # due to bad parsing when the boundary is close to the letters,
+        # the parser swallows the first letter. of the line. 
+        # however, since all additional functions fit in one line (observed for now)
+        # meaning no letter are swallowed of additional function signal names,
+        # it's acceptabale to also only look for "dditional". 
+        # Stream-based parsing instead of lattice-based parsing does not have this
+        # problem, however, the data is weirdly formatted so that other cleanup
+        # techniques are needed again...
+        add_start = inp.find("dditional: ")
         # check if anyhting was found
         if add_start == -1:
             return list()
         # get the rest of the string after that
-        inp = inp[add_start + len("Additional: "):]
+        inp = inp[add_start + len("dditional: "):]
         arr = inp.split(",")
         arr = [x.strip() for x in arr]
         return arr
