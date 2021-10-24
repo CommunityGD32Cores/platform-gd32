@@ -6,7 +6,8 @@
     "f_cpu": "48000000L",
     "mcu": "gd32f170c4t6",
     "spl_series": "GD32F1x0",
-    "series": "GD32F170"
+    "series": "GD32F170",
+    "variant": "GD32F170C4_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F170C4",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F170C4 (4k RAM, 16k Flash)",
   "upload": {

@@ -368,6 +368,8 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def add_periphalnames_enum(periph: str, pins: List[Tuple[GD32Pin, object]]) -> str:
+        if len(pins) == 0:
+            return "/* no %s pins */\n\n" % periph
         output = GD32PinMapGenerator.begin_periphalnames_enum()
         all_periphs = list(set([x[1].peripheral for x in pins]))
         all_periphs.sort(key=natural_keys)
