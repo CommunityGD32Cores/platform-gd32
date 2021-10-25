@@ -12,7 +12,7 @@ except ImportError:
     print("Could not import tabula. Please 'pip install tabula-py' first!")
     exit(-1)
 
-from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk, OverwriteAdditionFunctionsList
+from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
 from func_utils import get_trailing_number, filter_nans, is_nan, print_big_str
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPageParsingInfo, DatasheetParsingInfo, DatasheetPinDefPageParsingInfo
 from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
@@ -88,6 +88,7 @@ class GD32DatasheetParser:
         if datasheet_info is None: 
             print(f"Failed to find datasheet info for filename {path.basename(datasheet_pdf_path)}.")
             print("Known datasheets: " + ",".join(known_datasheets_infos.keys()))
+            exit(0)
         pinmaps: List[GD32PinMap] = list()
         for af_page in datasheet_info.alternate_funcs:
             dataframe = GD32DatasheetParser.get_dataframe_for_pdf_pages(datasheet_pdf_path, af_page)
@@ -137,9 +138,35 @@ class GD32DatasheetParser:
             print("Failed to extract one datatable from PDF")
             return False
         dfs = GD32DatasheetParser.cleanup_dataframe(dfs)
+        # check if we need to condense columns
+        for q in pages_info.get_quirks_of_type(CondenseColumnsQuirk):
+            dfs = GD32DatasheetParser.dataframe_condense_columns(dfs, q)
 
         print(dfs)
         print(type(dfs))
+        return dfs
+
+    def dataframe_condense_columns(dfs: DataFrame, quirk: CondenseColumnsQuirk) -> DataFrame:
+        # fix for parsing quirk where colums have NaNs in between 
+        # and are thus shifted 
+        # 0 NaN AF0 AF1 AF2 AF3 NaN AF4 AF5 AF6 AF7
+        # we just move over the column names and drop all NaN columns
+        row = quirk.row
+        print("Condensing columns on row %d" % row)
+        print("Before:")
+        print(dfs)
+        # get first row, but skip first element (always NaN)
+        first_row = list(dfs.iloc[row,])[1:]
+        print(first_row)
+        first_row_no_nans = [x for x in first_row if not is_nan(x)]
+        # expand with NaNs at the end
+        first_row_no_nans.extend([math.nan] * (len(first_row) - len(first_row_no_nans)))
+        # add back first element
+        first_row_no_nans.insert(0, math.nan)
+        print(first_row_no_nans)
+        dfs.iloc[row] = first_row_no_nans
+        #print(dfs)
+        dfs = dfs.dropna(axis=1, how='all')
         return dfs
 
     def cleanup_dataframe(dfs: DataFrame) -> DataFrame:

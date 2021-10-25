@@ -1,7 +1,7 @@
 from os import path
 from typing import Dict
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPinDefPageParsingInfo, DatasheetParsingInfo
-from parsing_quirks import ParseUsingAreaQuirk, OverwritePinAdditionalInfoQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList
+from parsing_quirks import ParseUsingAreaQuirk, OverwritePinAdditionalInfoQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
 
 # Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
@@ -80,6 +80,58 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([25], "GD32F170Tx", "QFN36", [ParseUsingAreaQuirk((82.229,124.645,401.469,531.695))]),
         ],
         series = "GD32F170", # series
+        family_type = "B" # family type
+    ),
+    "GD32F150xx_Datasheet_Rev3.2.pdf" : DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([30], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+                ParseUsingAreaQuirk((132.804,123.132,765.204,532.332)),
+                CondenseColumnsQuirk(),
+                OverwritePinAlternateInfoQuirk("PA11", ["EVENTOUT", "USART0_CTS", "TIMER0_CH3", "TSI_G3_CH3", None, None, None, "CMP0_OUT"])
+            ]),
+            DatasheetAFPageParsingInfo([31], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+                ParseUsingAreaQuirk((80.724,123.132,321.036,532.332)),
+                CondenseColumnsQuirk()
+            ]),
+            DatasheetAFPageParsingInfo([32], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.836,122.388,656.58,532.332)),
+                CondenseColumnsQuirk()
+            ]),
+            DatasheetAFPageParsingInfo([33], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.092,123.132,389.484,530.844)),
+                CondenseColumnsQuirk()
+            ])
+        ],
+        pin_defs = [
+            # GD32F150Rx
+            DatasheetPinDefPageParsingInfo([15], "GD32F150Rx", "LQFP64", [
+                ParseUsingAreaQuirk((175.956,121.644,759.252,533.076)),
+                OverwritePinAdditionalInfoQuirk("PA1", "Additional: ADC_IN1, CMP0_IP"),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+            DatasheetPinDefPageParsingInfo([16], "GD32F150Rx", "LQFP64", [
+                ParseUsingAreaQuirk((82.212,123.132,769.668,532.332)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+            DatasheetPinDefPageParsingInfo([17], "GD32F150Rx", "LQFP64", [
+                ParseUsingAreaQuirk((82.212,123.132,769.668,532.332)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+            DatasheetPinDefPageParsingInfo([18], "GD32F150Rx", "LQFP64", [
+                ParseUsingAreaQuirk((82.212,123.132,769.668,532.332)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+            DatasheetPinDefPageParsingInfo([19], "GD32F150Rx", "LQFP64", [
+                ParseUsingAreaQuirk((82.212,122.388,301.692,531.588)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+        ],
+        series = "GD32F150", # series
         family_type = "B" # family type
     )
 }

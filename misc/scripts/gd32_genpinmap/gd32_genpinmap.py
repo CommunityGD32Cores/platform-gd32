@@ -692,12 +692,13 @@ def main_func():
     print("Pinmap generator started.")
     # temporary static path
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
+    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
+    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf"
     device_pinmap = load_pinmap(datasheet_pdf_path)
     if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
         save_pinmap(device_pinmap)
-        #return
+        return
     all_mcus = read_all_known_mcus()
     all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
     GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)

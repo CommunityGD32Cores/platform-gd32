@@ -1,6 +1,6 @@
 import re
 import math
-from pandas import Series
+from pandas import Series, isna
 import sys
 from typing import Tuple
 from pin_definitions import GD32Pin, GD32AdditionalFunc
@@ -10,7 +10,7 @@ def get_trailing_number(s):
     return int(m.group()) if m else None
 
 def is_nan(number_or_obj):
-    return type(number_or_obj) == float and math.isnan(number_or_obj)
+    return type(number_or_obj) == float and math.isnan(number_or_obj) or isna(number_or_obj)
 
 def filter_nans(list_input: Series) -> list:
     return [x for x in list_input if not is_nan(x) and x != ""]

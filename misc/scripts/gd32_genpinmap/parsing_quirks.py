@@ -24,3 +24,8 @@ class OverwriteAdditionFunctionsList(DatasheetPageParsingQuirk):
     def __init__(self, af_list: List[str]) -> None:
         super().__init__()
         self.af_list = af_list
+
+class CondenseColumnsQuirk(DatasheetPageParsingQuirk):
+    def __init__(self, row=0) -> None:
+        super().__init__()
+        self.row = row
