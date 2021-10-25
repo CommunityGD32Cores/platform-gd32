@@ -190,6 +190,104 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         ],
         series = "GD32F150", # series
         family_type = "B" # family type
+    ),
+    "GD32F130xx_Datasheet_Rev3.4.pdf" : DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([31], { "1": ["GD32F130x4"], "2": ["GD32F130x8", "GD32F130x6"], "3": ["GD32F130x8"]}, quirks=[
+                ParseUsingAreaQuirk((130.572,123.132,704.94,533.076)),
+                CondenseColumnsQuirk(),
+            ]),
+            DatasheetAFPageParsingInfo([32], { "1": ["GD32F130x4"], "2": ["GD32F130x8", "GD32F130x6"], "3": ["GD32F130x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.836,124.62,687.084,533.82)),
+                CondenseColumnsQuirk(),
+            ]),
+            DatasheetAFPageParsingInfo([33], { "1": ["GD32F130x4", "GD32F130x6"], "2": ["GD32F130x8"]}, quirks=[
+                ParseUsingAreaQuirk((96.348,124.62,405.852,533.82)),
+                CondenseColumnsQuirk(),
+            ]),
+        ], 
+        pin_defs = [
+            # GD32F130R8
+            DatasheetPinDefPageParsingInfo([15], "GD32F130R8", "LQFP64", [
+                ParseUsingAreaQuirk((175.956,123.876,762.228,533.076)),
+                OverwritePinAdditionalInfoQuirk("PA1", "Additional: ADC_IN1"),
+            ]),
+            DatasheetPinDefPageParsingInfo([16], "GD32F130R8", "LQFP64", [
+                ParseUsingAreaQuirk((80.724,124.62,769.668,531.588)),
+            ]),
+            DatasheetPinDefPageParsingInfo([17], "GD32F130R8", "LQFP64", [
+                ParseUsingAreaQuirk((80.724,124.62,769.668,531.588)),
+            ]),
+            DatasheetPinDefPageParsingInfo([18], "GD32F130R8", "LQFP64", [
+                ParseUsingAreaQuirk((81.468,124.62,588.876,533.076)),
+            ]),
+            # GD32F130Cx
+            DatasheetPinDefPageParsingInfo([19], "GD32F130Cx", "LQFP48", [
+                ParseUsingAreaQuirk((132.804,125.364,768.924,532.332)),
+            ]),
+            DatasheetPinDefPageParsingInfo([20], "GD32F130Cx", "LQFP48", [
+                ParseUsingAreaQuirk((81.468,123.876,769.668,533.076)),
+            ]),
+            DatasheetPinDefPageParsingInfo([21], "GD32F130Cx", "LQFP48", [
+                ParseUsingAreaQuirk((82.212,124.62,703.452,531.588)),
+            ]),
+            # GD32F130Kx LQFP32, meaning actually GD32F130KxTx
+            # HOWEVER, looking at https://www.gigadevice.com/?s=GD32F130K8
+            # There are only U variants listed (QFN32)
+            # and no T variants (LQFP32)
+            # so we actually ignore the LQFP32 variants..
+            # besides, we don't get the package name anyways and
+            # the board definitions also ommit the package.
+            # we might have to rethink that. 
+            #DatasheetPinDefPageParsingInfo([22], "GD32F130Kx", "LQFP32", [
+            #    ParseUsingAreaQuirk((191.58,124.62,772.644,531.588)),
+            #    OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+            #    CondenseColumnsQuirk(),
+            #]),
+            #DatasheetPinDefPageParsingInfo([23], "GD32F130Kx", "LQFP32", [
+            #    ParseUsingAreaQuirk((82.212,123.876,760.74,531.588)),
+            #    CondenseColumnsQuirk(),
+            #]),
+            #DatasheetPinDefPageParsingInfo([24], "GD32F130Kx", "LQFP32", [
+            #    ParseUsingAreaQuirk((81.468,124.62,232.5,532.332)),
+            #    CondenseColumnsQuirk(),
+            #]),
+            # technically this is for GD32F130KxUx but we don't get the package
+            # name.
+            DatasheetPinDefPageParsingInfo([24], "GD32F130Kx", "QFN32", [
+                ParseUsingAreaQuirk((385.02,124.62,768.924,533.076)),
+                OverwritePinAdditionalInfoQuirk("PA3", "Additional: ADC_IN3"),
+                CondenseColumnsQuirk(),
+            ]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F130Kx", "QFN32", [
+                ParseUsingAreaQuirk((82.212,124.62,760.74,533.82)),
+                CondenseColumnsQuirk(),
+            ]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F130Kx", "QFN32", [
+                ParseUsingAreaQuirk((81.468,124.62,444.54,533.076)),
+                CondenseColumnsQuirk(),
+            ]),
+            # GD32F130Gx
+            DatasheetPinDefPageParsingInfo([27], "GD32F130Gx", "QFN28", [
+                ParseUsingAreaQuirk((131.316,124.62,769.668,533.076)),
+                OverwritePinAdditionalInfoQuirk("PB0", "Additional: ADC_IN8"),
+                CondenseColumnsQuirk(),
+            ]),
+            DatasheetPinDefPageParsingInfo([28], "GD32F130Gx", "QFN28", [
+                ParseUsingAreaQuirk((81.468,124.62,690.804,533.076)),
+                CondenseColumnsQuirk(),
+            ]),
+            # GD32F130Fx
+            DatasheetPinDefPageParsingInfo([29], "GD32F130Fx", "TSSOP20", [
+                ParseUsingAreaQuirk((174.468,124.62,771.156,532.332)),
+                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+            ]),
+            DatasheetPinDefPageParsingInfo([30], "GD32F130Fx", "TSSOP20", [
+                ParseUsingAreaQuirk((82.212,124.62,434.124,533.076)),
+            ]),
+        ],
+        series = "GD32F130", # series
+        family_type = "B" # family type
     )
 }
 

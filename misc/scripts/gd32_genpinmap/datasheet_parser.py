@@ -76,6 +76,23 @@ class GD32DatasheetParser:
             # cleanup data error from datasheet ("SPI1_ MOSI(3)")
             if "_ " in input_str_or_float:
                 input_str_or_float = input_str_or_float.replace("_ ", "_", 1)
+            
+            # slight timer fixup.. if we detected "_CH%d_TIMER" we put a 
+            # , after the %d. 
+            # e.g., TIMER1_CH0TIMER1_ETI -> TIMER1_CH0,TIMER1_ETI
+            for c in range(15):
+                if "_CH%dTIMER" % c in input_str_or_float:
+                    input_str_or_float = input_str_or_float.replace("_CH%dTIMER" % c, "_CH%d,TIMER" % c, 1)
+            # general fixups where we're too lazy to do complicated parsing / reconstructing
+            # if key is found, it will be replaced with the value in the dict.
+            general_replacements = {
+                "USART1_T(2)X": "USART1_TX(2)",
+                "SPI1_NSS,EVENTOUT": "SPI1_NSS/EVENTOUT"
+            }
+            for k in general_replacements.keys():
+                if k in input_str_or_float:
+                    input_str_or_float = input_str_or_float.replace(k, general_replacements[k], 1)
+
             return input_str_or_float
         else: 
             # convert float NaN to more easily handable python None value
@@ -137,10 +154,13 @@ class GD32DatasheetParser:
         else:
             print("Failed to extract one datatable from PDF")
             return False
-        dfs = GD32DatasheetParser.cleanup_dataframe(dfs)
         # check if we need to condense columns
         for q in pages_info.get_quirks_of_type(CondenseColumnsQuirk):
             dfs = GD32DatasheetParser.dataframe_condense_columns(dfs, q)
+        else:
+            # if no elements in for loop, do generic cleanup
+            dfs = GD32DatasheetParser.cleanup_dataframe(dfs)
+
 
         print(dfs)
         print(type(dfs))

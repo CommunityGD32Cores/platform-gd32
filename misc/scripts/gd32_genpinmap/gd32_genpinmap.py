@@ -448,8 +448,10 @@ class GD32PinMapGenerator:
         output += "\n/* LED definitions */\n"
         if pinmap.pin_is_available_for_device("PC13", device_name):
             output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
-        else:
+        elif pinmap.pin_is_available_for_device("PB2", device_name):
             output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PB2") # default for now
+        elif pinmap.pin_is_available_for_device("PA4", device_name):
+            output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PA4") # default for now
         output += "\n/* user keys definitions */\n"
         output += GD32PinMapGenerator.add_macro_def("KEY0", "PA0") # default for now
         output += "\n/* SPI definitions */\n"
@@ -693,7 +695,8 @@ def main_func():
     # temporary static path
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf"
+    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf"
+    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf"
     device_pinmap = load_pinmap(datasheet_pdf_path)
     if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)

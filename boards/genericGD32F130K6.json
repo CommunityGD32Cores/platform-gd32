@@ -6,7 +6,8 @@
     "f_cpu": "48000000L",
     "mcu": "gd32f130k6uk",
     "spl_series": "GD32F1x0",
-    "series": "GD32F130"
+    "series": "GD32F130",
+    "variant": "GD32F130K6_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F130K6",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F130K6 (4k RAM, 32k Flash)",
   "upload": {
