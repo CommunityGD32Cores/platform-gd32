@@ -130,6 +130,63 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(2)
             ]),
+            # GD32F150Cx
+            DatasheetPinDefPageParsingInfo([20], "GD32F150Cx", "LQFP48", [
+                ParseUsingAreaQuirk((131.316,121.644,771.156,531.588)),
+                OverwritePinAdditionalInfoQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5"),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(2)
+            ]),
+            DatasheetPinDefPageParsingInfo([21], "GD32F150Cx", "LQFP48", [
+                ParseUsingAreaQuirk((80.724,122.388,766.692,532.332)),
+                OverwritePinAdditionalInfoQuirk("PB15", "Additional: RTC_REFIN"),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([22], "GD32F150Cx", "LQFP48", [
+                ParseUsingAreaQuirk((80.724,122.388,766.692,532.332)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([23], "GD32F150Cx", "LQFP48", [
+                ParseUsingAreaQuirk((80.724,123.132,344.844,531.588)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            # GD32F150Kx
+            DatasheetPinDefPageParsingInfo([24], "GD32F150Kx", "QFN32", [
+                ParseUsingAreaQuirk((131.316,121.644,771.9,532.332)),
+                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F150Kx", "QFN32", [
+                ParseUsingAreaQuirk((81.468,120.9,758.508,531.588)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F150Kx", "QFN32", [
+                ParseUsingAreaQuirk((80.724,121.644,431.892,533.076)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            # GD32F150Gx
+            DatasheetPinDefPageParsingInfo([27], "GD32F150Gx", "QFN28", [
+                ParseUsingAreaQuirk((132.06,122.388,771.9,532.332)),
+                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([28], "GD32F150Gx", "QFN28", [
+                ParseUsingAreaQuirk((81.468,123.132,759.252,530.1)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
+            DatasheetPinDefPageParsingInfo([29], "GD32F150Gx", "QFN28", [
+                ParseUsingAreaQuirk((82.212,121.644,315.084,531.588)),
+                CondenseColumnsQuirk(0),
+                CondenseColumnsQuirk(1)
+            ]),
         ],
         series = "GD32F150", # series
         family_type = "B" # family type
