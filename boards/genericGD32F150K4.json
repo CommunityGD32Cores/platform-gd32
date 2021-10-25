@@ -6,7 +6,8 @@
     "f_cpu": "72000000L",
     "mcu": "gd32f150k4u6",
     "spl_series": "GD32F1x0",
-    "series": "GD32F150"
+    "series": "GD32F150",
+    "variant": "GD32F150K4_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F150K4",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F150K4 (4k RAM, 16k Flash)",
   "upload": {
