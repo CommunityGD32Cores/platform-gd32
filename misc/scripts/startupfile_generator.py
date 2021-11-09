@@ -132,6 +132,11 @@ g_pfnVectors:
         header += arduino_part
     header += header2
     header = header.replace("cortex-m4", cpu_type)
+    if for_arduino:
+      header = header.replace(".isr_vector", ".vectors")
+      header = header.replace("_estack", "_sp")
+      header = header.replace("g_pfnVectors", "__gVectors")
+
     return header
 
 
