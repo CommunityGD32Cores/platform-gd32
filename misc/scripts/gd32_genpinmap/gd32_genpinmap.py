@@ -249,6 +249,11 @@ class GD32PinMapGenerator:
     def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
         output = gigadevice_header
         output += spl_family_b_peripheral_pins_c_header
+        # small correction for header: remove AF above 6
+        if device_name.lower().startswith("gd32e23"):
+            output = output.replace("    GPIO_AF_7,             /* 7 */\n", "")
+            output = output.replace("    GPIO_AF_9,             /* 8 */\n", "")
+            output = output.replace("    GPIO_AF_11             /* 9 */\n", "")
         # ADC
         output += GD32PinMapGenerator.begin_pinmap("ADC")
         for p, f in GD32PinMapGenerator.get_adc_pins(pinmap, device_name):
@@ -699,7 +704,7 @@ def main_func():
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf"
     datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf"
     device_pinmap = load_pinmap(datasheet_pdf_path)
-    if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
+    if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
         save_pinmap(device_pinmap)
         #return
