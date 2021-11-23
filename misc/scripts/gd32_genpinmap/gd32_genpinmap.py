@@ -696,9 +696,10 @@ def main_func():
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
     #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf"
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf"
+    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf"
+    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf"
     device_pinmap = load_pinmap(datasheet_pdf_path)
-    if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
+    if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
         device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
         save_pinmap(device_pinmap)
         #return

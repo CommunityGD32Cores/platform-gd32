@@ -6,7 +6,8 @@
     "f_cpu": "72000000L",
     "mcu": "gd32e230c4t6",
     "spl_series": "GD32E23x",
-    "series": "GD32E230"
+    "series": "GD32E230",
+    "variant": "GD32E230C4_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32E230C4",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32E230C4 (4k RAM, 16k Flash)",
   "upload": {

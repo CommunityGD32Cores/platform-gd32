@@ -77,6 +77,10 @@ class GD32DatasheetParser:
             if "_ " in input_str_or_float:
                 input_str_or_float = input_str_or_float.replace("_ ", "_", 1)
             
+            # cleanup double "/"
+            if input_str_or_float.count("//") >= 1:
+                input_str_or_float = input_str_or_float.replace("//", "/")
+
             # slight timer fixup.. if we detected "_CH%d_TIMER" we put a 
             # , after the %d. 
             # e.g., TIMER1_CH0TIMER1_ETI -> TIMER1_CH0,TIMER1_ETI

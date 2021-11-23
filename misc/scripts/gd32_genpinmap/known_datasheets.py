@@ -288,6 +288,32 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         ],
         series = "GD32F130", # series
         family_type = "B" # family type
+    ),
+    "GD32E230xx_Datasheet_Rev1.4.pdf" : DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([32], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+                ParseUsingAreaQuirk((132.831,124.645,708.059,533.928)),
+            ]),
+            DatasheetAFPageParsingInfo([33], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+                ParseUsingAreaQuirk((94.879,124.645,637.364,535.416)),
+            ]),
+            DatasheetAFPageParsingInfo([33], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+                ParseUsingAreaQuirk((658.201,125.389,757.917,533.928 )),
+                OverwritePinAlternateInfoQuirk("PF6", ["I2C0_SCL(1)/I2C1_SCL(3)", None, None, None, None, None, None])
+            ]),
+            DatasheetAFPageParsingInfo([34], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+                ParseUsingAreaQuirk((79.996,124.645,178.968,533.183 ))
+            ]),
+        ],
+        pin_defs = [
+            # GD32E230Cx
+            DatasheetPinDefPageParsingInfo([18], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((179.712,125.389,757.173,536.904))]),
+            DatasheetPinDefPageParsingInfo([19], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.996,124.645,766.102,535.416))]),
+            DatasheetPinDefPageParsingInfo([20], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.252,124.645,758.661,534.672))]),
+            # page 21 only has VSS and VDD, non important.
+        ],
+        series = "GD32E230", # series
+        family_type = "B" # family type
     )
 }
 
