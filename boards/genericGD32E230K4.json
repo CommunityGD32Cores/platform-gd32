@@ -6,11 +6,12 @@
     "f_cpu": "72000000L",
     "mcu": "gd32e230k4u6",
     "spl_series": "GD32E23x",
-    "series": "GD32E230"
+    "series": "GD32E230",
+    "variant": "GD32E230K4_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32E230K4",
-    "openocd_target": "stm32f2x",
+    "openocd_target": "gd32e23x",
     "svd_path": "GD32E230.svd",
     "default_tools": [
       "stlink"
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32E230K4 (4k RAM, 16k Flash)",
   "upload": {

@@ -311,6 +311,12 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([19], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.996,124.645,766.102,535.416))]),
             DatasheetPinDefPageParsingInfo([20], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.252,124.645,758.661,534.672))]),
             # page 21 only has VSS and VDD, non important.
+            DatasheetPinDefPageParsingInfo([21], "GD32E230Kx", "LQFP32", [
+                ParseUsingAreaQuirk((325.566,125.389,759.405,536.904)),
+                OverwritePinAdditionalInfoQuirk("PA4", "Additional: ADC_IN4, CMP_IM4"),
+            ]),
+            DatasheetPinDefPageParsingInfo([22], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,124.645,772.8,535.416 ))]),
+            DatasheetPinDefPageParsingInfo([23], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,123.157,343.425,536.16))]),
         ],
         series = "GD32E230", # series
         family_type = "B" # family type

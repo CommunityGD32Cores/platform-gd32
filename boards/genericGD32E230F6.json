@@ -10,7 +10,7 @@
   },
   "debug": {
     "jlink_device": "GD32E230F6",
-    "openocd_target": "stm32f2x",
+    "openocd_target": "gd32e23x",
     "svd_path": "GD32E230.svd",
     "default_tools": [
       "stlink"
