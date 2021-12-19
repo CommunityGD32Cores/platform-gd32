@@ -178,7 +178,8 @@ def autodetect_cpu_type(filename):
         "gd32f30x": "cortex-m4",  # GD32F30x_Firmware_Library_V2.1.2
         "gd32e50x": "cortex-m33",  # GD32E50x_Firmware_Library_V1.2.1
         "gd32e508": "cortex-m33",
-        "gd32eprt": "cortex-m33"
+        "gd32eprt": "cortex-m33",
+        "gd32w51x": "cortex-m33",  #GD32W51x_Firmware_Library_V1.0.0
     }
     for key in filename_to_cpu.keys():
         print("checking against " + str(key))
