@@ -310,13 +310,27 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([18], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((179.712,125.389,757.173,536.904))]),
             DatasheetPinDefPageParsingInfo([19], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.996,124.645,766.102,535.416))]),
             DatasheetPinDefPageParsingInfo([20], "GD32E230Cx", "LQFP48", [ParseUsingAreaQuirk((79.252,124.645,758.661,534.672))]),
-            # page 21 only has VSS and VDD, non important.
+            # page 21 only has VSS and VDD, non important for Cx.
+            # GD32E230Kx, LQFP32 and QFN32 definitions are the same.
             DatasheetPinDefPageParsingInfo([21], "GD32E230Kx", "LQFP32", [
                 ParseUsingAreaQuirk((325.566,125.389,759.405,536.904)),
                 OverwritePinAdditionalInfoQuirk("PA4", "Additional: ADC_IN4, CMP_IM4"),
             ]),
-            DatasheetPinDefPageParsingInfo([22], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,124.645,772.8,535.416 ))]),
+            DatasheetPinDefPageParsingInfo([22], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,124.645,772.8,535.416))]),
             DatasheetPinDefPageParsingInfo([23], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,123.157,343.425,536.16))]),
+            # GD32E230Gx
+            DatasheetPinDefPageParsingInfo([25], "GD32E230Gx", "QFN28", [ParseUsingAreaQuirk((697.641,123.901,763.87,536.904))]),
+            DatasheetPinDefPageParsingInfo([26], "GD32E230Gx", "QFN28", [
+                ParseUsingAreaQuirk((79.252,124.645,768.335,536.904)),
+                OverwritePinAdditionalInfoQuirk("PB1", "Additional: ADC_IN9"),
+            ]),
+            DatasheetPinDefPageParsingInfo([27], "GD32E230Gx", "QFN28", [ParseUsingAreaQuirk((80.74,124.645,602.389,535.416))]),
+            # GD32E230Fx TSSOP20 + LGA20.
+            DatasheetPinDefPageParsingInfo([28], "GD32E230Fx", "TSSOP20", [
+                ParseUsingAreaQuirk((135.063,123.157,763.87,535.416)),
+                OverwritePinAdditionalInfoQuirk("PB1", "Additional: ADC_IN9"),
+            ]),
+            DatasheetPinDefPageParsingInfo([29], "GD32E230Fx", "TSSOP20", [ParseUsingAreaQuirk((79.996,123.901,333.751,535.416))])
         ],
         series = "GD32E230", # series
         family_type = "B" # family type

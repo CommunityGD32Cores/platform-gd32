@@ -251,7 +251,10 @@ class GD32DatasheetParser:
 
     def strip_pinname(pin_name:str):
         if "-" in pin_name:
-            return pin_name[0 : pin_name.index("-")]
+            pin_name = pin_name[0 : pin_name.index("-")]
+        # to get rid of "PA9(6)" style pin names with footnotes
+        if "(" in pin_name:
+            pin_name = pin_name[0 : pin_name.index("(")]
         return pin_name
 
     def merge_additional_funcs_into_pinmap(add_funcs_fam:GD32AdditionalFuncFamiliy, gd32_pin_map:GD32PinMap):
