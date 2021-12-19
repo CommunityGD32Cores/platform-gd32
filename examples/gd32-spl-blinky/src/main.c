@@ -50,7 +50,7 @@ int main(void)
     /* set output as output */
 #if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x) || defined(GD32L23x) || defined(GD32W51x)
     gpio_mode_set(LEDPORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LEDPIN);
-    gpio_output_options_set(LEDPORT, GPIO_OTYPE_PP, GPIO_OSPEED_10MHZ, LEDPIN);
+    gpio_output_options_set(LEDPORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, LEDPIN);
 #else /* valid for GD32F10x, GD32E20x, GD32F30x, GD32F403, GD32E10X */
     gpio_init(LEDPORT, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, LEDPIN);
 #endif
