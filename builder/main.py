@@ -43,7 +43,7 @@ def BeforeUpload(target, source, env):  # pylint: disable=W0613,W0621
 
 def check_debugger_config_file():
     global platform
-    expected_filepath = join(platform.get_package_dir("tool-openocd"), "scripts", "interface", "ftdi", "sipeed-rv-debugger.cfg")
+    expected_filepath = join(platform.get_package_dir("tool-openocd-gd32"), "scripts", "interface", "ftdi", "sipeed-rv-debugger.cfg")
     expected_filecontents = """adapter driver ftdi
 ftdi_device_desc "JTAG Debugger"
 ftdi_vid_pid 0x0403 0x6010
@@ -328,7 +328,7 @@ elif upload_protocol in debug_tools:
     ])
     openocd_args = [
         f.replace("$PACKAGE_DIR",
-                  platform.get_package_dir("tool-openocd") or "")
+                  platform.get_package_dir("tool-openocd-gd32") or "")
         for f in openocd_args
     ]
     env.Replace(

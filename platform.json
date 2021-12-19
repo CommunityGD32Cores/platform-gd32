@@ -80,10 +80,10 @@
       "owner": "platformio",
       "version": "~1.0.1"
     },
-    "tool-openocd": {
+    "tool-openocd-gd32": {
       "type": "uploader",
       "optional": true,
-      "owner": "platformio",
+      "owner": "communitygd32cores",
       "version": "~2.1100.0"
     },
     "tool-jlink": {

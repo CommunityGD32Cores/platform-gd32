@@ -145,7 +145,7 @@ class Gd32Platform(PlatformBase):
 
                 debug["tools"][link] = {
                     "server": {
-                        "package": "tool-openocd",
+                        "package": "tool-openocd-gd32",
                         "executable": "bin/openocd",
                         "arguments": server_args
                     }
