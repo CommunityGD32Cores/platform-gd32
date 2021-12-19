@@ -167,6 +167,7 @@ def autodetect_cpu_type(filename):
     filename_to_cpu = {
         "gd32e10x": "cortex-m3",  # GD32E10x_Firmware_Library_V1.2.1
         "gd32e23x": "cortex-m23",  # GD32E23x_Firmware_Library_V1.1.1
+        "gd32l23x": "cortex-m23",  # GD32L23x_Firmware_Library_V1.0.0
         "gd32f1x0": "cortex-m3",  # GD32F1x0_Firmware_Library_V3.3.2
         "gd32f3x0": "cortex-m4",  # GD32F3x0_Firmware_Library_V2.1.2
         # covers gd32f{405,407, 450} from GD32F4xx_Firmware_Library_V2.1.3

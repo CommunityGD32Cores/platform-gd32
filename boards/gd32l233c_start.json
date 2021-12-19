@@ -5,7 +5,7 @@
     "extra_flags": "-DGD32L2 -DGD32L233 -DGD32L23x",
     "f_cpu": "64000000L",
     "mcu": "gd32l233cct6",
-    "spl_series": "GD32E23x",
+    "spl_series": "GD32L23x",
     "series": "GD32L233"
   },
   "debug": {
@@ -16,7 +16,7 @@
     "onboard_tools": [
       "cmsis-dap"
     ],
-    "openocd_target": "stm32f1x",
+    "openocd_target": "gd32e23x",
     "svd_path": "GD32L23x.svd",
     "openocd_extra_pre_target_args": [
       "-c",
