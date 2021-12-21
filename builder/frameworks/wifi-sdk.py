@@ -1,4 +1,4 @@
-# Copyright 2014-present PlatformIO <contact@platformio.org>
+# Copyright 2021-present CommunityCoresGD32 <maximlian.gerhardt@rub.de>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,10 @@
 # limitations under the License.
 
 """
-SPL
+WiFi SDK
 
-The ST Standard Peripheral Library provides a set of functions for
-handling the peripherals on the GD32 ARM chip family.
-The idea is to save the user (the new user, in particular) having to deal
-directly with the registers.
+The GigaDevice supplied WiFi SDK enables the development of WiFi-enabled
+firmwares for GD32W51x series microcontrollers.
 """
 
 from os.path import isdir, isfile, join, dirname, realpath
@@ -32,10 +30,7 @@ board = env.BoardConfig()
 
 env.SConscript("_bare.py")
 
-# by default, add newlibnano into linker flags.
-# otherwise many standard C functions won't be accessible without using a own syscall
-# implementation.
-# but we also check if need to add semhosting here
+# same semihosting logic as with SPL
 activate_semihosting = board.get("debug.semihosting", False)
 activate_semihosting = str(activate_semihosting).lower() in ("1", "yes", "true")
 if activate_semihosting:
@@ -44,13 +39,11 @@ if activate_semihosting:
 else:
     env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
+FRAMEWORK_DIR = platform.get_package_dir("framework-wifi-sdk-gd32")
 assert isdir(FRAMEWORK_DIR)
 
-# hardcoded -- only gd32 chips 
-spl_chip_type = "gd32"
-if not board.get("build.mcu").startswith("gd32"):
-    print("Error! This is a non GD32 chip in the GD32 repository. Don't know which SPL implementation to use.")
+if not board.get("build.mcu").startswith("gd32w51"):
+    print("Error! Only GD32W51x chips are supported by this framework")
     env.Exit(-1)
 
 # the SPL series key in the JSON is mixed case to match the vendor convention, 
@@ -204,58 +197,3 @@ libs.append(env.BuildLibrary(
 ))
 
 env.Append(LIBS=libs)
-
-# include optional SPL libraries into the library search path for the LDF
-# can be put in board def file, or overridden in the platformio.ini with
-# board_build.spl_libs = no
-def configure_builtin_spl_libs(board):
-    SPL_LIBRARIES_PATH = join(FRAMEWORK_DIR, spl_chip_type, "spl", "libraries", spl_series)
-    should_include_spl_libs = board.get("build.spl_libs", True)
-    should_include_spl_libs = str(should_include_spl_libs).lower() in ("1", "yes", "true")
-    print("SPL libraries are included: " + str(should_include_spl_libs))
-    if isdir(SPL_LIBRARIES_PATH) and should_include_spl_libs:
-        env.Append(
-            LIBSOURCE_DIRS = SPL_LIBRARIES_PATH
-        )
-
-configure_builtin_spl_libs(board)
-
-def configure_builtin_cmsis_libs(board):
-    CMSIS_LIBRARIES_PATH = join(FRAMEWORK_DIR, "gd32", "cmsis", "libraries")
-    should_include_cmsis_libs = board.get("build.cmsis_libs", True)
-    should_include_cmsis_libs = str(should_include_cmsis_libs).lower() in ("1", "yes", "true")
-    print("CMSIS libraries are included: " + str(should_include_cmsis_libs))
-    if isdir(CMSIS_LIBRARIES_PATH) and should_include_cmsis_libs:
-        env.Append(
-            LIBSOURCE_DIRS = CMSIS_LIBRARIES_PATH
-        )
-
-configure_builtin_cmsis_libs(board)
-
-# Configure possible FPU / DSP / VFP
-# see https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
-def configure_floatingpoint(board):
-    # default settings: Hard-FP for Cortex-M33, Soft-FP for Cortex-M4(F).
-    should_use_cm33_hardfloat = board.get("build.cm33_hardfloat", True)
-    should_use_cm33_hardfloat = str(should_use_cm33_hardfloat).lower() in ("1", "yes", "true")
-    should_use_cm4_hardfloat = board.get("build.cm4_hardfloat", False)
-    should_use_cm4_hardfloat = str(should_use_cm4_hardfloat).lower() in ("1", "yes", "true")
-    # deduce flags
-    board_cpu = board.get('build.cpu', "")
-    core_type_to_fpu_flags = {
-        "cortex-m33": [
-            "-mfloat-abi=%s" % ("hard" if should_use_cm33_hardfloat else "softfp") , 
-            "-march=armv8-m.main+dsp+fp" # E50x and W51x all have DSP + FPU
-        ],
-        "cortex-m4": [
-            "-mfloat-abi=%s" % ("hard" if should_use_cm4_hardfloat else "softfp") , 
-            "-mfpu=fpv4-sp-d16"
-        ],
-    }
-    # inject
-    if board_cpu in core_type_to_fpu_flags.keys():
-        flags = core_type_to_fpu_flags[board_cpu]
-        # add FPU/DSP/Float ABI flags to both compilation and linking stage
-        env.Append(CCFLAGS=flags, LINKFLAGS=flags)
-
-configure_floatingpoint(board)
