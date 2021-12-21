@@ -32,6 +32,11 @@ board = env.BoardConfig()
 
 env.SConscript("_bare.py")
 
+def get_flag_value(flag_name:str, default_val:bool):
+    flag_val = board.get("build.%s" % flag_name, default_val)
+    flag_val = str(flag_val).lower() in ("1", "yes", "true")
+    return flag_val
+
 # by default, add newlibnano into linker flags.
 # otherwise many standard C functions won't be accessible without using a own syscall
 # implementation.
@@ -57,6 +62,13 @@ if not board.get("build.mcu").startswith("gd32"):
 # but our directory names are lowercase. 
 spl_series = board.get("build.spl_series").lower()
 
+def process_standard_library_configuration(cpp_defines):
+    if "PIO_FRAMEWORK_SPL_STANDARD_LIB" in cpp_defines or get_flag_value("spl_std_lib", False):
+        env["LINKFLAGS"].remove("--specs=nano.specs")
+    if "PIO_FRAMEWORK_SPL_NANOLIB_FLOAT_PRINTF" in cpp_defines or get_flag_value("spl_printf_float", False):
+        env.Append(LINKFLAGS=["-u_printf_float"])
+    if "PIO_FRAMEWORK_SPL_NANOLIB_FLOAT_SCANF" in cpp_defines or get_flag_value("spl_scanf_float", False):
+        env.Append(LINKFLAGS=["-u_scanf_float"])
 
 def get_linker_script(mcu):
     # naming convention is to take the MCU name but without the package name
@@ -147,6 +159,9 @@ if not board.get("build.ldscript", ""):
     env.Replace(
         LDSCRIPT_PATH=get_linker_script(board.get("build.mcu")))
 
+# Configure standard library
+cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
+process_standard_library_configuration(cpp_defines)
 #
 # Target: Build SPL Library
 #
