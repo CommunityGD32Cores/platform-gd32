@@ -250,8 +250,11 @@ configure_builtin_cmsis_libs(board)
 # Configure possible FPU / DSP / VFP
 # see https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
 def configure_floatingpoint(board):
-    # default settings: Hard-FP for Cortex-M33, Soft-FP for Cortex-M4(F).
-    should_use_cm33_hardfloat = board.get("build.cm33_hardfloat", True)
+    # default settings: Soft-FP for Cortex-M33, Soft-FP for Cortex-M4(F).
+    # CMSIS-DSP requires hardfloat for Cortex-M33
+    # FreeRTOS requires softfloat for Cortex-M33
+    # project has to select the right one... 
+    should_use_cm33_hardfloat = board.get("build.cm33_hardfloat", False)
     should_use_cm33_hardfloat = str(should_use_cm33_hardfloat).lower() in ("1", "yes", "true")
     should_use_cm4_hardfloat = board.get("build.cm4_hardfloat", False)
     should_use_cm4_hardfloat = str(should_use_cm4_hardfloat).lower() in ("1", "yes", "true")
