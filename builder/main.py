@@ -307,6 +307,32 @@ elif upload_protocol == "hid":
         env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE")
     ]
 
+elif upload_protocol == "gdlinkcli":
+    def _gdlinkcli_cmd_script(env, source):
+        build_dir = env.subst("$BUILD_DIR")
+        if not isdir(build_dir):
+            makedirs(build_dir)
+        script_path = join(build_dir, "upload.gdlinkcli")
+        # halt, load binary, reset, quit.
+        commands = [
+            "h", 
+            "loadbin %s %s" % (source, board.get(
+                "upload.offset_address", "0x08000000")),
+            "r",
+            "q"
+        ]
+        with open(script_path, "w") as fp:
+            fp.write("\n".join(commands))
+        return script_path
+
+    env.Replace(
+        __gdlinkcli_cmd_script=_gdlinkcli_cmd_script,
+        UPLOADER="gdlink.bat", # wrapper script that calls into GD_Link_CLI.exe and corrects error code
+        UPLOADERFLAGS=[],
+        UPLOADCMD='$UPLOADER $UPLOADERFLAGS -commandfile "${__gdlinkcli_cmd_script(__env__, SOURCE)}"'
+    )
+    upload_actions = [env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE")]
+
 elif upload_protocol in debug_tools:
 
     # quick fix: add config file on-the-fly

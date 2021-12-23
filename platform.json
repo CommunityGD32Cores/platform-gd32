@@ -99,6 +99,12 @@
       "owner": "communitygd32cores",
       "version": "~2.1100.0"
     },
+    "tool-gdlinkcli": {
+      "type": "uploader",
+      "optional": true,
+      "owner": "communitygd32cores",
+      "version": "https://github.com/CommunityGD32Cores/pio-gd32-gdlinkcli.git"
+    },
     "tool-jlink": {
       "type": "uploader",
       "optional": true,

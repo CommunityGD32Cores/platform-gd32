@@ -49,6 +49,8 @@ class Gd32Platform(PlatformBase):
         default_protocol = board_config.get("upload.protocol") or ""
         if variables.get("upload_protocol", default_protocol) == "dfu":
             self.packages["tool-dfuutil"]["optional"] = False
+        if variables.get("upload_protocol", default_protocol) == "gdlinkcli":
+            self.packages["tool-gdlinkcli"]["optional"] = False
 
         # configure J-LINK tool
         jlink_conds = [
