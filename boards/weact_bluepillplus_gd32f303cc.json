@@ -1,0 +1,60 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F3 -DGD32F303 -DGD32F30x -DGD32F30X_HD",
+    "f_cpu": "120000000L",
+    "mcu": "gd32f303cct6",
+    "spl_series": "GD32F30x",
+    "series": "GD32F303",
+    "hwids": [
+      [
+        "0x1EAF",
+        "0x0003"
+      ],
+      [
+        "0x1EAF",
+        "0x0004"
+      ]
+    ],
+    "spl_sub_series": "HD",
+    "variant": "GD32F303CC_GENERIC"
+  },
+  "debug": {
+    "jlink_device": "GD32F303CC",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32F30x_HD.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0x2ba01477"
+    ]
+  },
+  "frameworks": [
+    "spl",
+    "arduino"
+  ],
+  "name": "WeAct Studio Bluepill Plus GD32F303CC (48k RAM, 256k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 49152,
+    "maximum_size": 262144,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "dfu"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://github.com/WeActTC/BluePill-Plus",
+  "vendor": "WeAct Studio"
+}
