@@ -18,7 +18,7 @@
       ]
     ],
     "spl_sub_series": "HD",
-    "variant": "GD32F303CC_GENERIC"
+    "variant": "WEACT_BLUEPILLPLUS_GD32F303CC"
   },
   "debug": {
     "jlink_device": "GD32F303CC",
