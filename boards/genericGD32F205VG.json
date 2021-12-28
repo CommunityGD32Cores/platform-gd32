@@ -36,7 +36,8 @@
       "stlink",
       "blackmagic",
       "sipeed-rv-debugger",
-      "serial"
+      "serial",
+      "gdlinkcli"
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,

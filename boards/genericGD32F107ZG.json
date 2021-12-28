@@ -47,6 +47,7 @@
       "blackmagic",
       "sipeed-rv-debugger",
       "serial",
+      "gdlinkcli",
       "dfu"
     ],
     "require_upload_port": true,

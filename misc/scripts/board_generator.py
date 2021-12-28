@@ -85,8 +85,8 @@ class GD32MCUInfo:
         "GD32F10x": "stm32f1x",
         "GD32F1x0": "stm32f1x",
         "GD32F20x": "stm32f2x", # guess
-        "GD32E23x": "gd32e23x", # needs newest OpenOCD   # guess, these are cortex-m23. probably needs https://github.com/GigaDevice-Semiconductor/openocd/blob/xpack/tcl/target/gd32e23x.cfg
-        "GD32E50X": "stm32f4x", # guess, these are cortex-m33. will likely not work, needs custom OpenOCD expansion..
+        "GD32E23x": "gd32e23x", # supported in latest OpenOCD
+        "GD32E50X": "gd32e50x", # supported through our OpenOCD fork
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
@@ -306,7 +306,8 @@ class GD32MCUInfo:
                     "stlink",
                     "blackmagic",
                     "sipeed-rv-debugger",
-                    "serial"
+                    "serial",
+                    "gdlinkcli" # this tool is Windows-only atm
                 ],
                 # todo check if these make sense...
                 "require_upload_port": True,

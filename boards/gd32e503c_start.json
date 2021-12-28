@@ -11,7 +11,7 @@
   },
   "debug": {
     "jlink_device": "GD32E503CE",
-    "openocd_target": "gd32e23x",
+    "openocd_target": "gd32e50x",
     "svd_path": "GD32E50X_HD.svd",
     "onboard_tools": [
       "cmsis-dap"

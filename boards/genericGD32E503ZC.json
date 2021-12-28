@@ -11,7 +11,7 @@
   },
   "debug": {
     "jlink_device": "GD32E503ZC",
-    "openocd_target": "stm32f4x",
+    "openocd_target": "gd32e50x",
     "svd_path": "GD32E50X_HD.svd",
     "default_tools": [
       "stlink"
@@ -36,7 +36,8 @@
       "stlink",
       "blackmagic",
       "sipeed-rv-debugger",
-      "serial"
+      "serial",
+      "gdlinkcli"
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
