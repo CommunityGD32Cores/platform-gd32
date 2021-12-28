@@ -7,7 +7,8 @@
     "mcu": "gd32e503cet6",
     "spl_series": "GD32E50X",
     "series": "GD32E503",
-    "spl_sub_series": "HD"
+    "spl_sub_series": "HD",
+    "variant": "GD32E503C_START"
   },
   "debug": {
     "jlink_device": "GD32E503CE",
@@ -25,6 +26,7 @@
     ]
   },
   "frameworks": [
+    "arduino",
     "spl"
   ],
   "name": "GD32E503CE (128k RAM, 512k Flash)",
@@ -32,7 +34,7 @@
     "disable_flushing": false,
     "maximum_ram_size": 131072,
     "maximum_size": 524288,
-    "protocol": "gdlinkcli",
+    "protocol": "cmsis-dap",
     "protocols": [
       "jlink",
       "cmsis-dap",
