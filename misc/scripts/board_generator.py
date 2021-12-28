@@ -75,10 +75,10 @@ class GD32MCUInfo:
         "GD32E230": "GD32E23x",
         "GD32E231": "GD32E23x",
         "GD32E232": "GD32E23x", # MCU not yet available
-        "GD32E503": "GD32E50X", # uppercase X here is *wanted*.
-        "GD32E505": "GD32E50X",
-        "GD32E507": "GD32E50X",
-        "GD32E508": "GD32E50X"  # listed in SPL header but no chip listed yet..
+        "GD32E503": "GD32E50x", # uppercase X is in macro (specially handled) but all folder names user lowercase x
+        "GD32E505": "GD32E50x",
+        "GD32E507": "GD32E50x",
+        "GD32E508": "GD32E50x"  # listed in SPL header but no chip listed yet..
     }
 
     spl_series_to_openocd_target = {
@@ -86,7 +86,7 @@ class GD32MCUInfo:
         "GD32F1x0": "stm32f1x",
         "GD32F20x": "stm32f2x", # guess
         "GD32E23x": "gd32e23x", # supported in latest OpenOCD
-        "GD32E50X": "gd32e50x", # supported through our OpenOCD fork
+        "GD32E50x": "gd32e50x", # supported through our OpenOCD fork
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
@@ -141,7 +141,7 @@ class GD32MCUInfo:
                 # 256-512kByte: HD
                 # >512kByte: XD
                 sub_series = "MD" if self.flash_kb <= 128 else "HD" if self.flash_kb <= 512 else "XD"
-        if self.spl_series == "GD32E50X":
+        if self.spl_series.lower() == "gd32e50x":
             # there are GD32EPRT, GD32E50X_HD, GD32E50X_XD, GD32E50X_CL and GD32E508..
             # however, only CL, XD and HD are explained
             if self.name.startswith("GD32E505") or self.name.startswith("GD32E507"):
@@ -165,13 +165,21 @@ class GD32MCUInfo:
         # special case for E23x series
         if self.spl_series == "GD32E23x":
             svd = f"{self.series}.svd"
+        if self.spl_series.lower() == "gd32e50x":
+            if self.sub_series is None:
+                svd = f"{self.spl_series}.svd"
+            else:
+                svd = f"{self.spl_series.upper()}_{self.sub_series}.svd"
         self.svd_path = svd
 
     def infer_compile_flags(self):
         compile_flags = [] 
         compile_flags += ["-D" + self.series[0:6]]
         compile_flags += ["-D" + self.series]
-        compile_flags += ["-D" + self.spl_series]
+        if self.spl_series.lower() == "gd32e50x":
+            compile_flags += ["-D" + self.spl_series.upper()]
+        else:
+            compile_flags += ["-D" + self.spl_series]
         if self.sub_series is not None:
             compile_flags += ["-D" + self.spl_series.upper() + "_" + self.sub_series]
         # todo add more series specific compile flags

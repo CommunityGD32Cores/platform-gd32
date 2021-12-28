@@ -5,7 +5,7 @@
     "extra_flags": "-DGD32E5 -DGD32E505 -DGD32E50X -DGD32E50X_CL",
     "f_cpu": "180000000L",
     "mcu": "gd32e505vet6",
-    "spl_series": "GD32E50X",
+    "spl_series": "GD32E50x",
     "series": "GD32E505",
     "spl_sub_series": "CL"
   },
