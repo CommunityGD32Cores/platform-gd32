@@ -90,8 +90,7 @@ LoopFillZerobss:
 """
     arduino_part = """
 /* call into Arduino core's low-level first-init function */
-  bl first_system_init
-"""
+  bl first_system_init"""
     header2 = """
 /* Call the clock system initialization function.*/
   bl  SystemInit   
