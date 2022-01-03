@@ -49,6 +49,10 @@ if activate_semihosting:
 else:
     env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
 
+# make it easure to enable LTO
+if get_flag_value("use_lto", False):
+    env.Append(LINKFLAGS=["-flto"])
+
 FRAMEWORK_DIR = platform.get_package_dir("framework-spl-gd32")
 assert isdir(FRAMEWORK_DIR)
 
@@ -267,7 +271,8 @@ def configure_floatingpoint(board):
         ],
         "cortex-m4": [
             "-mfloat-abi=%s" % ("hard" if should_use_cm4_hardfloat else "softfp") , 
-            "-mfpu=fpv4-sp-d16"
+            "-mfpu=fpv4-sp-d16",
+            "-march=armv7e-m+fp" # so that correct thumb\v7e-m+fp GCC library is selected
         ],
     }
     # inject
@@ -277,3 +282,19 @@ def configure_floatingpoint(board):
         env.Append(CCFLAGS=flags, LINKFLAGS=flags)
 
 configure_floatingpoint(board)
+
+def configure_printf_lib():
+    # allows wrapping of printf functions though, e.g., printf-minimal library.
+    if get_flag_value("use_minimal_printf", False):
+        env.Append(LINKFLAGS=[
+            "-Wl,--wrap,printf",
+            "-Wl,--wrap,sprintf",
+            "-Wl,--wrap,snprintf",
+            "-Wl,--wrap,vprintf",
+            "-Wl,--wrap,vsprintf",
+            "-Wl,--wrap,vsnprintf",
+            "-Wl,--wrap,fprintf",
+            "-Wl,--wrap,vfprintf"
+        ])
+
+configure_printf_lib()
