@@ -84,13 +84,12 @@ class GD32MCUInfo:
     spl_series_to_openocd_target = {
         "GD32F10x": "stm32f1x",
         "GD32F1x0": "stm32f1x",
-        "GD32F20x": "stm32f2x", # guess
+        "GD32F20x": "stm32f1x",
         "GD32E23x": "gd32e23x", # supported in latest OpenOCD
         "GD32E50x": "gd32e50x", # supported through our OpenOCD fork
         "GD32F30x": "stm32f1x",
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
-        "GD32F20x": "stm32f2x",
         "GD32F4xx": "stm32f4x",
         "GD32F450": "stm32f4x"
     }

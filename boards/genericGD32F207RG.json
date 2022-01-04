@@ -11,7 +11,7 @@
   },
   "debug": {
     "jlink_device": "GD32F207RG",
-    "openocd_target": "stm32f2x",
+    "openocd_target": "stm32f1x",
     "svd_path": "GD32F20x_CL.svd",
     "default_tools": [
       "stlink"
