@@ -1,0 +1,49 @@
+{
+   "build":{
+      "core":"gd32",
+      "cpu":"cortex-m23",
+      "extra_flags":"-DGD32L2 -DGD32L233 -DGD32L23x",
+      "f_cpu":"64000000L",
+      "mcu":"gd32l233kbt6",
+      "spl_series":"GD32L23x",
+      "series":"GD32L233"
+   },
+   "debug":{
+      "default_tools":[
+         "cmsis-dap"
+      ],
+      "jlink_device":"GD32L233KB",
+      "onboard_tools":[
+         "cmsis-dap"
+      ],
+      "openocd_target":"gd32e23x",
+      "svd_path":"GD32L23x.svd",
+      "openocd_extra_pre_target_args":[
+         "-c",
+         "set CPUTAPID 0"
+      ]
+   },
+   "frameworks":[
+      "spl"
+   ],
+   "name":"GD32L233CC (24k RAM, 128k Flash)",
+   "upload":{
+      "disable_flushing":false,
+      "maximum_ram_size":24576,
+      "maximum_size":131072,
+      "protocol":"cmsis-dap",
+      "protocols":[
+         "jlink",
+         "cmsis-dap",
+         "stlink",
+         "blackmagic",
+         "sipeed-rv-debugger",
+         "serial"
+      ],
+      "require_upload_port":true,
+      "use_1200bps_touch":false,
+      "wait_for_upload_port":false
+   },
+   "url":"https://www.gigadevice.com/press-release/gigadevice-launches-the-new-gd32l233-series-for-energy-saving-applications/",
+   "vendor":"GigaDevice"
+}
