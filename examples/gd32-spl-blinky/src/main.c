@@ -32,6 +32,11 @@
 #define LEDPORT     GPIOA
 #define LEDPIN      GPIO_PIN_1
 #define LED_CLOCK   RCU_GPIOA
+#elif GD32L233K_START
+/* correct LED for GD32L233k-START board. PA8 */
+#define LEDPORT GPIOA
+#define LEDPIN GPIO_PIN_8
+#define LED_CLOCK RCU_GPIOA
 #else
 #define LEDPORT     GPIOC
 #define LEDPIN      GPIO_PIN_13
