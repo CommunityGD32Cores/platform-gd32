@@ -78,7 +78,8 @@ class GD32MCUInfo:
         "GD32E503": "GD32E50x", # uppercase X is in macro (specially handled) but all folder names user lowercase x
         "GD32E505": "GD32E50x",
         "GD32E507": "GD32E50x",
-        "GD32E508": "GD32E50x"  # listed in SPL header but no chip listed yet..
+        "GD32E508": "GD32E50x",  # listed in SPL header but no chip listed yet..
+        "GD32L233": "GD32L23x"
     }
 
     spl_series_to_openocd_target = {
@@ -91,7 +92,8 @@ class GD32MCUInfo:
         "GD32F3x0": "stm32f1x",
         "GD32E10X": "stm32f1x",
         "GD32F4xx": "stm32f4x",
-        "GD32F450": "stm32f4x"
+        "GD32F450": "stm32f4x",
+        "GD32L23x": "gd32e23x" # works per user comment
     }
 
     known_arduino_variants = {
@@ -385,7 +387,9 @@ def main():
     #print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
     #print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
     #print_board_files_mcus = ["GD32E231C8T6"]
-    print_board_files_mcus = ["GD32E507ZE"]
+    #print_board_files_mcus = ["GD32E507ZE"]
+    #print_board_files_mcus = ["GD32E507ZE"]
+    print_board_files_mcus = ["GD32L233CBT6"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
