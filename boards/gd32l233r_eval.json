@@ -10,6 +10,9 @@
   },
   "debug": {
     "jlink_device": "GD32L233RC",
+    "onboard_tools": [
+      "cmsis-dap"
+    ],
     "openocd_target": "gd32e23x",
     "svd_path": "GD32L23x.svd",
     "default_tools": [
