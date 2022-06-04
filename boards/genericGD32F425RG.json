@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F4 -DGD32F425 -DGD32F4xx",
+    "f_cpu": "200000000L",
+    "mcu": "gd32f425rgt6",
+    "spl_series": "GD32F4xx",
+    "series": "GD32F425"
+  },
+  "debug": {
+    "jlink_device": "GD32F425RG",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32F4xx.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32F425RG (256k RAM, 1024k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 262144,
+    "maximum_size": 1048576,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f425rgt6/",
+  "vendor": "GigaDevice"
+}

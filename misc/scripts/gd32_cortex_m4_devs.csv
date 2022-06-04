@@ -1,135 +1,192 @@
 Part No.,Series,Line,Speed,Flash,SRAM,Resources,Purchase
-GD32E103C8T6,GD32E103,Value,120,64K,20K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103CBT6,GD32E103,Value,120,128K,32K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103R8T6,GD32E103,Value,120,64K,20K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103RBT6,GD32E103,Value,120,128K,32K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103T8U6,GD32E103,Value,120,64K,20K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103TBU6,GD32E103,Value,120,128K,32K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103V8T6,GD32E103,Value,120,64K,20K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E103VBT6,GD32E103,Value,120,128K,32K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F303CCT6,GD32F303,Mainstream,120,256K,48K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303CET6,GD32F303,Mainstream,120,512K,64K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303CGT6,GD32F303,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303RCT6,GD32F303,Mainstream,120,256K,48K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303RET6,GD32F303,Mainstream,120,512K,64K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303RGT6,GD32F303,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303RIT6,GD32F303,Mainstream,120,2048K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303RKT6,GD32F303,Mainstream,120,3072K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303VCT6,GD32F303,Mainstream,120,256K,48K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303VET6,GD32F303,Mainstream,120,512K,64K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303VGT6,GD32F303,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303VIT6,GD32F303,Mainstream,120,2048K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303VKT6,GD32F303,Mainstream,120,3072K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303ZCT6,GD32F303,Mainstream,120,256K,48K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303ZET6,GD32F303,Mainstream,120,512K,64K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303ZGT6,GD32F303,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303ZIT6,GD32F303,Mainstream,120,2048K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F303ZKT6,GD32F303,Mainstream,120,3072K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305RBT6,GD32F305,Mainstream,120,128K,64K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305RCT6,GD32F305,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305RET6,GD32F305,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305RGT6,GD32F305,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305VCT6,GD32F305,Mainstream,120,256K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305VET6,GD32F305,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305VGT6,GD32F305,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305ZCT6,GD32F305,Mainstream,120,256K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F305ZET6,GD32F305,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307RCT6,GD32F307,Mainstream,120,256K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307RET6,GD32F307,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307RGT6,GD32F307,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307VCT6,GD32F307,Mainstream,120,256K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307VET6,GD32F307,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307VGT6,GD32F307,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307ZCT6,GD32F307,Mainstream,120,256K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307ZET6,GD32F307,Mainstream,120,512K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F307ZGT6,GD32F307,Mainstream,120,1024K,96K,Data SheetManualMore+Firmware LibraryFirmware Library User Guide,Purchase
-GD32F330C4T6,GD32F330,Value,84,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330C6T6,GD32F330,Value,84,32K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330C8T6,GD32F330,Value,84,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330CBT6,GD32F330,Value,84,128K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330F4P6,GD32F330,Value,84,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330F6P6,GD32F330,Value,84,32K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330F8P6,GD32F330,Value,84,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330G4U6,GD32F330,Value,84,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330G6U6,GD32F330,Value,84,32K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330G8U6,GD32F330,Value,84,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330K4U6,GD32F330,Value,84,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330K6U6,GD32F330,Value,84,32K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330K8U6,GD32F330,Value,84,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330R8T6,GD32F330,Value,84,64K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F330RBT6,GD32F330,Value,84,128K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350C4T6,GD32F350,Value,108,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350C6T6,GD32F350,Value,108,32K,6K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350C8T6,GD32F350,Value,108,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350CBT6,GD32F350,Value,108,128K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350G4U6,GD32F350,Value,108,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350G6U6,GD32F350,Value,108,32K,6K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350G8U6,GD32F350,Value,108,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350K4U6,GD32F350,Value,108,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350K6U6,GD32F350,Value,108,32K,6K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350K8U6,GD32F350,Value,108,64K,8K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350R4T6,GD32F350,Value,108,16K,4K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350R6T6,GD32F350,Value,108,32K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350R8T6,GD32F350,Value,108,64K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F350RBT6,GD32F350,Value,108,128K,16K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32F403RCT6,GD32F403,High Performance,168,256K,64K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403RET6,GD32F403,High Performance,168,512K,96K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403RGT6,GD32F403,High Performance,168,1024K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403RIT6,GD32F403,High Performance,168,2048K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403RKT6,GD32F403,High Performance,168,3072K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VCH6,GD32F403,High Performance,168,256K,64K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VCT6,GD32F403,High Performance,168,256K,64K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VEH6,GD32F403,High Performance,168,521K,96K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VET6,GD32F403,High Performance,168,512K,96K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VGH6,GD32F403,High Performance,168,1024K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VGT6,GD32F403,High Performance,168,1024K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VIH6,GD32F403,High Performance,168,2048K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VIT6,GD32F403,High Performance,168,2048K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VKH6,GD32F403,High Performance,168,3072K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403VKT6,GD32F403,High Performance,168,3072K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403ZCT6,GD32F403,High Performance,168,256K,64K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403ZET6,GD32F403,High Performance,168,512K,96K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403ZGT6,GD32F403,High Performance,168,1024K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403ZIT6,GD32F403,High Performance,168,2048K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F403ZKT6,GD32F403,High Performance,168,3072K,128K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405IEH6,GD32F405,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405IGH6,GD32F405,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405IKH6,GD32F405,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405RET6,GD32F405,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405RGT6,GD32F407,High Performance,168,1024k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405RKT6,GD32F407,High Performance,168,3072k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VEH6,GD32F407,High Performance,168,512k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VET6,GD32F407,High Performance,168,512k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VGH6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VGT6,GD32F407,High Performance,168,1024k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VKH6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405VKT6,GD32F407,High Performance,168,3072k,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405ZET6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405ZGT6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F405ZKT6,GD32F405,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407IEH6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407IGH6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407IKH6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407RET6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407RGT6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407RKT6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VEH6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VET6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VGH6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VGT6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VKH6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407VKT6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407ZET6,GD32F407,High Performance,168,512K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407ZGT6,GD32F407,High Performance,168,1024K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F407ZKT6,GD32F407,High Performance,168,3072K,192K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450IGH6,GD32F450,Stretch Performance,200,1024K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450IIH6,GD32F450,Stretch Performance,200,2048K,512K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450IKH6,GD32F450,Stretch Performance,200,3072K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450VET6,GD32F450,Stretch Performance,200,512K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450VGT6,GD32F450,Stretch Performance,200,1024K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450VIT6,GD32F450,Stretch Performance,200,2048K,512K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450VKT6,GD32F450,Stretch Performance,200,3027K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450ZET6,GD32F450,Stretch Performance,200,512K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450ZGT6,GD32F450,Stretch Performance,200,1024K,256K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450ZIT6,GD32F450,Stretch Performance,200,2048K,512K,Data SheetManualMore+Firmware Library,Purchase
-GD32F450ZKT6,GD32F450,Stretch Performance,200,3072K,256K,Data SheetManualMore+Firmware Library,Purchase
+GD32C103CBT6,GD32C103,Mainstream,120,128K,32K,Download,Purchase
+GD32C103RBT6,GD32C103,Mainstream,120,128K,32K,Download,Purchase
+GD32C103TBU6,GD32C103,Mainstream,120,128K,32K,Download,Purchase
+GD32C103VBT6,GD32C103,Mainstream,120,128K,32K,Download,Purchase
+GD32E103C8T6,GD32E103,Mainstream,120,64K,20K,Download,Purchase
+GD32E103CBT6,GD32E103,Mainstream,120,128K,32K,Download,Purchase
+GD32E103R8T6,GD32E103,Mainstream,120,64K,20K,Download,Purchase
+GD32E103RBT6,GD32E103,Mainstream,120,128K,32K,Download,Purchase
+GD32E103T8U6,GD32E103,Mainstream,120,64K,20K,Download,Purchase
+GD32E103TBU6,GD32E103,Mainstream,120,128K,32K,Download,Purchase
+GD32E103V8T6,GD32E103,Mainstream,120,64K,20K,Download,Purchase
+GD32E103VBT6,GD32E103,Mainstream,120,128K,32K,Download,Purchase
+GD32F303CBT6,GD32F303,Mainstream,120,128K,32K,Download,Purchase
+GD32F303CCT6,GD32F303,Mainstream,120,256K,48K,Download,Purchase
+GD32F303CET6,GD32F303,Mainstream,120,512K,64K,Download,Purchase
+GD32F303CGT6,GD32F303,Mainstream,120,1024K,96K,Download,Purchase
+GD32F303RBT6,GD32F303,Mainstream,120,128K,32K,Download,Purchase
+GD32F303RCT6,GD32F303,Mainstream,120,256K,48K,Download,Purchase
+GD32F303RET6,GD32F303,Mainstream,120,512K,64K,Download,Purchase
+GD32F303RGT6,GD32F303,Mainstream,120,1024K,96K,Download,Purchase
+GD32F303RIT6,GD32F303,Mainstream,120,2048K,96K,Download,Purchase
+GD32F303RKT6,GD32F303,Mainstream,120,3072K,96K,Download,Purchase
+GD32F303VBT6,GD32F303,Mainstream,120,128K,32K,Download,Purchase
+GD32F303VCT6,GD32F303,Mainstream,120,256K,48K,Download,Purchase
+GD32F303VET6,GD32F303,Mainstream,120,512K,64K,Download,Purchase
+GD32F303VGT6,GD32F303,Mainstream,120,1024K,96K,Download,Purchase
+GD32F303VIT6,GD32F303,Mainstream,120,2048K,96K,Download,Purchase
+GD32F303VKT6,GD32F303,Mainstream,120,3072K,96K,Download,Purchase
+GD32F303ZCT6,GD32F303,Mainstream,120,256K,48K,Download,Purchase
+GD32F303ZET6,GD32F303,Mainstream,120,512K,64K,Download,Purchase
+GD32F303ZGT6,GD32F303,Mainstream,120,1024K,96K,Download,Purchase
+GD32F303ZIT6,GD32F303,Mainstream,120,2048K,96K,Download,Purchase
+GD32F303ZKT6,GD32F303,Mainstream,120,3072K,96K,Download,Purchase
+GD32F305RBT6,GD32F305,Mainstream,120,128K,64K,Download,Purchase
+GD32F305RCT6,GD32F305,Mainstream,120,256K,96K,Download,Purchase
+GD32F305RET6,GD32F305,Mainstream,120,512K,96K,Download,Purchase
+GD32F305RGT6,GD32F305,Mainstream,120,1024K,96K,Download,Purchase
+GD32F305VCT6,GD32F305,Mainstream,120,256K,96K,Download,Purchase
+GD32F305VET6,GD32F305,Mainstream,120,512K,96K,Download,Purchase
+GD32F305VGT6,GD32F305,Mainstream,120,1024K,96K,Download,Purchase
+GD32F305ZCT6,GD32F305,Mainstream,120,256K,96K,Download,Purchase
+GD32F305ZET6,GD32F305,Mainstream,120,512K,96K,Download,Purchase
+GD32F305ZGT6,GD32F305,Mainstream,120,1024K,96K,Download,Purchase
+GD32F307RCT6,GD32F307,Mainstream,120,256K,96K,Download,Purchase
+GD32F307RET6,GD32F307,Mainstream,120,512K,96K,Download,Purchase
+GD32F307RGT6,GD32F307,Mainstream,120,1024K,96K,Download,Purchase
+GD32F307VCT6,GD32F307,Mainstream,120,256K,96K,Download,Purchase
+GD32F307VET6,GD32F307,Mainstream,120,512K,96K,Download,Purchase
+GD32F307VGT6,GD32F307,Mainstream,120,1024K,96K,Download,Purchase
+GD32F307ZCT6,GD32F307,Mainstream,120,256K,96K,Download,Purchase
+GD32F307ZET6,GD32F307,Mainstream,120,512K,96K,Download,Purchase
+GD32F307ZGT6,GD32F307,Mainstream,120,1024K,96K,Download,Purchase
+GD32F310C8T6,GD32F310,Value,72,64K,8K,Download,Purchase
+GD32F310F4P6,GD32F310,Value,72,16K,4K,Download,Purchase
+GD32F310F6P6,GD32F310,Value,72,32K,6K,Download,Purchase
+GD32F310F8P6,GD32F310,Value,72,64K,8K,Download,Purchase
+GD32F310G8U6,GD32F310,Value,72,64K,8K,Download,Purchase
+GD32F310K6T6,GD32F310,Value,72,32K,6K,Download,Purchase
+GD32F310K8T6,GD32F310,Value,72,64K,8K,Download,Purchase
+GD32F310K8U6,GD32F310,Value,72,64K,8K,Download,Purchase
+GD32F330C4T6,GD32F330,Value,84,16K,4K,Download,Purchase
+GD32F330C6T6,GD32F330,Value,84,32K,4K,Download,Purchase
+GD32F330C8T6,GD32F330,Value,84,64K,8K,Download,Purchase
+GD32F330CBT6,GD32F330,Value,84,128K,16K,Download,Purchase
+GD32F330F4P6,GD32F330,Value,84,16K,4K,Download,Purchase
+GD32F330F6P6,GD32F330,Value,84,32K,4K,Download,Purchase
+GD32F330F8P6,GD32F330,Value,84,64K,8K,Download,Purchase
+GD32F330G4U6,GD32F330,Value,84,16K,4K,Download,Purchase
+GD32F330G6U6,GD32F330,Value,84,32K,4K,Download,Purchase
+GD32F330G8U6,GD32F330,Value,84,64K,8K,Download,Purchase
+GD32F330K4T6,GD32F330,Value,84,16K,4K,Download,Purchase
+GD32F330K4U6,GD32F330,Value,84,16K,4K,Download,Purchase
+GD32F330K6T6,GD32F330,Value,84,32K,4K,Download,Purchase
+GD32F330K6U6,GD32F330,Value,84,32K,4K,Download,Purchase
+GD32F330K8T6,GD32F330,Value,84,64K,8K,Download,Purchase
+GD32F330K8U6,GD32F330,Value,84,64K,8K,Download,Purchase
+GD32F330R8T6,GD32F330,Value,84,64K,16K,Download,Purchase
+GD32F330RBT6,GD32F330,Value,84,128K,16K,Download,Purchase
+GD32F350C4T6,GD32F350,Value,108,16K,4K,Download,Purchase
+GD32F350C6T6,GD32F350,Value,108,32K,6K,Download,Purchase
+GD32F350C8T6,GD32F350,Value,108,64K,8K,Download,Purchase
+GD32F350CBT6,GD32F350,Value,108,128K,16K,Download,Purchase
+GD32F350G4U6,GD32F350,Value,108,16K,4K,Download,Purchase
+GD32F350G6U6,GD32F350,Value,108,32K,6K,Download,Purchase
+GD32F350G8U6,GD32F350,Value,108,64K,8K,Download,Purchase
+GD32F350K4U6,GD32F350,Value,108,16K,4K,Download,Purchase
+GD32F350K6U6,GD32F350,Value,108,32K,6K,Download,Purchase
+GD32F350K8U6,GD32F350,Value,108,64K,8K,Download,Purchase
+GD32F350R4T6,GD32F350,Value,108,16K,4K,Download,Purchase
+GD32F350R6T6,GD32F350,Value,108,32K,16K,Download,Purchase
+GD32F350R8T6,GD32F350,Value,108,64K,16K,Download,Purchase
+GD32F350RBT6,GD32F350,Value,108,128K,16K,Download,Purchase
+GD32F403RCT6,GD32F403,High Performance,168,256K,64K,Download,Purchase
+GD32F403RET6,GD32F403,High Performance,168,512K,96K,Download,Purchase
+GD32F403RGT6,GD32F403,High Performance,168,1024K,128K,Download,Purchase
+GD32F403RIT6,GD32F403,High Performance,168,2048K,128K,Download,Purchase
+GD32F403RKT6,GD32F403,High Performance,168,3072K,128K,Download,Purchase
+GD32F403VCH6,GD32F403,High Performance,168,256K,64K,Download,Purchase
+GD32F403VCT6,GD32F403,High Performance,168,256K,64K,Download,Purchase
+GD32F403VEH6,GD32F403,High Performance,168,521K,96K,Download,Purchase
+GD32F403VET6,GD32F403,High Performance,168,512K,96K,Download,Purchase
+GD32F403VGH6,GD32F403,High Performance,168,1024K,128K,Download,Purchase
+GD32F403VGT6,GD32F403,High Performance,168,1024K,128K,Download,Purchase
+GD32F403VIH6,GD32F403,High Performance,168,2048K,128K,Download,Purchase
+GD32F403VIT6,GD32F403,High Performance,168,2048K,128K,Download,Purchase
+GD32F403VKH6,GD32F403,High Performance,168,3072K,128K,Download,Purchase
+GD32F403VKT6,GD32F403,High Performance,168,3072K,128K,Download,Purchase
+GD32F403ZCT6,GD32F403,High Performance,168,256K,64K,Download,Purchase
+GD32F403ZET6,GD32F403,High Performance,168,512K,96K,Download,Purchase
+GD32F403ZGT6,GD32F403,High Performance,168,1024K,128K,Download,Purchase
+GD32F403ZIT6,GD32F403,High Performance,168,2048K,128K,Download,Purchase
+GD32F403ZKT6,GD32F403,High Performance,168,3072K,128K,Download,Purchase
+GD32F405IEH6,GD32F405,High Performance,168,512K,192K,Download,Purchase
+GD32F405IGH6,GD32F405,High Performance,168,1024K,192K,Download,Purchase
+GD32F405IKH6,GD32F405,High Performance,168,3072K,192K,Download,Purchase
+GD32F405RET6,GD32F405,High Performance,168,512K,192K,Download,Purchase
+GD32F405RGT6,GD32F407,High Performance,168,1024k,192K,Download,Purchase
+GD32F405RKT6,GD32F407,High Performance,168,3072k,192K,Download,Purchase
+GD32F405VEH6,GD32F407,High Performance,168,512k,192K,Download,Purchase
+GD32F405VET6,GD32F407,High Performance,168,512k,192K,Download,Purchase
+GD32F405VGH6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F405VGT6,GD32F407,High Performance,168,1024k,192K,Download,Purchase
+GD32F405VKH6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F405VKT6,GD32F407,High Performance,168,3072k,192K,Download,Purchase
+GD32F405ZET6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F405ZGT6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F405ZKT6,GD32F405,High Performance,168,3072K,192K,Download,Purchase
+GD32F407IEH6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F407IGH6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F407IKH6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F407RET6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F407RGT6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F407RKT6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F407VEH6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F407VET6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F407VGH6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F407VGT6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F407VKH6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F407VKT6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F407ZET6,GD32F407,High Performance,168,512K,192K,Download,Purchase
+GD32F407ZGT6,GD32F407,High Performance,168,1024K,192K,Download,Purchase
+GD32F407ZKT6,GD32F407,High Performance,168,3072K,192K,Download,Purchase
+GD32F425RET6,GD32F425,High Performance,200,512K,256K,Download,Purchase
+GD32F425RGT6,GD32F425,High Performance,200,1024K,256K,Download,Purchase
+GD32F425RKT6,GD32F425,High Performance,200,3072K,256K,Download,Purchase
+GD32F425VGH6,GD32F425,High Performance,200,1024K,256K,Download,Purchase
+GD32F425VGT6,GD32F425,High Performance,200,1024K,256K,Download,Purchase
+GD32F425VKH6,GD32F425,High Performance,200,3072K,256K,Download,Purchase
+GD32F425VKT6,GD32F425,High Performance,200,3072K,256K,Download,Purchase
+GD32F425ZGT6,GD32F425,High Performance,200,1024K,256K,Download,Purchase
+GD32F425ZKT6,GD32F425,High Performance,200,3072K,256K,Download,Purchase
+GD32F427IEH6,GD32F427,High Performance,200,512K,256K,Download,Purchase
+GD32F427IGH6,GD32F427,High Performance,200,1024K,256K,Download,Purchase
+GD32F427IKH6,GD32F427,High Performance,200,3072K,256K,Download,Purchase
+GD32F427RET6,GD32F427,High Performance,200,512K,256K,Download,Purchase
+GD32F427RGT6,GD32F427,High Performance,200,1024K,256K,Download,Purchase
+GD32F427RKT6,GD32F427,High Performance,200,3072K,256K,Download,Purchase
+GD32F427VEH6,GD32F427,High Performance,200,512K,256K,Download,Purchase
+GD32F427VET6,GD32F427,High Performance,200,512K,256K,Download,Purchase
+GD32F427VGH6,GD32F427,High Performance,200,1024K,256K,Download,Purchase
+GD32F427VGT6,GD32F427,High Performance,200,1024K,256K,Download,Purchase
+GD32F427VKH6,GD32F427,High Performance,200,3072K,256K,Download,Purchase
+GD32F427VKT6,GD32F427,High Performance,200,3072K,256K,Download,Purchase
+GD32F427ZET6,GD32F427,High Performance,200,512K,256K,Download,Purchase
+GD32F427ZGT6,GD32F427,High Performance,200,1024K,256K,Download,Purchase
+GD32F427ZKT6,GD32F427,High Performance,200,3072K,256K,Download,Purchase
+GD32F450IGH6,GD32F450,Stretch Performance,200,1024K,256K,Download,Purchase
+GD32F450IIH6,GD32F450,Stretch Performance,200,2048K,512K,Download,Purchase
+GD32F450IKH6,GD32F450,Stretch Performance,200,3072K,256K,Download,Purchase
+GD32F450VET6,GD32F450,Stretch Performance,200,512K,256K,Download,Purchase
+GD32F450VGT6,GD32F450,Stretch Performance,200,1024K,256K,Download,Purchase
+GD32F450VIT6,GD32F450,Stretch Performance,200,2048K,512K,Download,Purchase
+GD32F450VKT6,GD32F450,Stretch Performance,200,3027K,256K,Download,Purchase
+GD32F450ZET6,GD32F450,Stretch Performance,200,512K,256K,Download,Purchase
+GD32F450ZGT6,GD32F450,Stretch Performance,200,1024K,256K,Download,Purchase
+GD32F450ZIT6,GD32F450,Stretch Performance,200,2048K,512K,Download,Purchase
+GD32F450ZKT6,GD32F450,Stretch Performance,200,3072K,256K,Download,Purchase
+GD32F470IGH6,GD32F470,Stretch Performance,240,1024K,512K,Download,Purchase
+GD32F470IIH6,GD32F470,Stretch Performance,240,2048K,768K,Download,Purchase
+GD32F470IKH6,GD32F470,Stretch Performance,240,3072K,256K,Download,Purchase
+GD32F470VET6,GD32F470,Stretch Performance,240,512K,256K,Download,Purchase
+GD32F470VGH6,GD32F470,Stretch Performance,240,1024K,512K,Download,Purchase
+GD32F470VGT6,GD32F470,Stretch Performance,240,1024K,512K,Download,Purchase
+GD32F470VIH6,GD32F470,Stretch Performance,240,2048K,768K,Download,Purchase
+GD32F470VIT6,GD32F470,Stretch Performance,240,2048K,768K,Download,Purchase
+GD32F470VKH6,GD32F470,Stretch Performance,240,3072K,256K,Download,Purchase
+GD32F470VKT6,GD32F470,Stretch Performance,240,3072K,256K,Download,Purchase
+GD32F470ZET6,GD32F470,Stretch Performance,240,512K,256K,Download,Purchase
+GD32F470ZGT6,GD32F470,Stretch Performance,240,1024K,512K,Download,Purchase
+GD32F470ZIT6,GD32F470,Stretch Performance,240,2048K,768K,Download,Purchase
+GD32F470ZKT6,GD32F470,Stretch Performance,240,3072K,256K,Download,Purchase

@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32F3 -DGD32F310 -DGD32F3x0",
+    "f_cpu": "72000000L",
+    "mcu": "gd32f310f4p6",
+    "spl_series": "GD32F3x0",
+    "series": "GD32F310"
+  },
+  "debug": {
+    "jlink_device": "GD32F310F4",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32F3x0.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32F310F4 (4k RAM, 16k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 4096,
+    "maximum_size": 16384,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32f310f4p6/",
+  "vendor": "GigaDevice"
+}

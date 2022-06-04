@@ -128,6 +128,13 @@ def get_startup_filename(board):
         env.Exit(-1)
     # some have a SPL subseries.
     spl_sub_series = board.get("build.spl_sub_series", "")
+    # handle special cases
+    if series in ("GD32F425", "GD32F405"):
+        return "startup_gd32f405_425.S" 
+    if series in ("GD32F427", "GD32F407"):
+        return "startup_gd32f407_427.S" 
+    if series in ("GD32F450", "GD32F470"):
+        return "startup_gd32f407_427.S" 
     if spl_sub_series != "":
         # all boards which have a sub-series follow a common patter 
         startup_file = f"startup_{spl_series.lower()}_{spl_sub_series.lower()}.S" 

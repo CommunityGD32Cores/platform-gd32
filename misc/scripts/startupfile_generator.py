@@ -172,6 +172,7 @@ def autodetect_cpu_type(filename):
         # covers gd32f{405,407, 450} from GD32F4xx_Firmware_Library_V2.1.3
         "gd32f4": "cortex-m4",
                                   # and gd32f403 from GD32F403_Firmware_Library_V2.1.2,
+        "gd32c10x": "cortex-m4",
         "gd32f10x": "cortex-m3",  # GD32F10x_Firmware_Library_V2.2.1
         "gd32f20x": "cortex-m3",  # GD32F20x_Firmware_Library_V2.2.1
         "gd32f30x": "cortex-m4",  # GD32F30x_Firmware_Library_V2.1.2

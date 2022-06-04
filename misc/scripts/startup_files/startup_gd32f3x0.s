@@ -1,14 +1,15 @@
 ;/*!
-;    \file  startup_gd32f3x0.s
-;    \brief start up file
+;    \file    startup_gd32f3x0.s
+;    \brief   start up file
 ;
 ;    \version 2017-06-06, V1.0.0, firmware for GD32F3x0
 ;    \version 2019-06-01, V2.0.0, firmware for GD32F3x0
 ;    \version 2020-09-30, V2.1.0, firmware for GD32F3x0
+;    \version 2022-01-06, V2.2.0, firmware for GD32F3x0
 ;*/
 
 ;/*
-    ;Copyright (c) 2020, GigaDevice Semiconductor Inc.
+    ;Copyright (c) 2022, GigaDevice Semiconductor Inc.
 
     ;Redistribution and use in source and binary forms, with or without modification, 
 ;are permitted provided that the following conditions are met:

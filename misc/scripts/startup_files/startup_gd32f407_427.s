@@ -1,14 +1,15 @@
 ;/*!
-;    \file    startup_gd32f405.s
+;    \file    startup_gd32f407_427.s
 ;    \brief   start up file
 ;
 ;    \version 2016-08-15, V1.0.0, firmware for GD32F4xx
 ;    \version 2018-12-12, V2.0.0, firmware for GD32F4xx
 ;    \version 2020-09-30, V2.1.0, firmware for GD32F4xx
+;    \version 2022-03-09, V3.0.0, firmware for GD32F4xx
 ;*/
 ;
 ;/*
-;    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+;    Copyright (c) 2022, GigaDevice Semiconductor Inc.
 ;
 ;    Redistribution and use in source and binary forms, with or without modification, 
 ;are permitted provided that the following conditions are met:
@@ -129,9 +130,9 @@ __Vectors       DCD     __initial_sp                      ; Top of Stack
                 DCD     TIMER7_BRK_TIMER11_IRQHandler     ; 59:TIMER7 Break and TIMER11
                 DCD     TIMER7_UP_TIMER12_IRQHandler      ; 60:TIMER7 Update and TIMER12
                 DCD     TIMER7_TRG_CMT_TIMER13_IRQHandler ; 61:TIMER7 Trigger and Commutation and TIMER13
-                DCD     TIMER7_Channel_IRQHandler         ; 62:TIMER7 Channel Capture Compare
+                DCD     TIMER7_Channel_IRQHandler         ; 62:TIMER7 Capture Compare
                 DCD     DMA0_Channel7_IRQHandler          ; 63:DMA0 Channel7
-                DCD     0                                 ; 64:Reserved
+                DCD     EXMC_IRQHandler                   ; 64:EXMC
                 DCD     SDIO_IRQHandler                   ; 65:SDIO
                 DCD     TIMER4_IRQHandler                 ; 66:TIMER4
                 DCD     SPI2_IRQHandler                   ; 67:SPI2
@@ -144,8 +145,8 @@ __Vectors       DCD     __initial_sp                      ; Top of Stack
                 DCD     DMA1_Channel2_IRQHandler          ; 74:DMA1 Channel2
                 DCD     DMA1_Channel3_IRQHandler          ; 75:DMA1 Channel3
                 DCD     DMA1_Channel4_IRQHandler          ; 76:DMA1 Channel4
-                DCD     0                                 ; 77:Reserved
-                DCD     0                                 ; 78:Reserved
+                DCD     ENET_IRQHandler                   ; 77:Ethernet
+                DCD     ENET_WKUP_IRQHandler              ; 78:Ethernet Wakeup through EXTI Line
                 DCD     CAN1_TX_IRQHandler                ; 79:CAN1 TX
                 DCD     CAN1_RX0_IRQHandler               ; 80:CAN1 RX0
                 DCD     CAN1_RX1_IRQHandler               ; 81:CAN1 RX1
@@ -278,6 +279,7 @@ Default_Handler PROC
                 EXPORT  TIMER7_TRG_CMT_TIMER13_IRQHandler [WEAK]
                 EXPORT  TIMER7_Channel_IRQHandler         [WEAK]        
                 EXPORT  DMA0_Channel7_IRQHandler          [WEAK]       
+                EXPORT  EXMC_IRQHandler                   [WEAK]         
                 EXPORT  SDIO_IRQHandler                   [WEAK]           
                 EXPORT  TIMER4_IRQHandler                 [WEAK]           
                 EXPORT  SPI2_IRQHandler                   [WEAK]          
@@ -290,6 +292,8 @@ Default_Handler PROC
                 EXPORT  DMA1_Channel2_IRQHandler          [WEAK]         
                 EXPORT  DMA1_Channel3_IRQHandler          [WEAK]         
                 EXPORT  DMA1_Channel4_IRQHandler          [WEAK]          
+                EXPORT  ENET_IRQHandler                   [WEAK]         
+                EXPORT  ENET_WKUP_IRQHandler              [WEAK]         
                 EXPORT  CAN1_TX_IRQHandler                [WEAK]          
                 EXPORT  CAN1_RX0_IRQHandler               [WEAK]         
                 EXPORT  CAN1_RX1_IRQHandler               [WEAK]          
@@ -358,6 +362,7 @@ TIMER7_UP_TIMER12_IRQHandler
 TIMER7_TRG_CMT_TIMER13_IRQHandler 
 TIMER7_Channel_IRQHandler         
 DMA0_Channel7_IRQHandler         
+EXMC_IRQHandler                   
 SDIO_IRQHandler                   
 TIMER4_IRQHandler                 
 SPI2_IRQHandler                  
@@ -370,6 +375,8 @@ DMA1_Channel1_IRQHandler
 DMA1_Channel2_IRQHandler         
 DMA1_Channel3_IRQHandler         
 DMA1_Channel4_IRQHandler          
+ENET_IRQHandler                  
+ENET_WKUP_IRQHandler             
 CAN1_TX_IRQHandler                
 CAN1_RX0_IRQHandler              
 CAN1_RX1_IRQHandler               

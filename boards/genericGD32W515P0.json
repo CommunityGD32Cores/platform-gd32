@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32W5 -DGD32W515 -DGD32W51X",
+    "f_cpu": "180000000L",
+    "mcu": "gd32w515p0q6",
+    "spl_series": "GD32W51X",
+    "series": "GD32W515"
+  },
+  "debug": {
+    "jlink_device": "GD32W515P0",
+    "openocd_target": "unknown",
+    "svd_path": "GD32W51X.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32W515P0 (448k RAM, 0k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 458752,
+    "maximum_size": 0,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32w515p0q6/",
+  "vendor": "GigaDevice"
+}

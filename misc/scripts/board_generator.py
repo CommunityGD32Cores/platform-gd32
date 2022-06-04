@@ -65,12 +65,16 @@ class GD32MCUInfo:
         "GD32F303": "GD32F30x",
         "GD32F305": "GD32F30x",
         "GD32F307": "GD32F30x",
+        "GD32F310": "GD32F3x0",
         "GD32F330": "GD32F3x0",
         "GD32F350": "GD32F3x0",
         "GD32F403": "GD32F403", # yes, this is correct. special SPL package for only that chip.
         "GD32F405": "GD32F4xx",
         "GD32F407": "GD32F4xx",
+        "GD32F425": "GD32F4xx",
+        "GD32F427": "GD32F4xx",
         "GD32F450": "GD32F4xx",
+        "GD32F470": "GD32F4xx",
         "GD32E103": "GD32E10X", # uppercase X here is *wanted*.
         "GD32E230": "GD32E23x",
         "GD32E231": "GD32E23x",
@@ -79,7 +83,9 @@ class GD32MCUInfo:
         "GD32E505": "GD32E50x",
         "GD32E507": "GD32E50x",
         "GD32E508": "GD32E50x",  # listed in SPL header but no chip listed yet..
-        "GD32L233": "GD32L23x"
+        "GD32L233": "GD32L23x",
+        "GD32C103": "GD32C10X", # uppercase X wanted
+        "GD32W515": "GD32W51X"
     }
 
     spl_series_to_openocd_target = {
@@ -93,7 +99,8 @@ class GD32MCUInfo:
         "GD32E10X": "stm32f1x",
         "GD32F4xx": "stm32f4x",
         "GD32F450": "stm32f4x",
-        "GD32L23x": "gd32e23x" # works per user comment
+        "GD32L23x": "gd32e23x", # works per user comment
+        "GD32C10X": "stm32f4x"  # try Cortex-M4 compatible target
     }
 
     known_arduino_variants = {
@@ -156,6 +163,10 @@ class GD32MCUInfo:
     def infer_spl_series(self):
         if self.series in GD32MCUInfo.series_to_spl_series:
             self.spl_series = GD32MCUInfo.series_to_spl_series[self.series]
+        else:
+            print("Could not find SPL series for chip %s, series %s" %(
+                self.name, self.series))
+            exit(-1)
 
     def infer_svd_path(self):
         svd = None
@@ -166,6 +177,8 @@ class GD32MCUInfo:
         # special case for E23x series
         if self.spl_series == "GD32E23x":
             svd = f"{self.series}.svd"
+        if self.spl_series == "GD32C10X":
+            svd = "GD32C10x.svd"
         if self.spl_series.lower() == "gd32e50x":
             if self.sub_series is None:
                 svd = f"{self.spl_series}.svd"
@@ -189,7 +202,7 @@ class GD32MCUInfo:
                 compile_flags += ["-DGD32F170_190"]
             else:
                 compile_flags += ["-DGD32F130_150"]
-        if self.spl_series == "GD32E10X":
+        if self.spl_series in ("GD32E10X", "GD32C10X"):
             # SPL needs to know about crystal setup, else #error
             compile_flags += ["-DHXTAL_VALUE=8000000U" ,"-DHXTAL_VALUE_8M=HXTAL_VALUE"]
         self.compile_flags = compile_flags
@@ -389,7 +402,8 @@ def main():
     #print_board_files_mcus = ["GD32E231C8T6"]
     #print_board_files_mcus = ["GD32E507ZE"]
     #print_board_files_mcus = ["GD32E507ZE"]
-    print_board_files_mcus = ["GD32L233CBT6"]
+    #print_board_files_mcus = ["GD32L233CBT6"]
+    print_board_files_mcus = ["GD32C103CBT6"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()

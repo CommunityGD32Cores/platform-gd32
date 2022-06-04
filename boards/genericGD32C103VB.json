@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DGD32C1 -DGD32C103 -DGD32C10X -DHXTAL_VALUE=8000000U -DHXTAL_VALUE_8M=HXTAL_VALUE",
+    "f_cpu": "120000000L",
+    "mcu": "gd32c103vbt6",
+    "spl_series": "GD32C10X",
+    "series": "GD32C103"
+  },
+  "debug": {
+    "jlink_device": "GD32C103VB",
+    "openocd_target": "stm32f4x",
+    "svd_path": "GD32C10x.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32C103VB (32k RAM, 128k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 32768,
+    "maximum_size": 131072,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32c103vbt6/",
+  "vendor": "GigaDevice"
+}
