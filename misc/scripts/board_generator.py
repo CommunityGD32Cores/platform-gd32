@@ -85,7 +85,7 @@ class GD32MCUInfo:
         "GD32E508": "GD32E50x",  # listed in SPL header but no chip listed yet..
         "GD32L233": "GD32L23x",
         "GD32C103": "GD32C10X", # uppercase X wanted
-        "GD32W515": "GD32W51X"
+        "GD32W515": "GD32W51x"
     }
 
     spl_series_to_openocd_target = {
@@ -100,7 +100,8 @@ class GD32MCUInfo:
         "GD32F4xx": "stm32f4x",
         "GD32F450": "stm32f4x",
         "GD32L23x": "gd32e23x", # works per user comment
-        "GD32C10X": "stm32f4x"  # try Cortex-M4 compatible target
+        "GD32C10X": "stm32f4x",  # try Cortex-M4 compatible target
+        "GD32W51x": "gd32e50x", # buest guess with Cortex-M33
     }
 
     known_arduino_variants = {
@@ -179,6 +180,10 @@ class GD32MCUInfo:
             svd = f"{self.series}.svd"
         if self.spl_series == "GD32C10X":
             svd = "GD32C10x.svd"
+        if self.name.startswith("GD32W515P"):
+            svd = "GD32W515Px.svd" 
+        if self.name.startswith("GD32W515T"):
+            svd = "GD32W515Tx.svd" 
         if self.spl_series.lower() == "gd32e50x":
             if self.sub_series is None:
                 svd = f"{self.spl_series}.svd"
@@ -205,6 +210,16 @@ class GD32MCUInfo:
         if self.spl_series in ("GD32E10X", "GD32C10X"):
             # SPL needs to know about crystal setup, else #error
             compile_flags += ["-DHXTAL_VALUE=8000000U" ,"-DHXTAL_VALUE_8M=HXTAL_VALUE"]
+        if self.spl_series == "GD32W51x":
+            if self.name_no_package.upper()[:-1].endswith("T"):
+                compile_flags += ["-D" + self.name_no_package.upper()[:-1] + "X"]
+            else:
+                compile_flags += ["-D" + self.name_no_package.upper()]
+            # non-secure by default
+            # I actually don't yet have any idea about trustzone / secure - non-secure sections,
+            # but this makes it *compile*. must be investigated later to provide usefull control
+            # options for the secure and non-secure firmware. 
+            compile_flags += ["-DSYS_NS"]
         self.compile_flags = compile_flags
 
     def infer_arduino_variant(self):

@@ -2,16 +2,16 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m33",
-    "extra_flags": "-DGD32W5 -DGD32W515 -DGD32W51X",
+    "extra_flags": "-DGD32W5 -DGD32W515 -DGD32W51x -DGD32W515TX -DSYS_NS",
     "f_cpu": "180000000L",
     "mcu": "gd32w515tiq6",
-    "spl_series": "GD32W51X",
+    "spl_series": "GD32W51x",
     "series": "GD32W515"
   },
   "debug": {
     "jlink_device": "GD32W515TI",
-    "openocd_target": "unknown",
-    "svd_path": "GD32W51X.svd",
+    "openocd_target": "gd32e50x",
+    "svd_path": "GD32W515Tx.svd",
     "default_tools": [
       "stlink"
     ],
