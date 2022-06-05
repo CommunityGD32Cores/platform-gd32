@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32E5 -DGD32E508 -DGD32E50X",
+    "f_cpu": "180000000L",
+    "mcu": "gd32e508vet6",
+    "spl_series": "GD32E50x",
+    "series": "GD32E508"
+  },
+  "debug": {
+    "jlink_device": "GD32E508VE",
+    "openocd_target": "gd32e50x",
+    "svd_path": "GD32E50x.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32E508VE (128k RAM, 512k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 131072,
+    "maximum_size": 524288,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/microcontroller/gd32e508vet6/",
+  "vendor": "GigaDevice"
+}

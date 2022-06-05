@@ -1,26 +1,29 @@
 Part No.,Series,Line,Speed,Flash,SRAM,Resources,Purchase
-GD32E503CCT6,GD32E503,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503CET6,GD32E503,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503RCT6,GD32E503,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503RET6,GD32E503,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503VCT6,GD32E503,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503VET6,GD32E503,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503ZCT6,GD32E503,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E503ZET6,GD32E503,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505RBT6,GD32E505,High Performance,180,128K,80K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505RCT6,GD32E505,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505RET6,GD32E505,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505VCT6,GD32E505,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505VET6,GD32E505,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505ZCT6,GD32E505,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E505ZET6,GD32E505,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507RCT6,GD32E507,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507RET6,GD32E507,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507VCT6,GD32E507,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507VET6,GD32E507,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507ZCT6,GD32E507,High Performance,180,256K,96K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32E507ZET6,GD32E507,High Performance,180,512K,128K,Data SheetManualMore+Demo SuitesFirmware LibraryFirmware Library User Guide,Purchase
-GD32W515P0Q6,GD32W515,Wireless,180,0K,448K,Data SheetManual,Purchase
-GD32W515PIQ6,GD32W515,Wireless,180,2048K,448K,Data SheetManual,Purchase
-GD32W515TGQ6,GD32W515,Wireless,180,1024K,384K,Data SheetManual,Purchase
-GD32W515TIQ6,GD32W515,Wireless,180,2048K,448K,Data SheetManual,Purchase
+GD32E503CCT6,GD32E503,High Performance,180,256K,96K,Download,Purchase
+GD32E503CET6,GD32E503,High Performance,180,512K,128K,Download,Purchase
+GD32E503RCT6,GD32E503,High Performance,180,256K,96K,Download,Purchase
+GD32E503RET6,GD32E503,High Performance,180,512K,128K,Download,Purchase
+GD32E503VCT6,GD32E503,High Performance,180,256K,96K,Download,Purchase
+GD32E503VET6,GD32E503,High Performance,180,512K,128K,Download,Purchase
+GD32E503ZCT6,GD32E503,High Performance,180,256K,96K,Download,Purchase
+GD32E503ZET6,GD32E503,High Performance,180,512K,128K,Download,Purchase
+GD32E505RBT6,GD32E505,High Performance,180,128K,80K,Download,Purchase
+GD32E505RCT6,GD32E505,High Performance,180,256K,96K,Download,Purchase
+GD32E505RET6,GD32E505,High Performance,180,512K,128K,Download,Purchase
+GD32E505VCT6,GD32E505,High Performance,180,256K,96K,Download,Purchase
+GD32E505VET6,GD32E505,High Performance,180,512K,128K,Download,Purchase
+GD32E505ZCT6,GD32E505,High Performance,180,256K,96K,Download,Purchase
+GD32E505ZET6,GD32E505,High Performance,180,512K,128K,Download,Purchase
+GD32E507RCT6,GD32E507,High Performance,180,256K,96K,Download,Purchase
+GD32E507RET6,GD32E507,High Performance,180,512K,128K,Download,Purchase
+GD32E507VCT6,GD32E507,High Performance,180,256K,96K,Download,Purchase
+GD32E507VET6,GD32E507,High Performance,180,512K,128K,Download,Purchase
+GD32E507ZCT6,GD32E507,High Performance,180,256K,96K,Download,Purchase
+GD32E507ZET6,GD32E507,High Performance,180,512K,128K,Download,Purchase
+GD32E508RET6,GD32E508,High Performance,180,512K,128K,Download,Purchase
+GD32E508VET6,GD32E508,High Performance,180,512K,128K,Download,Purchase
+GD32E508ZET6,GD32E508,High Performance,180,512K,128K,Download,Purchase
+GD32W515P0Q6,GD32W515,Wireless,180,0K,448K,Download,Purchase
+GD32W515PIQ6,GD32W515,Wireless,180,2048K,448K,Download,Purchase
+GD32W515TGQ6,GD32W515,Wireless,180,1024K,384K,Download,Purchase
+GD32W515TIQ6,GD32W515,Wireless,180,2048K,448K,Download,Purchase
