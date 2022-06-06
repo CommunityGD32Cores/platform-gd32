@@ -366,6 +366,108 @@ class GD32MCUInfo:
         board_def = json.dumps(board, indent=2)
         return output_filename, board_def
 
+def generate_arduino_board_def(boards: List[GD32MCUInfo]) -> str:
+    output = """# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+
+menu.pnum=Board part number
+menu.upload_method=Upload method
+menu.opt=Optimize
+menu.usb=USB support"""
+    output += "\n"
+
+    # begin the generic F30X series
+    # first, filter out all arduino capable boards..
+    boards = list(filter(lambda b: b.arduino_variant is not None, boards))
+    possible_series = set()
+    for b in boards:
+        possible_series.add(b.spl_series)
+
+
+    print("Got %d Arduino capable boards." % len(boards))
+    print("Got %d different series: %s." % (len(possible_series), str(possible_series)))
+
+    for series in possible_series:
+        series_boards = list(filter(lambda b: b.spl_series == series, boards))
+        # lets checkout the ones which are the _GENERIC types
+        generic_boards = list(filter(lambda b: b.arduino_variant.endswith("_GENERIC"), series_boards))
+        print("Got %d generic %s boards." % (len(generic_boards), series))
+
+        def gen_series(name:str, series:str, boards:List[GD32MCUInfo]): 
+            o = "\n" + "#"*50 + "\n"
+            o += "# %s %s\n" % (name, series)
+            s_name = f"gd_{name.lower()}_{series.lower()}"
+            # first board
+            fb = boards[0]
+            
+            o += f"{s_name}.name={series} {name} series\n"
+            o += f"{s_name}.build.core=arduino\n"
+            o += f"{s_name}.build.board={s_name}\n"
+            o += f"{s_name}.build.mcu={fb.core_type}\n"
+            o += f"{s_name}.build.series={series}\n\n"
+            # todo: only do this if we're USB enabled
+            # adapt per board, not per-series
+            o += f"{s_name}.build.vid=0xdead\n"
+            o += f"{s_name}.build.pid=0xbeef\n"
+            o += f"{s_name}.build.usb_product=\"USB Test\"\n"
+            o += f"{s_name}.build.usb_manufacturer=\"Arduino\"\n\n"
+            o += "# create a new entry each board here\n"
+            for b in boards:
+                b_name = f"{b.name_no_package} (Generic)" if name == "Generic" else b.arduino_variant.replace("_", " ")
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}={b_name}\n"
+                # ToDo account for possible CCRAM
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_size={b.sram_kb * 1024}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_data_size={b.flash_kb * 1024}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.board={b.arduino_variant}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.series={b.spl_series}\n"
+                if len(b.compile_flags) >= 4:
+                    pl = b.compile_flags[3][2:]
+                    o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.product_line={pl}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.variant={b.arduino_variant}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.openocd_script=target/{b.openocd_target}.cfg\n"
+
+            o += f"{s_name}.menu.usb.off=Off\n"
+            # Only do this for USB enabled boards
+            if b.spl_series.lower() in ("gd32f30x"):
+                o += f"{s_name}.menu.usb.on=On\n"
+                o += s_name + ".menu.usb.on.build.enable_usb={build.usb_flags} -DUSBCON -DUSBD_USE_CDC\n"
+            o += "\n"
+            o += "# Upload menu\n"
+            for m in (
+                ("serialMethod", "gd32flash (Serial)", "maple_serial", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1", "serial_upload"),
+                ("gdlinkMethod", "GDlink (SWD)", "gdlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "gdlink_upload"),
+                ("stlinkMethod", "STLink (SWD)", "stlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "stlink_upload"),
+                ("jlinkMethod", "JLink (SWD)", "jlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "jlink_upload"),
+                ("dfuUtilMethod", "dfu-util (DFU - STMDuino bootloader)", "dfu", "", "", "dfu-util"),
+            ):
+                o += f"{s_name}.menu.upload_method.{m[0]}={m[1]}\n"
+                o += f"{s_name}.menu.upload_method.{m[0]}.upload.protocol={m[2]}\n"
+                o += f"{s_name}.menu.upload_method.{m[0]}.upload.options={m[3]}\n"
+                o += f"{s_name}.menu.upload_method.{m[0]}.build.upload_flags={m[4]}\n"
+                o += f"{s_name}.menu.upload_method.{m[0]}.upload.tool={m[5]}\n"
+                o += "\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.build.flash_offset=0x0x2000\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.pid=0x004\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.vid=0x1209\n"
+            o += "\n# Optimizations\n"
+            for m in (
+                ("osstd", "Smallest (default)", ""),
+                ("o1std", "Fast (-O1)", "-O1"),
+                ("o2std", "Faster (-O2)", "-O2"),
+                ("o3std", "Fastest (-O3)", "-O3"),
+                ("ogstd", "Debug (-Og)", "-Og")
+            ):
+                o += f"{s_name}.menu.opt.{m[0]}={m[1]}\n"
+                if m[2] != "":
+                    o += f"{s_name}.menu.opt.{m[0]}.build.flags.optimize={m[2]}\n"
+                    o += f"{s_name}.menu.opt.{m[0]}.build.flags.ldspecs=\n"
+
+            return o
+
+        if len(generic_boards) > 0:
+            # generate the thing for the generic 
+            output += gen_series("Generic", series, generic_boards)
+    return output
+
 def read_csv(filename, core_type) -> List[GD32MCUInfo]:
     mcus = []
     with open(filename) as csvfile:
@@ -389,6 +491,14 @@ def read_all_known_mcus() -> List[GD32MCUInfo]:
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
     return mcus
+
+def print_big_str(res:str):
+    import sys
+    # string is large, breaks console. print block-wise
+    n = 5*1024
+    for x in [res[i:i+n] for i in range(0, len(res), n)]:
+        print(x, end="", flush=True)
+        sys.stdout.flush()
 
 def main():
     mcus = read_all_known_mcus()
@@ -434,6 +544,17 @@ def main():
             fp.write(board_def)
 
     print("Done writing %d board defs." % len(mcus))
+
+    board_txt_content = generate_arduino_board_def(mcus)
+    print("boards.txt (%d bytes):" % (len(board_txt_content)))
+    # uncomment this to print it to console
+    #print_big_str(board_txt_content)
+    if os.path.exists("generated_output_arduino"):
+        shutil.rmtree("generated_output_arduino")
+    os.mkdir("generated_output_arduino")
+    with open(os.path.join("generated_output_arduino", "boards.txt"), "w") as fp:
+        fp.write(board_txt_content)
+    print("boards.txt written.")
 
 if __name__ == '__main__':
     main()

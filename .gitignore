@@ -1,4 +1,5 @@
 __pycache__/
 .vscode/
 generated_output/
+generated_output_arduino/
 variants/
