@@ -422,6 +422,10 @@ menu.usb=USB support"""
                 if len(b.compile_flags) >= 4:
                     pl = b.compile_flags[3][2:]
                     o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.product_line={pl}\n"
+                else:
+                    # we don't have a special series macro, just use a dummy one
+                    pl = b.compile_flags[1][2:]
+                    o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.product_line={pl}\n"
                 o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.variant={b.arduino_variant}\n"
                 o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.openocd_script=target/{b.openocd_target}.cfg\n"
 
