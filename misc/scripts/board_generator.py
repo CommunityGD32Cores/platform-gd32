@@ -415,8 +415,8 @@ menu.usb=USB support"""
                 b_name = f"{b.name_no_package} (Generic)" if name == "Generic" else b.arduino_variant.replace("_", " ")
                 o += f"{s_name}.menu.pnum.{b.arduino_variant}={b_name}\n"
                 # ToDo account for possible CCRAM
-                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_size={b.sram_kb * 1024}\n"
-                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_data_size={b.flash_kb * 1024}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_size={b.flash_kb * 1024}\n"
+                o += f"{s_name}.menu.pnum.{b.arduino_variant}.upload.maximum_data_size={b.sram_kb * 1024}\n"
                 o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.board={b.arduino_variant}\n"
                 o += f"{s_name}.menu.pnum.{b.arduino_variant}.build.series={b.spl_series}\n"
                 if len(b.compile_flags) >= 4:
