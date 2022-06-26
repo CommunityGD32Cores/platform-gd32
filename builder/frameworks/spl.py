@@ -86,17 +86,10 @@ def get_linker_script(mcu):
     default_ldscript = join(FRAMEWORK_DIR, "platformio",
                             "ldscripts", mcu[:-2].upper() + "_DEFAULT.ld")
 
-    print("Warning! Cannot find a linker script for the required board! "
-          "Firmware will be linked with a default linker script!")
-
-    # even if the file is there, regenerate the linker script.
-    # this way dynamic changes the linker script are applied and old errors are overwritten.
-    # if isfile(default_ldscript):
-    #    return default_ldscript
-
     ram = board.get("upload.maximum_ram_size", 0)
     ccram = board.get("upload.closely_coupled_ram_size", 0)
     flash = board.get("upload.maximum_size", 0)
+    flash_start = int(board.get("upload.offset_address", "0x8000000"), 0)
     template_file = join(FRAMEWORK_DIR, "platformio",
                          "ldscripts", "tpl", "linker.tpl")
     content = ""
@@ -106,7 +99,8 @@ def get_linker_script(mcu):
             stack=hex(0x20000000 + ram), # 0x20000000 - start address for RAM
             ram=str(int(ram/1024)) + "K",
             ccram=str(int(ccram/1024)) + "K", # Closely coupled RAM - not all parts have this
-            flash=str(int(flash/1024)) + "K"
+            flash=str(int(flash/1024)) + "K",
+            flash_start=hex(flash_start)
         )
 
     with open(default_ldscript, "w") as fp:
