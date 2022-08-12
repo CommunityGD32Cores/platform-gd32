@@ -407,15 +407,19 @@ class GD32PinMapGenerator:
         return output
 
     @staticmethod
-    def add_macro_def(macro_name:str, macro_value, width:int = 35):
+    def add_macro_def(macro_name:str, macro_value="", overridable:bool = False, width:int = 35):
         output = f"#define {macro_name}"
-        output = output.ljust(width) + " "
-        output += str(macro_value) + "\n"
+        if len(str(macro_value)) != 0:
+            output = output.ljust(width) + " "
+            output += str(macro_value)
+        output += "\n"
+        if overridable:       
+            output = f"#ifndef {macro_name}\n" + output + "#endif\n"
         return output
 
     @staticmethod
-    def filter_for_periph(pins: List[Tuple[GD32Pin, object]], periph) -> List[str]:
-        return [p_f[0].pin_name for p_f in pins if p_f[1].peripheral == periph] 
+    def filter_for_periph(pins: List[Tuple[GD32Pin, GD32AlternateFunc]], periph:str) -> List[str]:
+        return [p.pin_name for p,f in pins if f.peripheral == periph] 
 
     @staticmethod
     def get_second_or_fallback_first_pin(pins) -> str:
@@ -526,22 +530,24 @@ class GD32PinMapGenerator:
         for idx, p in enumerate(pwm_pins):
             output += GD32PinMapGenerator.add_macro_def("PWM%d" % idx, p)
 
-        output += "\n/* USART definitions */\n"
-        output += GD32PinMapGenerator.add_macro_def("SERIAL_HOWMANY", 1) # defaults
-        output += GD32PinMapGenerator.add_macro_def("USE_USART0_SERIAL", "") # defaults
-        default_uart = "USART0"
-        uart_tx = GD32PinMapGenerator.filter_for_periph(
-            GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name),
-            default_uart
-        )[0]
-        uart_rx = GD32PinMapGenerator.filter_for_periph(
-            GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name),
-            default_uart
-        )[0]
-        output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_RX", uart_rx)
-        output += GD32PinMapGenerator.add_macro_def("PIN_SERIAL_TX", uart_tx)
-        output += GD32PinMapGenerator.add_macro_def("SERIAL0_RX", uart_rx)
-        output += GD32PinMapGenerator.add_macro_def("SERIAL0_TX", uart_tx)
+        output += "\n/* Serial definitions */\n"
+        output += "/* \"Serial\" is by default Serial1 / USART0 */\n"
+        output += GD32PinMapGenerator.add_macro_def("DEFAULT_HWSERIAL_INSTANCE", "1", True) # defaults
+        all_usart_tx_pins = GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name)
+        usart_periphs = set([af.peripheral for _, af in all_usart_tx_pins])
+        for (i, usart) in enumerate(usart_periphs):
+            output += f"\n/* {usart} */\n"
+            uart_tx = GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name),
+                usart
+            )[0]
+            uart_rx = GD32PinMapGenerator.filter_for_periph(
+                GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name),
+                usart
+            )[0]
+            output += GD32PinMapGenerator.add_macro_def("HAVE_HWSERIAL%d" % (i+1))
+            output += GD32PinMapGenerator.add_macro_def("SERIAL%d_RX" % i, uart_rx, overridable=True)
+            output += GD32PinMapGenerator.add_macro_def("SERIAL%d_TX" % i, uart_tx, overridable=True)
 
         output += "\n/* ADC definitions */\n"
         output += GD32PinMapGenerator.add_macro_def("ADC_RESOLUTION", 10)
@@ -697,19 +703,22 @@ def load_pinmap(datasheet_pdf_path:str) -> GD32PinMap:
 
 def main_func():
     print("Pinmap generator started.")
-    # temporary static path
-    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf"
-    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf"
-    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf"
-    #datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf"
-    datasheet_pdf_path = "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf"
-    device_pinmap = load_pinmap(datasheet_pdf_path)
-    if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
-        device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
-        save_pinmap(device_pinmap)
-        #return
     all_mcus = read_all_known_mcus()
-    all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
-    GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
+    # temporary static path
+    datasheet_pdf_paths = [
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
+    ]
+    for datasheet_pdf_path in datasheet_pdf_paths:
+        device_pinmap = load_pinmap(datasheet_pdf_path)
+        if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
+            device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
+            save_pinmap(device_pinmap)
+            #return
+        all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
+        GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
 if __name__ == "__main__":
     main_func()

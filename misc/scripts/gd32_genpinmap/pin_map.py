@@ -60,7 +60,7 @@ class GD32PinMap:
             # replace x with "can be any character" regex
             regex_str = constraint.replace("x", ".")
             ret = re.match(regex_str, device_name) != None
-        print("Checked constraint \"%s\" against devicename \"%s\" -> %s" % (constraint, device_name, str(ret)))
+        #print("Checked constraint \"%s\" against devicename \"%s\" -> %s" % (constraint, device_name, str(ret)))
         return ret
 
     @staticmethod
