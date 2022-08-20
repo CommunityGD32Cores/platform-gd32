@@ -422,8 +422,20 @@ class GD32PinMapGenerator:
         return [p.pin_name for p,f in pins if f.peripheral == periph] 
 
     @staticmethod
-    def get_second_or_fallback_first_pin(pins) -> str:
-        return pins[1] if len(pins) >= 2 else pins[0]
+    def get_second_or_fallback_first_pin(pins, already_assigned_pins:List[str] = None) -> str:
+        pin_candidate = pins[1] if len(pins) >= 2 else pins[0]
+        if already_assigned_pins is None:
+            return pin_candidate
+        else:
+            if pin_candidate in already_assigned_pins:
+                # pick first non assigned pin
+                pin_candidates = list(filter(lambda p: p not in already_assigned_pins, pins))
+                if len(pin_candidates) >= 1:
+                    pin_candidates[0]
+                else:
+                    raise RuntimeError("Cannot find pin that is still unassigned!")
+            else:
+                return pin_candidate
 
     @staticmethod
     def generate_arduino_variant_h(pinmap:GD32PinMap, device_name:str) -> str:
@@ -499,26 +511,38 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.add_macro_def("PIN_SPI_MISO", spi_miso)
         output += GD32PinMapGenerator.add_macro_def("PIN_SPI_SCK", spi_sclk)
         # same logic for I2C pin
-        default_i2c = "I2C0"
-        i2c_scl = GD32PinMapGenerator.get_second_or_fallback_first_pin(
-            GD32PinMapGenerator.filter_for_periph(
-                GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name),
-                default_i2c
-            )
-        )
-        i2c_sda = GD32PinMapGenerator.get_second_or_fallback_first_pin(
-            GD32PinMapGenerator.filter_for_periph(
-                GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name),
-                default_i2c
-            )
-        )
+        all_i2c_sda_pins = GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name)
+        i2c_periphs = list(sorted(set([af.peripheral for _, af in all_i2c_sda_pins])))
         output += "\n/* I2C definitions */\n"
-        output += GD32PinMapGenerator.add_macro_def("PIN_WIRE_SDA", i2c_sda)
-        output += GD32PinMapGenerator.add_macro_def("PIN_WIRE_SCL", i2c_scl)
-        # ToDo: refactor this in the core so that it doesn't become necessary
-        output += GD32PinMapGenerator.add_macro_def("USE_I2C", 1)
+        assigned_i2c_pins: list[str] = list()
+        for i2c_periph in i2c_periphs:
+            i2c_scl = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+                GD32PinMapGenerator.filter_for_periph(
+                    GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name),
+                    i2c_periph
+                )
+            )
+            i2c_sda = GD32PinMapGenerator.get_second_or_fallback_first_pin(
+                GD32PinMapGenerator.filter_for_periph(
+                    GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name),
+                    i2c_periph
+                )
+            )
+            # update already used pins
+            assigned_i2c_pins.extend([i2c_scl, i2c_sda])
+            i2c_periph_num = int(i2c_periph[-1])
+            have_i2c_macro_name = "HAVE_I2C" if i2c_periph_num == 0 else "HAVE_%s" % i2c_periph
+            pin_wire = "PIN_WIRE" if i2c_periph_num == 0 else "PIN_WIRE%d" % i2c_periph_num
 
-        output += "\n/* TIMER or PWM definitions */\n"
+            output += f"/* {i2c_periph} */\n"
+            if i2c_periph_num == 2:
+                output += "/* Pins overlap with I2C0. Change I2C0 pins as neeeded. */\n"
+            output += GD32PinMapGenerator.add_macro_def(have_i2c_macro_name)
+            output += GD32PinMapGenerator.add_macro_def(f"{pin_wire}_SDA", i2c_sda, overridable=True)
+            output += GD32PinMapGenerator.add_macro_def(f"{pin_wire}_SCL", i2c_scl, overridable=True)
+            output += "\n"
+
+        output += "/* TIMER or PWM definitions */\n"
         output += GD32PinMapGenerator.add_macro_def("TIMER_TONE", "TIMER5") # defaults
         output += GD32PinMapGenerator.add_macro_def("TIMER_SERVO", "TIMER6") # defaults
         output += "\n"
@@ -534,7 +558,7 @@ class GD32PinMapGenerator:
         output += "/* \"Serial\" is by default Serial1 / USART0 */\n"
         output += GD32PinMapGenerator.add_macro_def("DEFAULT_HWSERIAL_INSTANCE", "1", True) # defaults
         all_usart_tx_pins = GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name)
-        usart_periphs = set([af.peripheral for _, af in all_usart_tx_pins])
+        usart_periphs = list(sorted(set([af.peripheral for _, af in all_usart_tx_pins])))
         for (i, usart) in enumerate(usart_periphs):
             output += f"\n/* {usart} */\n"
             uart_tx = GD32PinMapGenerator.filter_for_periph(
