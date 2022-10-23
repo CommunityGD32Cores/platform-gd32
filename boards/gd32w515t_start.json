@@ -1,0 +1,50 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32W5 -DGD32W515 -DGD32W51x -DGD32W515TX -DSYS_NS",
+    "f_cpu": "180000000L",
+    "mcu": "gd32w515tiq6",
+    "spl_series": "GD32W51x",
+    "series": "GD32W515"
+  },
+  "debug": {
+    "default_tools": [
+      "cmsis-dap"
+    ],
+    "jlink_device": "GD32W515PI",
+    "onboard_tools": [
+      "cmsis-dap"
+    ],
+    "openocd_target": "gd32e23x",
+    "svd_path": "GD32W515Tx.svd",
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32W515T-START (448k RAM, 2048k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 458752,
+    "maximum_size": 2097152,
+    "protocol": "gdlinkcli",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/press-release/gigadevice-launches-the-gd32w515-series-as-the-first-generation-of-wi-fi-mcus-to-enhance-wireless-security-in-the-aiot-market/",
+  "vendor": "GigaDevice"
+}
