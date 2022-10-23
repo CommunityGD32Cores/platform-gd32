@@ -12,7 +12,7 @@
     "default_tools": [
       "cmsis-dap"
     ],
-    "jlink_device": "GD32W515PI",
+    "jlink_device": "GD32W515TI",
     "onboard_tools": [
       "cmsis-dap"
     ],
