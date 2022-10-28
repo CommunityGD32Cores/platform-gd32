@@ -38,7 +38,6 @@ if activate_semihosting:
     env.Append(LIBS=["rdimon"])
 else:
     env.Append(LINKFLAGS=["--specs=nano.specs"])
-#    env.Append(LINKFLAGS=["--specs=nosys.specs", "--specs=nano.specs"])
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-wifi-sdk-gd32")
 assert isdir(FRAMEWORK_DIR)
@@ -120,7 +119,6 @@ env.Append(
         "-Wl,--unresolved-symbols=report-all",
     ],
     LIBS=["c", "gcc", "m", "stdc++"]
-#    LIBPATH=[join(CMSIS_DIR, "DSP", "Lib", "GCC")],
 )
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
@@ -209,18 +207,8 @@ def compile_bootloader_sources(default_env):
 env.Append(
     PIOBUILDFILES=[
         compile_bootloader_sources(env), # all build files for mbl.elf
-        #compiler_user_firmware(env)
-        # all build files for firmware.elf
-        #get_objects_for_path(
-        #    env, 
-        #    PROJECT_SRC_DIR,
-        #    join("$BUILD_DIR", "src"),
-        #)
-        # regular project sources
-        #compile_source_files(prebuilt_config_1, env, PROJECT_SRC_DIR)
-    ],
-    #_EXTRA_ZEPHYR_PIOBUILDFILES=compile_source_files(target_configs["zephyr_final"], env, PROJECT_SRC_DIR),
-    #__ZEPHYR_OFFSET_HEADER_CMD=offset_header_file,
+        # firmware files etc will be added by BuildProgram()
+    ]
 )
 
 # for further building the main program
@@ -344,68 +332,56 @@ linkerscript_cmd = envC.Command(
 )
 envC.Depends("$BUILD_DIR/${PROGNAME}.elf", linkerscript_cmd)
 
-srec_cat_cmd = envC.Command(
-    join("$BUILD_DIR", "image-all.bin"),  # $TARGET
-    join("$BUILD_DIR", "${PROGNAME}.bin"), # $SOURCE
-    envC.VerboseAction(" ".join([
-        '"%s"' % join(FRAMEWORK_DIR, "scripts", "imgtool", "srec_cat.exe"),
-        "-Binary",
-        join("$BUILD_DIR", "mbl.bin"),
-        "-Binary",
-        "-offset",
-        "0",
-        "$SOURCE", # firmware.bin
-        "-Binary",
-        "-offset",
-        "0xa000",
-        "-fill",
-        "0xFF",
-        "0x7FFC",
-        "0xA000",
-        "-o",
-        "$TARGET",
-    ]), 
-    "Generating image-all.bin")
+if False:
+    srec_cat_cmd = envC.Command(
+        join("$BUILD_DIR", "image-all.bin"),  # $TARGET
+        join("$BUILD_DIR", "${PROGNAME}.bin"), # $SOURCE
+        envC.VerboseAction(" ".join([
+            '"%s"' % join(FRAMEWORK_DIR, "scripts", "imgtool", "srec_cat.exe"),
+            "-Binary",
+            join("$BUILD_DIR", "mbl.bin"),
+            "-Binary",
+            "-offset",
+            "0",
+            "$SOURCE", # firmware.bin
+            "-Binary",
+            "-offset",
+            "0xa000",
+            "-fill",
+            "0xFF",
+            "0x7FFC",
+            "0xA000",
+            "-o",
+            "$TARGET",
+        ]), 
+        "Generating image-all.bin")
 )
 #envC.Depends(srec_cat_cmd, "$BUILD_DIR/${PROGNAME}.bin")
 #AlwaysBuild(srec_cat_cmd)
 #env.Depends("checkprogsize", "$BUILD_DIR/image-all.bin")
-env.AddPostAction(
-    "$BUILD_DIR/${PROGNAME}.bin",
-       envC.VerboseAction(" ".join([
-        '"%s"' % join(FRAMEWORK_DIR, "scripts", "imgtool", "srec_cat.exe"),
-        "$BUILD_DIR/mbl.bin",
-        "-Binary",
-        "-offset",
-        "0",
-        "$BUILD_DIR/${PROGNAME}.bin", # firmware.bin
-        "-Binary",
-        "-offset",
-        "0xa000",
-        "-fill",
-        "0xFF",
-        "0x7FFC",
-        "0xA000",
-        "-o",
-        "$BUILD_DIR/image-all.bin",
-        "-Binary"
-    ]), 
-    "Generating image-all.bin")
-)
+if False:
+    env.AddPostAction(
+        "$BUILD_DIR/${PROGNAME}.bin",
+        envC.VerboseAction(" ".join([
+            '"%s"' % join(platform.get_package_dir("tool-sreccat") or "",
+                "srec_cat"),
+            "$BUILD_DIR/mbl.bin",
+            "-Binary",
+            "-offset",
+            "0",
+            "$BUILD_DIR/${PROGNAME}.bin", # firmware.bin
+            "-Binary",
+            "-offset",
+            "0xa000",
+            "-fill",
+            "0xFF",
+            "0x7FFC",
+            "0xA000",
+            "-o",
+            "$BUILD_DIR/image-all.bin",
+            "-Binary"
+        ]), 
+        "Generating image-all.bin")
+    )
+
 env.Append(LIBS=libs)
-
-#print("MBL ENV LIBS:")
-#for x in saved_mbl_env["LIBS"]:
-#    print(x)
-
-#env.BuildSources(
-#
-#)
-
-#mbl_elf = mbl_env.Program(
-#        join("$BUILD_DIR", "zephyr", "firmware-pre0"), 
-#        env["PIOBUILDFILES"][0],
-#        #LDSCRIPT_PATH=os.path.join("$BUILD_DIR", "zephyr", "linker_zephyr_pre0.cmd")
-#    )
-
-#AlwaysBuild(mbl_elf)

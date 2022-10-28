@@ -109,6 +109,27 @@ env.Append(
                 "$TARGET"
             ]), "Building $TARGET"),
             suffix=".hex"
+        ),
+        BinsToCombinedBin=Builder(
+            action=env.VerboseAction(" ".join([
+                '"%s"' % join(platform.get_package_dir("tool-sreccat") or "",
+                    "srec_cat"),
+                "$BUILD_DIR/mbl.bin", # bootloader
+                "-Binary",
+                "-offset",
+                "0",
+                "$SOURCES", # firmware.bin
+                "-Binary",
+                "-offset",
+                "0xa000",
+                "-fill",
+                "0xFF",
+                "0x7FFC",
+                "0xA000",
+                "-o",
+                "$TARGET",
+                "-Binary"
+            ]), "Generating $TARGET"),
         )
     )
 )
@@ -135,6 +156,14 @@ else:
     target_elf = env.BuildProgram()
     target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
     env.Depends(target_firm, "checkprogsize")
+
+# replace target .bin file with *combined* image
+# this self-referential thing actually works.
+if "wifi-sdk" in pioframework:
+    target_firm = env.BinsToCombinedBin(
+        join("$BUILD_DIR", "image-all.bin"),
+        target_firm
+    )
 
 AlwaysBuild(env.Alias("nobuild", target_firm))
 target_buildprog = env.Alias("buildprog", target_firm, target_firm)

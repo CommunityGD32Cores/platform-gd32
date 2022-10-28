@@ -43,6 +43,8 @@ class Gd32Platform(PlatformBase):
                     if board in json.load(fp):
                         self.packages["framework-mbed"]["version"] = "~6.51506.0"
             self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
+        if "wifi-sdk" in frameworks:
+            self.packages["tool-sreccat"]["optional"] = False
 
         # include or exclude other packages for different frameworks.. 
 

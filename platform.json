@@ -87,6 +87,11 @@
       "owner": "maxgerhardt",
       "version": "https://github.com/CommunityGD32Cores/gd32-pio-wifi-sdk.git"
     },
+    "tool-sreccat": {
+      "owner": "platformio",
+      "version": "~1.164.0",
+      "optional": true
+    },
     "tool-stm32duino": {
       "type": "uploader",
       "optional": true,
