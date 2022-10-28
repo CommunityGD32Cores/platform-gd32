@@ -13,6 +13,7 @@ jobs:
           - "examples/gd32-arduino-blinky"
           - "examples/gd32-mbedos-baremetal-blinky"
           - "examples/gd32-spl-blinky"
+          - "examples/gd32-w51x-wifi-blinky"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2

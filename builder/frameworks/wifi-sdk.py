@@ -233,11 +233,17 @@ env.Append(
         join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "os"),
         join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "wifi"),
     ],
+    LINKFLAGS=['-Wl,-Map="%s"' % join("${BUILD_DIR}", "${PROGNAME}.map")],
     LIBPATH=[join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "lib", "GCC")],
     LIBS=["gd32w51x_wifi"]
 )
 
 envC = env.Clone()
+# respect build unflags etc, otherwise we always build with -Os
+envC.ProcessUnFlags(env.get("BUILD_UNFLAGS"))
+if "debug" in env.GetBuildType():
+    envC.ConfigureDebugFlags()
+
 libs = []
 libs.append(envC.BuildLibrary(
     join("$BUILD_DIR", "gd32w51x_peripheral"),
