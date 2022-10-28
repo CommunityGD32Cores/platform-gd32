@@ -114,11 +114,11 @@ env.Append(
             action=env.VerboseAction(" ".join([
                 '"%s"' % join(platform.get_package_dir("tool-sreccat") or "",
                     "srec_cat"),
-                "$BUILD_DIR/mbl.bin", # bootloader
+                "${SOURCES[1]}", # master bootloader (mbl)
                 "-Binary",
                 "-offset",
                 "0",
-                "$SOURCES", # firmware.bin
+                "${SOURCES[0]}", # firmware.bin (nspe)
                 "-Binary",
                 "-offset",
                 "0xa000",
@@ -157,12 +157,16 @@ else:
     target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
     env.Depends(target_firm, "checkprogsize")
 
-# replace target .bin file with *combined* image
+# replace target_firm variable with *combined* .bin image
+# of master bootloader and firmware.
 # this self-referential thing actually works.
 if "wifi-sdk" in pioframework:
     target_firm = env.BinsToCombinedBin(
         join("$BUILD_DIR", "image-all.bin"),
-        target_firm
+        [
+            target_firm,
+            join("$BUILD_DIR", "mbl.bin")
+        ]
     )
 
 AlwaysBuild(env.Alias("nobuild", target_firm))
