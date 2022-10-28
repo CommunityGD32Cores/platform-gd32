@@ -113,12 +113,19 @@ env.Append(
     )
 )
 
-if not env.get("PIOFRAMEWORK"):
-    env.SConscript("frameworks/_bare.py")
+pioframework = env.get("PIOFRAMEWORK", [])
+if not pioframework:
+    env.SConscript("frameworks/_bare.py", exports="env")
 
 #
 # Target: Build executable and linkable firmware
 #
+
+if "wifi-sdk" in pioframework:
+    env.SConscript(
+        join("frameworks", "wifi-sdk-pre.py"),
+        exports={"env": env}
+    )
 
 target_elf = None
 if "nobuild" in COMMAND_LINE_TARGETS:

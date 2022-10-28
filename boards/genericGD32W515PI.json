@@ -21,7 +21,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "wifi-sdk"
   ],
   "name": "GD32W515PI (448k RAM, 2048k Flash)",
   "upload": {
