@@ -222,6 +222,7 @@ env.Append(
         join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "network", "lwip-2.1.2", "apps"),
         join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "network", "mbedtls-2.17.0-ssl", "include"),
         join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "network", "mbedtls-2.17.0-ssl", "ns_interface"),
+        join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "network", "iperf3"),
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "GD32W51x_wifi_driver", "cmn"),
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "GD32W51x_wifi_driver", "inc"),
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "GD32W51x_wifi_driver", "osal"),
@@ -339,5 +340,9 @@ linkerscript_cmd = envC.Command(
     "Generating linkerscript $BUILD_DIR/nspe_gdm32_ns_processed.ld")
 )
 envC.Depends("$BUILD_DIR/${PROGNAME}.elf", linkerscript_cmd)
+
+link_iperf = board.get("build.link_iperf", False)
+if str(link_iperf).lower() in ("1", "yes", "true"):
+    libs.append("iperf3")
 
 env.Append(LIBS=libs)
