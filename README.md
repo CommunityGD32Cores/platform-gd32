@@ -2,16 +2,27 @@
 
 ## Description
 
-PlatformIO platform implementation for GD32F and GD32E type chips. Work in progress.
+PlatformIO platform implementation for GD32F, GD32E, GD32W and GD32C type chips. Work in progress.
 
 ## Supported boards
 
-See [boards](https://github.com/CommunityGD32Cores/platform-gd32/tree/main/boards) folder
+See [boards](https://github.com/CommunityGD32Cores/platform-gd32/tree/main/boards) folder.
 
-* GD32F303CC
-* GD32F150xx / F190xx 
-* GD32E130xx
-* many more..
+* GD32L23x (Cortex-M23)
+* GD32C10x (Cortex-M4)
+* GD32W51x (Cortex-M33)
+* GD32E10x (Cortex-M4)
+* GD32E23x (Cortex-M23)
+* GD32E50x (Cortex-M33)
+* GD32F10x (Cortex-M4)
+* GD32F1x0 (Cortex-M3)
+* GD32F20x (Cortex-M3)
+* GD32F30x (Cortex-M4)
+* GD32F3x0 (Cortex-M4)
+* GD32F4xx (Cortex-M4)
+* GD32F403 (Cortex-M4)
+
+All ARM-based GD32 microcontrollers are supported through `genericGD32...` board definitions. Further, many GD32 development boards made by Gigadevice or other vendors are supports.
 
 ## How to use
 

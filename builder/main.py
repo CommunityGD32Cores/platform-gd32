@@ -109,16 +109,44 @@ env.Append(
                 "$TARGET"
             ]), "Building $TARGET"),
             suffix=".hex"
+        ),
+        BinsToCombinedBin=Builder(
+            action=env.VerboseAction(" ".join([
+                '"%s"' % join(platform.get_package_dir("tool-sreccat") or "",
+                    "srec_cat"),
+                "${SOURCES[1]}", # master bootloader (mbl)
+                "-Binary",
+                "-offset",
+                "0",
+                "${SOURCES[0]}", # firmware.bin (nspe)
+                "-Binary",
+                "-offset",
+                "0xa000",
+                "-fill",
+                "0xFF",
+                "0x7FFC",
+                "0xA000",
+                "-o",
+                "$TARGET",
+                "-Binary"
+            ]), "Generating $TARGET"),
         )
     )
 )
 
-if not env.get("PIOFRAMEWORK"):
-    env.SConscript("frameworks/_bare.py")
+pioframework = env.get("PIOFRAMEWORK", [])
+if not pioframework:
+    env.SConscript("frameworks/_bare.py", exports="env")
 
 #
 # Target: Build executable and linkable firmware
 #
+
+if "wifi-sdk" in pioframework:
+    env.SConscript(
+        join("frameworks", "wifi-sdk-pre.py"),
+        exports={"env": env}
+    )
 
 target_elf = None
 if "nobuild" in COMMAND_LINE_TARGETS:
@@ -128,6 +156,18 @@ else:
     target_elf = env.BuildProgram()
     target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
     env.Depends(target_firm, "checkprogsize")
+
+# replace target_firm variable with *combined* .bin image
+# of master bootloader and firmware.
+# this self-referential thing actually works.
+if "wifi-sdk" in pioframework:
+    target_firm = env.BinsToCombinedBin(
+        join("$BUILD_DIR", "image-all.bin"),
+        [
+            target_firm,
+            join("$BUILD_DIR", "mbl.bin")
+        ]
+    )
 
 AlwaysBuild(env.Alias("nobuild", target_firm))
 target_buildprog = env.Alias("buildprog", target_firm, target_firm)

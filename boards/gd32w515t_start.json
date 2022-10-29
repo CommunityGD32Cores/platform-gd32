@@ -24,7 +24,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "wifi-sdk"
   ],
   "name": "GD32W515T-START (448k RAM, 2048k Flash)",
   "upload": {
