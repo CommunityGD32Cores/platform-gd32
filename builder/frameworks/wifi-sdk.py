@@ -249,11 +249,13 @@ libs.append(envC.BuildLibrary(
     join("$BUILD_DIR", "gd32w51x_peripheral"),
     join(FRAMEWORK_DIR, "NSPE", "Firmware", "GD32W51x_standard_peripheral")
 ))
-libs.append(envC.BuildLibrary(
+# must be linked as individual object files because it contains
+# interrupt handlers
+envC.BuildSources(
     join("$BUILD_DIR", "bsp"),
     join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "bsp"),
     src_filter=["+<*>", "-<bsp_gd32w51x.c>"]
-))
+)
 libs.append(envC.BuildLibrary(
     join("$BUILD_DIR", "common"),
     join(FRAMEWORK_DIR, "NSPE", "WIFI_IOT", "common"),
