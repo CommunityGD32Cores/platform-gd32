@@ -74,8 +74,8 @@ env.Replace(
 
     ARFLAGS=["rc"],
 
-    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx|\.ccram_data)\s+(\d+).*",
-    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
+    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.preinit_array|\.init_array|\.fini_array|\.code_to_sram|\.vectors|\.text.align|\.ARM.exidx|\.ccram_data)\s+(\d+).*",
+    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit|\.stack|\.code_to_sram|\.memory_layout)\s+(\d+).*",
     SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
     SIZEPRINTCMD='$SIZETOOL -B -d $SOURCES',
 
