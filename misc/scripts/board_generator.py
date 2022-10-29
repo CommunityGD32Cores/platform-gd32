@@ -359,6 +359,7 @@ class GD32MCUInfo:
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
         self.add_val_to_arr_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
         self.add_val_to_arr_if_true(board, "frameworks", self.mbedos_variant != None, "mbed")
+        self.add_val_to_arr_if_true(board, "frameworks", self.spl_series.startswith("GD32W51x"), "wifi-sdk")
         self.set_val_if_exists(board["build"], "mbed_variant", self.mbedos_variant)
         self.add_val_to_arr_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
         self.set_val_if_exists(board["upload"], "closely_coupled_ram_size", self.core_coupled_memory_kb * 1024 if self.core_coupled_memory_kb != 0 else None)
