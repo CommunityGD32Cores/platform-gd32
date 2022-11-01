@@ -16,6 +16,7 @@ import sys
 from platform import system
 from os import makedirs
 from os.path import basename, isdir, join, isfile
+import re
 
 from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
                           Builder, Default, DefaultEnvironment)
@@ -56,6 +57,47 @@ ftdi_layout_signal nSRST -oe 0x0020 -data 0x0020
         print("Writing config to %s" % expected_filepath)
         with open(expected_filepath, "w") as fp:
             fp.write(expected_filecontents)
+
+# safely evaluates a e.g. mathematical expression
+# no global variables or functions allowed
+def s_eval(input_string):
+     code = compile(input_string, "<int>", "eval")
+     if code.co_names:
+         raise NameError(f"Use of names not allowed")
+     return eval(code, {"__builtins__": {}}, {})
+
+def _update_max_upload_size(env):
+    # only invoked for wifi-sdk projects
+    # get the generated linkerscript again
+    genned_ldscript = join(env.subst("$BUILD_DIR"), "nspe_gdm32_ns_processed.ld")
+    if not isfile(genned_ldscript):
+        print("Warning: Failed to retrieve linker script for size update from file '%s'." % str(genned_ldscript))
+        return
+    ldscript = ""
+    with open(genned_ldscript, 'r') as fp:
+        ldscript = fp.read()
+    # parse the "MEMORY" sections out of it
+    # example:
+    #  FLASH (rx) : ORIGIN = (0x08000000 + 0xA000 + 0), LENGTH = (0x100000 - 0xA000)
+    #  RAM (xrw) : ORIGIN = ((0x20000000 + 0x200)), LENGTH = (0x00070000 - 0x200)
+    flash_matches = re.findall(r"FLASH \(rx\) : ORIGIN = \(([0-9xA-Fa-f +-]+)\), LENGTH = \(([0-9xA-Fa-f +-]+)\)", ldscript)
+    if flash_matches is None or len(flash_matches) != 1:
+        print("Warning: Failed to retrieve flash memory details from linker script for size update from file '%s'." % str(genned_ldscript))
+        print("Flash matches: %s" % str(flash_matches))
+        return
+    flash_origin, flash_len = flash_matches[0]
+    ram_matches = re.findall(r"RAM \(xrw\) : ORIGIN = \(\(([0-9xA-Fa-f +-]+)\)\), LENGTH = \(([0-9xA-Fa-f +-]+)\)", ldscript)
+    if ram_matches is None or len(ram_matches) != 1:
+        print("Warning: Failed to retrieve RAM memory details from linker script for size update from file '%s'." % str(genned_ldscript))
+        return
+    ram_origin, ram_len = ram_matches[0]
+    # due to the regexes, all extracted strings can can only be expressions involving hex numbers.
+    # especially, no paranthesis are possible, so no function calls etc.
+    # use a hardened of eval() anyways.
+    flash_origin, flash_len, ram_origin, ram_len = s_eval(flash_origin), s_eval(flash_len), s_eval(ram_origin), s_eval(ram_len)
+    print(f"Partition table: Flash at {hex(flash_origin)}, {flash_len} bytes. RAM at {hex(ram_origin)}, {ram_len} bytes.")
+    board.update("upload.maximum_ram_size", ram_len)
+    board.update("upload.maximum_size", flash_len)
 
 env = DefaultEnvironment()
 env.SConscript("compat.py", exports="env")
@@ -168,6 +210,13 @@ if "wifi-sdk" in pioframework:
             join("$BUILD_DIR", "mbl.bin")
         ]
     )
+    # update max upload size based on linker file
+    if env.get("PIOMAINPROG"):
+        env.AddPreAction(
+            "checkprogsize",
+            env.VerboseAction(
+                lambda source, target, env: _update_max_upload_size(env),
+                "Retrieving maximum program size $SOURCES"))
 
 AlwaysBuild(env.Alias("nobuild", target_firm))
 target_buildprog = env.Alias("buildprog", target_firm, target_firm)

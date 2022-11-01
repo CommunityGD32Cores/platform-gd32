@@ -46,6 +46,17 @@ if not board.get("build.mcu").startswith("gd32w51"):
     print("Error! Only GD32W51x chips are supported by this framework")
     env.Exit(-1)
 
+# Allow changing the config folder per-project
+# is expected to have the folder name relative to the project root
+config_folder = join(FRAMEWORK_DIR, "config")
+custom_config_folder = board.get("build.custom_config_folder", "")
+if custom_config_folder != "":
+    config_folder = join(env.subst("$PROJECT_DIR"), custom_config_folder)
+
+if not isdir(config_folder):
+    print("SDK config folder \"%s\" could not be found." % config_folder)
+    env.Exit(-1)
+
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
     CFLAGS=["-std=c99"],
@@ -87,7 +98,7 @@ env.Append(
         "PLATFORM_OS_FREERTOS", # hardcode to FreeRTOS for now
     ],
     CPPPATH=[
-        join(FRAMEWORK_DIR, "config"),
+        config_folder,
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "CMSIS", "ARM", "cmsis"),
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "CMSIS", "GD", "GD32W51x", "Include"),
         join(FRAMEWORK_DIR, "NSPE", "Firmware", "CMSIS", "DSP_Lib_v1.6.0", "include"),
@@ -137,8 +148,6 @@ def get_objects_for_path(target_env, source_path:str, target_prefix:str, only_al
                 )
     return objs
 
-saved_mbl_env = None
-
 def compile_bootloader_sources(default_env):
     is_build_type_debug = "debug" in default_env.GetBuildType()
     mbl_env = default_env.Clone()
@@ -167,7 +176,6 @@ def compile_bootloader_sources(default_env):
         "Generating linkerscript $BUILD_DIR/mbl_gdm32_ns_processed.ld")
     )
     mbl_env.Depends("$BUILD_DIR/${PROGNAME}.elf", linkerscript_cmd)
-    #mbl_env.Append()
     mbl_build_dir = join("$BUILD_DIR", "mbl")
     objs = get_objects_for_path(mbl_env, join(FRAMEWORK_DIR, "MBL", "source_ns"), mbl_build_dir)
     objs += get_objects_for_path(
@@ -201,7 +209,6 @@ def compile_bootloader_sources(default_env):
             "mbl_startup_gdm32.S"
         ]
     )
-    saved_mbl_env = mbl_env
     return objs
 
 env.Append(
