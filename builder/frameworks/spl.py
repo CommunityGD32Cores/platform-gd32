@@ -128,7 +128,7 @@ def get_startup_filename(board):
     if series in ("GD32F427", "GD32F407"):
         return "startup_gd32f407_427.S" 
     if series in ("GD32F450", "GD32F470"):
-        return "startup_gd32f407_427.S" 
+        return "startup_gd32f450_470.S" 
     if series == "GD32E508":
         return "startup_gd32e508.S"
     if spl_sub_series != "":
