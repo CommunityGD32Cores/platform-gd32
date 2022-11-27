@@ -4,7 +4,7 @@ import re
 from pin_definitions import GD32AdditionalFunc, GD32AlternateFunc, GD32Pin, GD32AdditionalFuncFamiliy
 
 class GD32PinMap:
-    def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin], pins_per_subdevice_family=None) -> None:
+    def __init__(self, series: str, datasheet_info, pin_map: Dict[str, GD32Pin], pins_per_subdevice_family: Dict[str, GD32AdditionalFuncFamiliy]=None) -> None:
         self.series = series
         self.datasheet_info = datasheet_info
         self.pin_map: Dict[str, GD32Pin] = pin_map

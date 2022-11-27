@@ -30,7 +30,7 @@ class GD32PinMapGenerator:
     @staticmethod
     def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
         adc_pins = GD32PinMapGenerator.get_adc_pins(pinmap, device_name)
-        return [x[0].pin_name for x in adc_pins]
+        return list(set([x[0].pin_name for x in adc_pins]))
 
     @staticmethod
     def get_non_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
@@ -423,6 +423,10 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def get_second_or_fallback_first_pin(pins, already_assigned_pins:List[str] = None) -> str:
+        if len(pins) == 0:
+            return "UNKNOWN_PIN"
+            # think about doing this
+            raise RuntimeError("No pins to chose from.")
         pin_candidate = pins[1] if len(pins) >= 2 else pins[0]
         if already_assigned_pins is None:
             return pin_candidate
@@ -730,15 +734,16 @@ def main_func():
     all_mcus = read_all_known_mcus()
     # temporary static path
     datasheet_pdf_paths = [
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf",
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf",
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F30x\\GD32F303xx_Datasheet_Rev1.9.pdf"
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
     ]
     for datasheet_pdf_path in datasheet_pdf_paths:
         device_pinmap = load_pinmap(datasheet_pdf_path)
-        if device_pinmap is None or "--no-load-preparsed" in sys.argv or False:
+        if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
             device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
             save_pinmap(device_pinmap)
             #return

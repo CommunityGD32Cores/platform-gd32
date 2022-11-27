@@ -119,11 +119,19 @@ class GD32DatasheetParser:
         for pindef_page in datasheet_info.pin_defs:
             dataframe = GD32DatasheetParser.get_dataframe_for_pdf_pages(datasheet_pdf_path, pindef_page)
             add_func_family = GD32DatasheetParser.process_add_funcs_dataframe(dataframe, datasheet_info, pindef_page)
+            # we don't have a "pin alternative functions" page, we have to extract it from the last column text 
+            if datasheet_info.family_type == "A":
+                alt_and_remap_family = GD32DatasheetParser.process_family_a_alts_and_remaps(dataframe, datasheet_info, pindef_page)
+                additional_functions.append(alt_and_remap_family)
             additional_functions.append(add_func_family)
         # merge all pinmap dictionary into the first object
-        first_pinmap = pinmaps[0]
-        for i in range(1, len(pinmaps)):
-            first_pinmap.pin_map.update(pinmaps[i].pin_map)
+        if len(pinmaps) > 0:
+            first_pinmap = pinmaps[0]
+            for i in range(1, len(pinmaps)):
+                first_pinmap.pin_map.update(pinmaps[i].pin_map)
+        else:
+            # no info
+            first_pinmap = GD32PinMap(datasheet_info.series, datasheet_info, {}, {})
         # merge all additional funcs families into first pinmap
         for add_func in additional_functions:
             GD32DatasheetParser.merge_additional_funcs_into_pinmap(add_func, first_pinmap)
@@ -249,6 +257,41 @@ class GD32DatasheetParser:
         arr = [x.strip() for x in arr]
         return arr
 
+    def analyze_alternate_and_remap_funcs_string(inp:str) -> Tuple[List[str], List[str]]: 
+        alt_start = inp.find("lternate: ")
+        remap_start = inp.find("Remap:")
+        # check if anyhting was found
+        if alt_start == -1 and remap_start == -1:
+            return (list(), list())
+        # get the rest of the string after that
+        if remap_start == -1:
+            alt_inp = inp[alt_start + len("lternate: "):]
+        else:
+            alt_inp = inp[alt_start + len("lternate: "):remap_start]
+        alt_arr = alt_inp.split(",")
+        alt_arr = [x.strip() for x in alt_arr]
+        remap_arr = []
+        if remap_start != -1:
+            remap_inp = inp[remap_start + len("Remap:"):]
+            remap_arr = remap_inp.split(",")
+            remap_arr = [x.strip() for x in remap_arr]
+        return alt_arr, remap_arr
+
+    def cleanup_funcs_array(inp: List[str]) -> List[str]:
+        l = list()
+        for f in inp:
+            if f.startswith("ADC") and f.count("_")  == 1:
+                # could be "ADC012_IN1", "ADC01_IN5" etc
+                # we have to add individually "ADC0", "ADC1", "ADC2".
+                periph_part, signal_part = f.split("_")
+                periph_part = periph_part.replace("ADC", "", 1)
+                # iterate through each char
+                for c in periph_part:
+                    l.append("ADC" + str(c) + "_" + signal_part)
+            else:
+                l.append(f)
+        return l
+
     def strip_pinname(pin_name:str):
         if "-" in pin_name:
             pin_name = pin_name[0 : pin_name.index("-")]
@@ -288,6 +331,32 @@ class GD32DatasheetParser:
             add_funcs_arr = GD32DatasheetParser.analyze_additional_funcs_string(last_column)
             print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
             additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
+        #print(additional_funcs)
+        return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
+
+    def process_family_a_alts_and_remaps(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> GD32AdditionalFuncFamiliy:
+        additional_funcs: Dict[str, List[GD32AdditionalFunc]] = dict()
+        for i, j in dfs.iterrows():
+            # data row
+            pin_row = list(j)
+            pin_name = GD32DatasheetParser.remove_newlines(pin_row[0])
+            if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
+                print("Skipping empty line because pin is not there.")
+                continue
+            pin_name = GD32DatasheetParser.strip_pinname(pin_name)
+            last_column: str = j[len(j) - 1]
+            last_column = last_column.replace("\r", " ")
+            # apply overwrite quirk
+            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinAdditionalInfoQuirk)
+            if len(overwrite_quirk) == 1:
+                overwrite_quirk: OverwritePinAdditionalInfoQuirk = overwrite_quirk[0]
+                if overwrite_quirk.pin_name == pin_name:
+                    last_column = overwrite_quirk.additional_funcs_str
+            alternate_arr, remap_arr = GD32DatasheetParser.analyze_alternate_and_remap_funcs_string(last_column)
+            alternate_arr = GD32DatasheetParser.cleanup_funcs_array(alternate_arr)
+            remap_arr = GD32DatasheetParser.cleanup_funcs_array(remap_arr)
+            print("Pin %s Alt. Funcs: %s Remap funcs: %s" % (pin_name, str(alternate_arr), str(remap_arr)))
+            additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in alternate_arr]
         #print(additional_funcs)
         return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
 
@@ -331,7 +400,7 @@ class GD32DatasheetParser:
                 pin_alternate_funcs = [GD32DatasheetParser.filter_string(x) for x in pin_alternate_funcs]
                 #print("[Before adjustment] Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
                 print("Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
-                af_map = dict()
+                af_map : Dict[str, list[GD32AlternateFunc]] = dict()
                 for ind, func in enumerate(pin_alternate_funcs):
                     af_name = parser_result["alternate_functions"][ind]
                     # check if individual breakup is needed

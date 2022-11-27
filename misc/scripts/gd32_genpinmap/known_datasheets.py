@@ -334,6 +334,15 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         ],
         series = "GD32E230", # series
         family_type = "B" # family type
+    ),
+    "GD32F303xx_Datasheet_Rev1.9.pdf" : DatasheetParsingInfo(
+        alternate_funcs = [],
+        pin_defs = [
+            # GD32F303Cx
+            DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))]),
+        ],
+        series = "GD32F303", # series
+        family_type = "A" # family type
     )
 }
 
