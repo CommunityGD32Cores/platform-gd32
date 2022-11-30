@@ -18,10 +18,11 @@ class DatasheetAFPageParsingInfo(DatasheetPageParsingInfo):
         self.footnotes_device_availability = footnotes_device_availablity
 
 class DatasheetPinDefPageParsingInfo(DatasheetPageParsingInfo):
-    def __init__(self, page_range: List[int], subseries:str, package:str, quirks:List[DatasheetPageParsingQuirk]=None) -> None:
+    def __init__(self, page_range: List[int], subseries:str, package:str, quirks:List[DatasheetPageParsingQuirk]=None, footnotes_device_availablity: Dict[str, str]=None) -> None:
         super().__init__(page_range, quirks)
         self.subseries = subseries
         self.package = package
+        self.footnotes_device_availability = footnotes_device_availablity
 
 class DatasheetParsingInfo:
     def __init__(self, alternate_funcs: List[DatasheetAFPageParsingInfo], pin_defs: List[DatasheetPinDefPageParsingInfo], series:str, family_type:str) -> None:

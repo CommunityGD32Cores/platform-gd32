@@ -1,7 +1,7 @@
 from os import path
 from typing import Dict
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPinDefPageParsingInfo, DatasheetParsingInfo
-from parsing_quirks import ParseUsingAreaQuirk, OverwritePinAdditionalInfoQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
+from parsing_quirks import ParseUsingAreaQuirk, OverwritePinDescriptionQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
 
 # Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
@@ -27,18 +27,18 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F190Cx
             DatasheetPinDefPageParsingInfo([21], "GD32F190Cx", "LQFP48", [
                 ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
-                OverwritePinAdditionalInfoQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5, DAC1_OUT, CANH")
+                OverwritePinDescriptionQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5, DAC1_OUT, CANH")
             ]),
             # PB15 cut off on page 23 too but no *additional* functions are cut-off, so no need to correct it 
             DatasheetPinDefPageParsingInfo([22,23], "GD32F190Cx", "LQFP48", [
                 ParseUsingAreaQuirk((79.996,124.645,766.847,533.183)),
-                OverwritePinAdditionalInfoQuirk("PB15", "Additional: RTC_REFIN")
+                OverwritePinDescriptionQuirk("PB15", "Additional: RTC_REFIN")
             ]),
             DatasheetPinDefPageParsingInfo([24], "GD32F190Cx", "LQFP48", [ParseUsingAreaQuirk((81.484,125.389,385.098,531.695))]),
             # GD32F190Tx
             DatasheetPinDefPageParsingInfo([25], "GD32F190Tx", "QFN36", [
                 ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
-                OverwritePinAdditionalInfoQuirk("PA6", "Additional: ADC_IN6, OPA1_VINP, CANL")
+                OverwritePinDescriptionQuirk("PA6", "Additional: ADC_IN6, OPA1_VINP, CANL")
             ]),
             DatasheetPinDefPageParsingInfo([26], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((79.996,124.645,766.847,533.183))]),
             DatasheetPinDefPageParsingInfo([27], "GD32F190Tx", "QFN36", [ParseUsingAreaQuirk((81.484,124.645,514.58,533.183))]),
@@ -58,7 +58,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F170R8
             DatasheetPinDefPageParsingInfo([14], "GD32F170R8", "LQFP64", [
                 ParseUsingAreaQuirk((176.736,125.389,767.591,531.695)),
-                OverwritePinAdditionalInfoQuirk("PA2", "Additional: ADC_IN2")
+                OverwritePinDescriptionQuirk("PA2", "Additional: ADC_IN2")
             ]),
             DatasheetPinDefPageParsingInfo([15], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
             DatasheetPinDefPageParsingInfo([16], "GD32F170R8", "LQFP64", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
@@ -66,7 +66,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F170Cx
             DatasheetPinDefPageParsingInfo([19], "GD32F170Cx", "LQFP48", [
                 ParseUsingAreaQuirk((127.622,124.645,760.893,533.183)),
-                OverwritePinAdditionalInfoQuirk("PA6", "Additional: ADC_IN6, CANL")
+                OverwritePinDescriptionQuirk("PA6", "Additional: ADC_IN6, CANL")
                 ]),
             DatasheetPinDefPageParsingInfo([20], "GD32F170Cx", "LQFP48", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
             DatasheetPinDefPageParsingInfo([21], "GD32F170Cx", "LQFP48", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
@@ -74,7 +74,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F170Tx
             DatasheetPinDefPageParsingInfo([23], "GD32F170Tx", "QFN36", [
                 ParseUsingAreaQuirk((128.366,125.389,770.567,533.183)),
-                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7")
+                OverwritePinDescriptionQuirk("PA7", "Additional: ADC_IN7")
             ]),
             DatasheetPinDefPageParsingInfo([24], "GD32F170Tx", "QFN36", [ParseUsingAreaQuirk((82.973,125.389,771.311,539.881))]),
             DatasheetPinDefPageParsingInfo([25], "GD32F170Tx", "QFN36", [ParseUsingAreaQuirk((82.229,124.645,401.469,531.695))]),
@@ -106,7 +106,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F150Rx
             DatasheetPinDefPageParsingInfo([15], "GD32F150Rx", "LQFP64", [
                 ParseUsingAreaQuirk((175.956,121.644,759.252,533.076)),
-                OverwritePinAdditionalInfoQuirk("PA1", "Additional: ADC_IN1, CMP0_IP"),
+                OverwritePinDescriptionQuirk("PA1", "Additional: ADC_IN1, CMP0_IP"),
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(2)
             ]),
@@ -133,13 +133,13 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F150Cx
             DatasheetPinDefPageParsingInfo([20], "GD32F150Cx", "LQFP48", [
                 ParseUsingAreaQuirk((131.316,121.644,771.156,531.588)),
-                OverwritePinAdditionalInfoQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5"),
+                OverwritePinDescriptionQuirk("PA5", "Additional: ADC_IN5, CMP0_IM5, CMP1_IM5"),
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(2)
             ]),
             DatasheetPinDefPageParsingInfo([21], "GD32F150Cx", "LQFP48", [
                 ParseUsingAreaQuirk((80.724,122.388,766.692,532.332)),
-                OverwritePinAdditionalInfoQuirk("PB15", "Additional: RTC_REFIN"),
+                OverwritePinDescriptionQuirk("PB15", "Additional: RTC_REFIN"),
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(1)
             ]),
@@ -156,7 +156,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F150Kx
             DatasheetPinDefPageParsingInfo([24], "GD32F150Kx", "QFN32", [
                 ParseUsingAreaQuirk((131.316,121.644,771.9,532.332)),
-                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+                OverwritePinDescriptionQuirk("PA7", "Additional: ADC_IN7"),
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(1)
             ]),
@@ -173,7 +173,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F150Gx
             DatasheetPinDefPageParsingInfo([27], "GD32F150Gx", "QFN28", [
                 ParseUsingAreaQuirk((132.06,122.388,771.9,532.332)),
-                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+                OverwritePinDescriptionQuirk("PA7", "Additional: ADC_IN7"),
                 CondenseColumnsQuirk(0),
                 CondenseColumnsQuirk(1)
             ]),
@@ -210,7 +210,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F130R8
             DatasheetPinDefPageParsingInfo([15], "GD32F130R8", "LQFP64", [
                 ParseUsingAreaQuirk((175.956,123.876,762.228,533.076)),
-                OverwritePinAdditionalInfoQuirk("PA1", "Additional: ADC_IN1"),
+                OverwritePinDescriptionQuirk("PA1", "Additional: ADC_IN1"),
             ]),
             DatasheetPinDefPageParsingInfo([16], "GD32F130R8", "LQFP64", [
                 ParseUsingAreaQuirk((80.724,124.62,769.668,531.588)),
@@ -256,7 +256,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # name.
             DatasheetPinDefPageParsingInfo([24], "GD32F130Kx", "QFN32", [
                 ParseUsingAreaQuirk((385.02,124.62,768.924,533.076)),
-                OverwritePinAdditionalInfoQuirk("PA3", "Additional: ADC_IN3"),
+                OverwritePinDescriptionQuirk("PA3", "Additional: ADC_IN3"),
                 CondenseColumnsQuirk(),
             ]),
             DatasheetPinDefPageParsingInfo([25], "GD32F130Kx", "QFN32", [
@@ -270,7 +270,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F130Gx
             DatasheetPinDefPageParsingInfo([27], "GD32F130Gx", "QFN28", [
                 ParseUsingAreaQuirk((131.316,124.62,769.668,533.076)),
-                OverwritePinAdditionalInfoQuirk("PB0", "Additional: ADC_IN8"),
+                OverwritePinDescriptionQuirk("PB0", "Additional: ADC_IN8"),
                 CondenseColumnsQuirk(),
             ]),
             DatasheetPinDefPageParsingInfo([28], "GD32F130Gx", "QFN28", [
@@ -280,7 +280,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32F130Fx
             DatasheetPinDefPageParsingInfo([29], "GD32F130Fx", "TSSOP20", [
                 ParseUsingAreaQuirk((174.468,124.62,771.156,532.332)),
-                OverwritePinAdditionalInfoQuirk("PA7", "Additional: ADC_IN7"),
+                OverwritePinDescriptionQuirk("PA7", "Additional: ADC_IN7"),
             ]),
             DatasheetPinDefPageParsingInfo([30], "GD32F130Fx", "TSSOP20", [
                 ParseUsingAreaQuirk((82.212,124.62,434.124,533.076)),
@@ -314,7 +314,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             # GD32E230Kx, LQFP32 and QFN32 definitions are the same.
             DatasheetPinDefPageParsingInfo([21], "GD32E230Kx", "LQFP32", [
                 ParseUsingAreaQuirk((325.566,125.389,759.405,536.904)),
-                OverwritePinAdditionalInfoQuirk("PA4", "Additional: ADC_IN4, CMP_IM4"),
+                OverwritePinDescriptionQuirk("PA4", "Additional: ADC_IN4, CMP_IM4"),
             ]),
             DatasheetPinDefPageParsingInfo([22], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,124.645,772.8,535.416))]),
             DatasheetPinDefPageParsingInfo([23], "GD32E230Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,123.157,343.425,536.16))]),
@@ -322,13 +322,13 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([25], "GD32E230Gx", "QFN28", [ParseUsingAreaQuirk((697.641,123.901,763.87,536.904))]),
             DatasheetPinDefPageParsingInfo([26], "GD32E230Gx", "QFN28", [
                 ParseUsingAreaQuirk((79.252,124.645,768.335,536.904)),
-                OverwritePinAdditionalInfoQuirk("PB1", "Additional: ADC_IN9"),
+                OverwritePinDescriptionQuirk("PB1", "Additional: ADC_IN9"),
             ]),
             DatasheetPinDefPageParsingInfo([27], "GD32E230Gx", "QFN28", [ParseUsingAreaQuirk((80.74,124.645,602.389,535.416))]),
             # GD32E230Fx TSSOP20 + LGA20.
             DatasheetPinDefPageParsingInfo([28], "GD32E230Fx", "TSSOP20", [
                 ParseUsingAreaQuirk((135.063,123.157,763.87,535.416)),
-                OverwritePinAdditionalInfoQuirk("PB1", "Additional: ADC_IN9"),
+                OverwritePinDescriptionQuirk("PB1", "Additional: ADC_IN9"),
             ]),
             DatasheetPinDefPageParsingInfo([29], "GD32E230Fx", "TSSOP20", [ParseUsingAreaQuirk((79.996,123.901,333.751,535.416))])
         ],
@@ -339,7 +339,7 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         alternate_funcs = [],
         pin_defs = [
             # GD32F303Cx
-            DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))]),
+            DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))], {"3":["GD32F303CG"]}),
         ],
         series = "GD32F303", # series
         family_type = "A" # family type
