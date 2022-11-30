@@ -144,11 +144,11 @@ class GD32DatasheetParser:
         # Propagate AF pin info to subseries pin info.
         for pin_name, gd32pin in all_alternate_func_infos.items():
             for subseries in pinmaps.keys():
+                # only add function to it if this pin exists in this subseries
+                # otherwise do not create it.
                 if pin_name in pinmaps[subseries]:
                     for f in gd32pin.pin_functions:
                         pinmaps[subseries][pin_name].add_func(f)
-                else:
-                    pinmaps[subseries][pin_name] = gd32pin
 
         # generate all sub series maps
         subseries_pin_maps: Dict[str, GD32SubseriesPinMap] = dict()
@@ -249,10 +249,6 @@ class GD32DatasheetParser:
             if all([is_nan(x) for x in dfs.iloc[:, -1]]):
                 dfs = dfs.drop([dfs.columns[-1]], axis=1)
         return dfs
-
-    def print_parsing_result_json(res:dict):
-        as_json = json.dumps(res, indent=2, default=lambda o: o.__dict__)
-        print_big_str(as_json)
 
     def remove_newlines(inp):
         if isinstance(inp, str):
@@ -455,14 +451,7 @@ class GD32DatasheetParser:
                         funcs = [func]
                     for f in funcs:
                         # check if we need to extra footnotes
-                        sig_name = f 
-                        footnote = None
-                        if "(" in f and ")" in f:
-                            sig_name = f[0:f.index("(")]
-                            func_footnode_part = f[f.index("("):]
-                            # strip first and last char
-                            footnote = func_footnode_part[1:-1]
-                            #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
+                        sig_name, footnote = GD32DatasheetParser.analyze_footnote(f)
                         af_list.append(GD32PinFunction(sig_name, get_trailing_number(af_name), footnote, pages_info.footnotes_device_availability))
                 print(af_list)
                 parser_result_pins[pin_name] = GD32Pin(pin_name, af_list)
