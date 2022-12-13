@@ -1,4 +1,3 @@
-from os import device_encoding
 from typing import Dict, List, Tuple
 import re
 from pin_definitions import GD32Pin, GD32PinFunction

@@ -1,14 +1,11 @@
-from typing import Dict, Tuple, List
-from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma, write_to_file, natural_key_for_pin_func
+from typing import List
 from known_datasheets import identify_datasheet
-from pin_definitions import GD32Pin, GD32PinFunction
-from pin_map import GD32PinMap, GD32SubseriesPinMap
+from pin_map import GD32PinMap
 from datasheet_parser import GD32DatasheetParser
 from static_data import *
 import pickle
 from os import mkdir, path
 import sys
-import string
 from pinmap_converter import GD32PinMapGenerator
 
 # add directory above us to the python path.

@@ -1,4 +1,3 @@
-
 from typing import List, Dict
 from parsing_quirks import DatasheetPageParsingQuirk
 
