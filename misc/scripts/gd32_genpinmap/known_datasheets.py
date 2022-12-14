@@ -342,9 +342,50 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))], {"3":["GD32F303CG"]}),
         ],
         series = "GD32F303", # series
-        family_type = "A" # family type
+        family_type = "A", # family type
+        family_name= "GD32F30x"
     )
 }
+
+#remapping_infos = [
+#    ("PA4", "SPI2_NSS", "GPIO_SPI2_REMAP")
+#]
+
+remapping_infos_2 = {
+    "GPIO_SPI2_REMAP": {
+        "mapping": [
+            ("PA4", "SPI2_NSS"),
+            ("PA4", "I2S2_WS")
+        ]
+    }
+}
+
+remapping_infos_3 = {
+    # when this macro is active, the following pins have these functions.
+    # note: we don't say what the "off" (no remap) info is since we don't need it.
+    "GPIO_SPI2_REMAP": {
+        "PA4": "SPI2_NSS/I2S2_WS",
+        "PC10": "SPI2_SCK/I2S2_CK",
+        "PC11": "SPI2_MOSI",
+        "PC12": "SPI2_MISO/I2S_SD",
+    }
+}
+
+remapper_infos = {
+    "GD32F30x": {
+        "GPIO_SPI2_REMAP": {
+            "PA4": "SPI2_NSS/I2S2_WS",
+            "PC10": "SPI2_SCK/I2S2_CK",
+            "PC11": "SPI2_MOSI",
+            "PC12": "SPI2_MISO/I2S_SD",
+        }
+    }
+}
+
+def get_remapper_infos_for_family(datasheet: DatasheetParsingInfo):
+    if datasheet.family_name in remapper_infos:
+        return remapper_infos[datasheet.family_name] 
+    raise RuntimeError("Remapper info not found for family: " + str(datasheet.family_name))
 
 def identify_datasheet(datasheet_pdf_path: str) -> DatasheetParsingInfo:
     global known_datasheets_infos

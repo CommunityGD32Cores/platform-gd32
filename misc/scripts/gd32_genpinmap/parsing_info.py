@@ -24,8 +24,9 @@ class DatasheetPinDefPageParsingInfo(DatasheetPageParsingInfo):
         self.footnotes_device_availability = footnotes_device_availablity
 
 class DatasheetParsingInfo:
-    def __init__(self, alternate_funcs: List[DatasheetAFPageParsingInfo], pin_defs: List[DatasheetPinDefPageParsingInfo], series:str, family_type:str) -> None:
+    def __init__(self, alternate_funcs: List[DatasheetAFPageParsingInfo], pin_defs: List[DatasheetPinDefPageParsingInfo], series:str, family_type:str, family_name:str=None) -> None:
         self.alternate_funcs = alternate_funcs
         self.pin_defs = pin_defs
         self.series = series 
         self.family_type = family_type
+        self.family_name = family_name

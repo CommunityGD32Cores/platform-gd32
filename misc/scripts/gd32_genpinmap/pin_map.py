@@ -2,6 +2,7 @@ from typing import Dict, List, Tuple
 import re
 from pin_definitions import GD32Pin, GD32PinFunction
 from parsing_info import DatasheetParsingInfo
+from known_datasheets import get_remapper_infos_for_family
 
 class GD32SubseriesPinMap:
     def __init__(self, series: str, subseries:str, package:str, datasheet_info:DatasheetParsingInfo, pin_map: Dict[str, GD32Pin]) -> None:
@@ -121,3 +122,35 @@ class GD32PinMap:
         results = list(filter(lambda p_func_tuple: GD32PinMap.does_pinfunction_pass_filter(p_func_tuple[1], filter_device_name), results))
         results = list(filter(lambda p_func_tuple: self.pin_is_available_for_device(p_func_tuple[0].pin_name, filter_device_name), results))
         return results
+
+    def solve_remapper_pin(self, pin_name:str, pin_func: GD32PinFunction) -> str:
+        remapping_info = get_remapper_infos_for_family(self.datasheet_info)
+        # check if any macro knows this thing
+        sig_name = pin_func.signal_name
+        matches: List[str] = list()
+        for macro_name, pin_map in remapping_info.items():
+            if pin_name in pin_map:
+                if sig_name in pin_map[pin_name]:
+                    print(f"MATCH for {pin_name} ({sig_name}) -> {macro_name}")
+                    matches.append(macro_name)
+        # if we have multiple matches, prefer the one the "FULL" remap
+        if len(matches) > 1:
+            full_macros = list(filter(lambda m: "FULL" in m, matches))
+            if len(full_macros) == 1:
+                return full_macros[0]
+            else:
+                print(f"Multiple possibilities found for {pin_name} ({sig_name}) and no FULL in name, returning first one.")
+                return matches[0]
+        elif len(matches) == 1:
+            return matches[0]
+        print(f"No remapping match found for {pin_name} ({sig_name})")
+        return None
+
+    def solve_remapper_pins(self):
+        for subfamily in self.subseries_pinmaps:
+            pinmap = self.subseries_pinmaps[subfamily].pin_map
+            for pin_name, pin_info in pinmap.items():
+                for pin_func in pin_info.pin_functions:
+                    if pin_func.needs_remap:
+                        print(f"[{subfamily}] Pin {pin_name} ({pin_func.signal_name}) needs remapping info!")
+                        pin_func.remapping_activation_macro = self.solve_remapper_pin(pin_name, pin_func)

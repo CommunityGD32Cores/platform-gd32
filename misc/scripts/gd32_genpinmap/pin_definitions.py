@@ -16,6 +16,8 @@ class GD32PinFunction:
         self.subseries = subseries
         self.package = package
         self.needs_remap = needs_remap
+        # to be filled in later
+        self.remapping_activation_macro: str = None
         try:
             if "_" in self.signal_name:
                 self.peripheral = self.signal_name.split("_")[0]
