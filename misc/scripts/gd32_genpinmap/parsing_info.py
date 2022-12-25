@@ -12,7 +12,7 @@ class DatasheetPageParsingInfo:
         return list(filter(lambda q: isinstance(q, wanted_type), self.quirks))
 
 class DatasheetAFPageParsingInfo(DatasheetPageParsingInfo):
-    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, str], quirks:List[DatasheetPageParsingQuirk]=None) -> None:
+    def __init__(self, page_range: List[int], footnotes_device_availablity: Dict[str, List[str]], quirks:List[DatasheetPageParsingQuirk]=None) -> None:
         super().__init__(page_range, quirks)
         self.footnotes_device_availability = footnotes_device_availablity
 

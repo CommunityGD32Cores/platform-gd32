@@ -340,9 +340,9 @@ class GD32DatasheetParser:
             # apply overwrite quirk
             overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinDescriptionQuirk)
             if len(overwrite_quirk) == 1:
-                overwrite_quirk: OverwritePinDescriptionQuirk = overwrite_quirk[0]
-                if overwrite_quirk.pin_name == pin_name:
-                    last_column = overwrite_quirk.pin_description
+                the_overwrite_quirk: OverwritePinDescriptionQuirk = overwrite_quirk[0]
+                if the_overwrite_quirk.pin_name == pin_name:
+                    last_column = the_overwrite_quirk.pin_description
             add_funcs_arr = GD32DatasheetParser.analyze_additional_funcs_string(last_column)
             print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
             additional_funcs[pin_name] = GD32Pin(pin_name, [GD32PinFunction(sig, None, None, None, pages_info.subseries, pages_info.package) for sig in add_funcs_arr])
