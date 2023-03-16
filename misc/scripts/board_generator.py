@@ -271,7 +271,7 @@ class GD32MCUInfo:
         # Hence we need to adjust the upoad.maximum_ram_size so that the linker script doesn't
         # set the SP into memory that doesn't exist.
         # the only F4 series that does not have TCMSRAM is GD32F403xx.
-        if self.series == "GD32F405" or self.series == "GD32F407" or self.series == "GD32F450":
+        if self.series.startswith("GD32F4") and not self.name.startswith("GD32F403"):
             # subtract size of TCM SRAM
             # SRAM0 and SRAM1 are contiguous (112 + 16 kB)
             # from GD32F407xx_Datasheet_Rev2.1.pdf page 71
