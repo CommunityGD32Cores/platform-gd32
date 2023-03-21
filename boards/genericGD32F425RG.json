@@ -26,7 +26,7 @@
   "name": "GD32F425RG (256k RAM, 1024k Flash)",
   "upload": {
     "disable_flushing": false,
-    "maximum_ram_size": 262144,
+    "maximum_ram_size": 196608,
     "maximum_size": 1048576,
     "protocol": "stlink",
     "protocols": [
@@ -40,7 +40,8 @@
     ],
     "require_upload_port": true,
     "use_1200bps_touch": false,
-    "wait_for_upload_port": false
+    "wait_for_upload_port": false,
+    "closely_coupled_ram_size": 65536
   },
   "url": "https://www.gigadevice.com/microcontroller/gd32f425rgt6/",
   "vendor": "GigaDevice"
