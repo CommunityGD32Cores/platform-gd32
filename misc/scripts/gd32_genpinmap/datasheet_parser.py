@@ -416,9 +416,9 @@ class GD32DatasheetParser:
                 if len(af_list_quirks) == 1:
                     parser_result_alternate_functions = af_list_quirks[0].af_list
                 else:
-                    alternate_funcs = filter_nans(j)
+                    alternate_funcs = filter_nans(j[1:])
                     print(alternate_funcs)
-                    if any([not x.startswith("AF") for x in alternate_funcs]):
+                    if not all([x.startswith("AF") for x in alternate_funcs]) or len(alternate_funcs) == 0:
                         print("Fail: These are not the alternate function descriptions: " + str(alternate_funcs))
                         # check if we can use the columns:
                         af_cols = dfs.columns[1:]

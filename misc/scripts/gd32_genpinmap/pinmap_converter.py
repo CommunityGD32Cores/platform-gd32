@@ -549,8 +549,14 @@ class GD32PinMapGenerator:
             output += "\n"
 
         output += "/* TIMER or PWM definitions */\n"
-        output += GD32PinMapGenerator.add_macro_def("TIMER_TONE", "TIMER5") # defaults
-        output += GD32PinMapGenerator.add_macro_def("TIMER_SERVO", "TIMER6") # defaults
+        timer_tone = "TIMER5" # defaults
+        timer_servo = "TIMER6" # defaults
+        # some timers are not available on all devices, use other ones.
+        if device_name.upper().startswith("GD32F330"):
+            timer_tone = "TIMER13"
+            timer_servo = "TIMER14"
+        output += GD32PinMapGenerator.add_macro_def("TIMER_TONE", timer_tone) 
+        output += GD32PinMapGenerator.add_macro_def("TIMER_SERVO", timer_servo)
         output += "\n"
 
         # generate list of first 5 PWM pins

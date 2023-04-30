@@ -6,7 +6,8 @@
     "f_cpu": "84000000L",
     "mcu": "gd32f330k4u6",
     "spl_series": "GD32F3x0",
-    "series": "GD32F330"
+    "series": "GD32F330",
+    "variant": "GD32F330K4_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F330K4",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F330K4 (4k RAM, 16k Flash)",
   "upload": {

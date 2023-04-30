@@ -395,7 +395,60 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         ],
         series = "GD32F350", # series
         family_type = "B" # family type
-    )
+    ),
+    "GD32F330xx_Datasheet_Rev2.6.pdf": DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([34], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+                ParseUsingAreaQuirk((125.389,124.645,643.318,536.16)),
+            ]),
+            DatasheetAFPageParsingInfo([35], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+                ParseUsingAreaQuirk((94.879,125.389,562.205,534.672)),
+            ]),
+            DatasheetAFPageParsingInfo([36], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+                ParseUsingAreaQuirk((110.506,123.157,405.934,533.928)),
+            ]),
+            DatasheetAFPageParsingInfo([36], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+                ParseUsingAreaQuirk((442.397,118.692,729.639,539.137)),
+            ]),
+            DatasheetAFPageParsingInfo([37], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+                ParseUsingAreaQuirk((111.25,123.901,436.444,535.416)),
+            ]),
+        ],
+        pin_defs = [
+            # GD32F330Rx
+            DatasheetPinDefPageParsingInfo([19], "GD32F330Rx", "LQFP64", [
+                ParseUsingAreaQuirk((169.294,123.901,769.079,535.416)),
+                OverwritePinDescriptionQuirk("PA2", "Default: PA2\rAlternate: USART1_TX, TIMER1_CH2, TIMER14_CH0\rAdditional: ADC_IN2"),
+            ]),
+            DatasheetPinDefPageParsingInfo([20], "GD32F330Rx", "LQFP64", [
+                ParseUsingAreaQuirk((79.996,122.413,768.335,533.928)),
+                OverwritePinDescriptionQuirk("PB12", "Default: PB12\rAlternate: SPI1_NSS, TIMER0_BKIN, I2C1_SMBA, EVENTOUT"),
+            ]),
+            DatasheetPinDefPageParsingInfo([21], "GD32F330Rx", "LQFP64", [ParseUsingAreaQuirk((80.74,124.645,768.335,533.183))]),
+            DatasheetPinDefPageParsingInfo([22], "GD32F330Rx", "LQFP64", [ParseUsingAreaQuirk((81.484,124.645,491.511,533.928))]),
+            # GD32F330Cx
+            DatasheetPinDefPageParsingInfo([22], "GD32F330Cx", "LQFP48", [ParseUsingAreaQuirk((636.62,123.157,767.591,534.672))]),
+            DatasheetPinDefPageParsingInfo([23], "GD32F330Cx", "LQFP48", [ParseUsingAreaQuirk((79.996,117.948,770.567,535.416))]),
+            DatasheetPinDefPageParsingInfo([24], "GD32F330Cx", "LQFP48", [
+                ParseUsingAreaQuirk((79.996,123.901,759.405,535.416)),
+                OverwritePinDescriptionQuirk("PF6", "Default: PF6\rAlternate: I2C0_SCL(3), I2C1_SCL(5)"),
+            ]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F330Cx", "LQFP48", [ParseUsingAreaQuirk((79.252,123.901,543.602,533.928))]),
+            # GD32F330Kx (LQFP32)
+            DatasheetPinDefPageParsingInfo([25], "GD32F330Kx", "LQFP32", [ParseUsingAreaQuirk((688.711,123.157,773.544,535.416))]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F330Kx", "LQFP32", [ParseUsingAreaQuirk((79.996,123.157,760.893,537.648))]),
+            DatasheetPinDefPageParsingInfo([27], "GD32F330Kx", "LQFP32", [ParseUsingAreaQuirk((79.252,121.669,670.851,536.16))]),
+            # GD32F330Kx (QFN32) is ommited here, same info as for LQFP32!
+            # GD32F330Gx (QFN28)
+            DatasheetPinDefPageParsingInfo([30], "GD32F330Gx", "QFN28", [ParseUsingAreaQuirk((230.314,120.18,770.567,534))]),
+            DatasheetPinDefPageParsingInfo([31], "GD32F330Gx", "QFN28", [ParseUsingAreaQuirk((77.764,122.413,735.592,536.16))]),
+            # GD32F330Fx (TSSOP20)
+            DatasheetPinDefPageParsingInfo([32], "GD32F330Fx", "TSSOP20", [ParseUsingAreaQuirk((199.06,123.157,766.847,537.648))]),
+            DatasheetPinDefPageParsingInfo([33], "GD32F330Fx", "TSSOP20", [ParseUsingAreaQuirk((79.252,120.924,352.355,536.904))]),
+        ],
+        series = "GD32F330", # series
+        family_type = "B" # family type
+    ),
 }
 
 #remapping_infos = [
