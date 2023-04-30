@@ -9,11 +9,11 @@ class OverwritePinAlternateInfoQuirk(DatasheetPageParsingQuirk):
         self.pin_name = pin_name
         self.alternate_funcs = alternate_funcs
 
-class OverwritePinAdditionalInfoQuirk(DatasheetPageParsingQuirk):
+class OverwritePinDescriptionQuirk(DatasheetPageParsingQuirk):
     def __init__(self, pin_name:str, additional_funcs_str: str) -> None:
         super().__init__()
         self.pin_name = pin_name
-        self.additional_funcs_str = additional_funcs_str
+        self.pin_description = additional_funcs_str
 
 class ParseUsingAreaQuirk(DatasheetPageParsingQuirk):
     def __init__(self, area) -> None:

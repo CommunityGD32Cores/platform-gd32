@@ -12,11 +12,11 @@ except ImportError:
     print("Could not import tabula. Please 'pip install tabula-py' first!")
     exit(-1)
 
-from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinAdditionalInfoQuirk, ParseUsingAreaQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
+from parsing_quirks import OverwritePinAlternateInfoQuirk, OverwritePinDescriptionQuirk, ParseUsingAreaQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
 from func_utils import get_trailing_number, filter_nans, is_nan, print_big_str
 from parsing_info import DatasheetAFPageParsingInfo, DatasheetPageParsingInfo, DatasheetParsingInfo, DatasheetPinDefPageParsingInfo
-from pin_definitions import GD32AdditionalFunc, GD32AdditionalFuncFamiliy, GD32AlternateFunc, GD32Pin
-from pin_map import GD32PinMap
+from pin_definitions import GD32Pin, GD32PinFunction
+from pin_map import GD32PinMap, GD32SubseriesPinMap
 from known_datasheets import known_datasheets_infos, identify_datasheet
 
 class GD32DatasheetParser:
@@ -110,47 +110,79 @@ class GD32DatasheetParser:
             print(f"Failed to find datasheet info for filename {path.basename(datasheet_pdf_path)}.")
             print("Known datasheets: " + ",".join(known_datasheets_infos.keys()))
             exit(0)
-        pinmaps: List[GD32PinMap] = list()
+        # maps from subseries to list of dictionaries
+        pinmaps: Dict[str, Dict[str, GD32Pin]] = dict()
+        # alternate function mapping exists *ONCE* per datasheet for a SPL family type B datasheet.
+        # can be accumulated all into one object
+        all_alternate_func_infos: Dict[str, GD32Pin] = dict()
+        # maps from subseries to package type
+        package_info: Dict[str, str] = dict()
         for af_page in datasheet_info.alternate_funcs:
             dataframe = GD32DatasheetParser.get_dataframe_for_pdf_pages(datasheet_pdf_path, af_page)
-            pin_map = GD32DatasheetParser.process_af_dataframe(dataframe, datasheet_info, af_page)
-            pinmaps.append(pin_map)
-        additional_functions: List[GD32AdditionalFuncFamiliy] = list()
+            alternate_func_infos = GD32DatasheetParser.process_af_dataframe(dataframe, datasheet_info, af_page)
+            all_alternate_func_infos.update(alternate_func_infos)
         for pindef_page in datasheet_info.pin_defs:
             dataframe = GD32DatasheetParser.get_dataframe_for_pdf_pages(datasheet_pdf_path, pindef_page)
-            add_func_family = GD32DatasheetParser.process_add_funcs_dataframe(dataframe, datasheet_info, pindef_page)
-            additional_functions.append(add_func_family)
-        # merge all pinmap dictionary into the first object
-        first_pinmap = pinmaps[0]
-        for i in range(1, len(pinmaps)):
-            first_pinmap.pin_map.update(pinmaps[i].pin_map)
-        # merge all additional funcs families into first pinmap
-        for add_func in additional_functions:
-            GD32DatasheetParser.merge_additional_funcs_into_pinmap(add_func, first_pinmap)
-        # merge all additional funcs families into a full one for the subfamiliy
-        pins_per_subdev_family_dict: Dict[str, GD32AdditionalFuncFamiliy] = dict()
-        for add_func in additional_functions:
-            subfam = add_func.subseries
-            if subfam not in pins_per_subdev_family_dict:
-                pins_per_subdev_family_dict[subfam] = add_func
-            else:
-                pins_per_subdev_family_dict[subfam].additional_funcs.update(add_func.additional_funcs)
-        first_pinmap.pins_per_subdevice_family = pins_per_subdev_family_dict
-        for k in pins_per_subdev_family_dict:
-            fam = pins_per_subdev_family_dict[k]
-            print("Subfamiliy \"%s\" (%s) has %s GPIO pins" %(fam.subseries, fam.package, len(fam.additional_funcs)))
-            print(",".join(fam.additional_funcs.keys()))
-        print(pinmaps)
-        #print_parsing_result_json(first_pinmap.pin_map)
-        print("Parsed PDF \"%s\" and extracted %d pin infos." % (path.basename(datasheet_pdf_path), len(first_pinmap.pin_map)))
-        return first_pinmap
+            add_funcs = GD32DatasheetParser.process_add_funcs_dataframe(dataframe, datasheet_info, pindef_page)
+            # we don't have a "pin alternative functions" page, we have to extract it from the last column text
+            alt_and_remaps: Dict[str, GD32Pin] = dict()
+            if datasheet_info.family_type == "A":
+                alt_and_remaps = GD32DatasheetParser.process_alts_and_remaps(dataframe, datasheet_info, pindef_page)
+            if pindef_page.subseries not in pinmaps:
+                pinmaps[pindef_page.subseries] = dict()
+            # merge into one dictionary (alt_and_remaps)
+            for pin_name, gd32pin in add_funcs.items():
+                if pin_name in alt_and_remaps:
+                    for f in gd32pin.pin_functions:
+                        alt_and_remaps[pin_name].add_func(f)
+                else:
+                    alt_and_remaps[pin_name] = gd32pin
+            pinmaps[pindef_page.subseries].update(alt_and_remaps)
+            package_info[pindef_page.subseries] = pindef_page.package
+
+        # All subseries and the AF mapping has been parsed.
+        # Propagate AF pin info to subseries pin info.
+        for pin_name, gd32pin in all_alternate_func_infos.items():
+            for subseries in pinmaps.keys():
+                # only add function to it if this pin exists in this subseries
+                # otherwise do not create it.
+                if pin_name in pinmaps[subseries]:
+                    for f in gd32pin.pin_functions:
+                        pinmaps[subseries][pin_name].add_func(f)
+
+        # generate all sub series maps
+        subseries_pin_maps: Dict[str, GD32SubseriesPinMap] = dict()
+        for subseries in pinmaps.keys():
+            subseries_pin_maps[subseries] = GD32SubseriesPinMap(
+                datasheet_info.series,
+                subseries,
+                package_info[subseries],
+                datasheet_info,
+                pinmaps[subseries]
+            )
+
+        for k in subseries_pin_maps:
+            fam = subseries_pin_maps[k]
+            print("Subfamiliy \"%s\" (%s) has %s GPIO pins" %(fam.subseries, fam.package, len(fam.pin_map)))
+            print(",".join(fam.pin_map.keys()))
+
+        total_pinmap = GD32PinMap(
+            datasheet_info.series,
+            datasheet_info,
+            subseries_pin_maps
+        )
+        print("Parsed PDF \"%s\" and extracted %d pin infos." % (
+            path.basename(datasheet_pdf_path), 
+            sum([len(pmap.pin_map.keys()) for pmap in total_pinmap.subseries_pinmaps.values()])))
+        return total_pinmap
 
     def get_dataframe_for_pdf_pages(datasheet_pdf_path: str, pages_info: DatasheetPageParsingInfo) -> DataFrame:
         # lattice is important, can't correctly parse data otherwise
         area_quirk = pages_info.get_quirks_of_type(ParseUsingAreaQuirk)
         area = None
         if len(area_quirk) == 1:
-            area = area_quirk[0].area
+            the_quirk: ParseUsingAreaQuirk = area_quirk[0]
+            area = the_quirk.area
         print("Parsing PDF \"%s\" pages %s.." % (datasheet_pdf_path, str(pages_info.page_range)))
         dfs : DataFrame = tb.read_pdf(datasheet_pdf_path, pages=pages_info.page_range, lattice=True, stream=False, area=area) 
         if len(dfs) >= 1:
@@ -164,7 +196,6 @@ class GD32DatasheetParser:
         else:
             # if no elements in for loop, do generic cleanup
             dfs = GD32DatasheetParser.cleanup_dataframe(dfs)
-
 
         print(dfs)
         print(type(dfs))
@@ -219,10 +250,6 @@ class GD32DatasheetParser:
                 dfs = dfs.drop([dfs.columns[-1]], axis=1)
         return dfs
 
-    def print_parsing_result_json(res:dict):
-        as_json = json.dumps(res, indent=2, default=lambda o: o.__dict__)
-        print_big_str(as_json)
-
     def remove_newlines(inp):
         if isinstance(inp, str):
             return inp.replace("\r", "")
@@ -249,6 +276,47 @@ class GD32DatasheetParser:
         arr = [x.strip() for x in arr]
         return arr
 
+    # Input: Last column description text
+    # Output: List of "alternate" functions, List of "remap" functions
+    def analyze_alternate_and_remap_funcs_string(inp:str) -> Tuple[List[str], List[str]]: 
+        alt_start = inp.find("lternate: ")
+        remap_start = inp.find("Remap:")
+        # check if anyhting was found
+        if alt_start == -1 and remap_start == -1:
+            return (list(), list())
+        # get the rest of the string after that
+        if remap_start == -1:
+            alt_inp = inp[alt_start + len("lternate: "):]
+        else:
+            alt_inp = inp[alt_start + len("lternate: "):remap_start]
+        alt_arr = alt_inp.split(",")
+        alt_arr = [x.strip() for x in alt_arr]
+        remap_arr = []
+        if remap_start != -1:
+            remap_inp = inp[remap_start + len("Remap:"):]
+            remap_arr = remap_inp.split(",")
+            remap_arr = [x.strip() for x in remap_arr]
+        return alt_arr, remap_arr
+
+    # Applies corrections regarding shorthand name for
+    # signals names like "ADC0123_IN1" that are actually
+    # multiple signals. 
+    def cleanup_funcs_array(inp: List[str]) -> List[str]:
+        l = list()
+        for f in inp:
+            if f.startswith("ADC") and f.count("_")  == 1:
+                # could be "ADC012_IN1", "ADC01_IN5" etc
+                # we have to add individually "ADC0", "ADC1", "ADC2".
+                periph_part, signal_part = f.split("_")
+                periph_part = periph_part.replace("ADC", "", 1)
+                # iterate through each char
+                for c in periph_part:
+                    l.append("ADC" + str(c) + "_" + signal_part)
+            else:
+                l.append(f)
+        return l
+
+    # removes - and () parts (footnotes)
     def strip_pinname(pin_name:str):
         if "-" in pin_name:
             pin_name = pin_name[0 : pin_name.index("-")]
@@ -257,18 +325,8 @@ class GD32DatasheetParser:
             pin_name = pin_name[0 : pin_name.index("(")]
         return pin_name
 
-    def merge_additional_funcs_into_pinmap(add_funcs_fam:GD32AdditionalFuncFamiliy, gd32_pin_map:GD32PinMap):
-        for pin in add_funcs_fam.additional_funcs.keys():
-            add_funcs = add_funcs_fam.additional_funcs[pin]
-            if pin not in gd32_pin_map.pin_map:
-                print("Setting new pin %s with add funcs %s" % (pin, str(add_funcs)))
-                gd32_pin_map.pin_map[pin] = GD32Pin(pin, dict(), add_funcs)
-            else:
-                print("Extending pin %s by funcs %s" % (pin, str(add_funcs)))
-                gd32_pin_map.pin_map[pin].additional_functions.extend(add_funcs)
-
-    def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> GD32AdditionalFuncFamiliy:
-        additional_funcs: Dict[str, List[GD32AdditionalFunc]] = dict()
+    def process_add_funcs_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> Dict[str, GD32Pin]:
+        additional_funcs: Dict[str, GD32Pin] = dict()
         for i, j in dfs.iterrows():
             # data row
             pin_row = list(j)
@@ -280,22 +338,71 @@ class GD32DatasheetParser:
             last_column: str = j[len(j) - 1]
             last_column = last_column.replace("\r", " ")
             # apply overwrite quirk
-            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinAdditionalInfoQuirk)
+            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinDescriptionQuirk)
             if len(overwrite_quirk) == 1:
-                overwrite_quirk: OverwritePinAdditionalInfoQuirk = overwrite_quirk[0]
-                if overwrite_quirk.pin_name == pin_name:
-                    last_column = overwrite_quirk.additional_funcs_str
+                the_overwrite_quirk: OverwritePinDescriptionQuirk = overwrite_quirk[0]
+                if the_overwrite_quirk.pin_name == pin_name:
+                    last_column = the_overwrite_quirk.pin_description
             add_funcs_arr = GD32DatasheetParser.analyze_additional_funcs_string(last_column)
             print("Pin %s Add. Funcs: %s" % (pin_name, str(add_funcs_arr)))
-            additional_funcs[pin_name] = [GD32AdditionalFunc(sig, pages_info.subseries, pages_info.package) for sig in add_funcs_arr]
-        #print(additional_funcs)
-        return GD32AdditionalFuncFamiliy(pages_info.subseries, pages_info.package, additional_funcs)
+            additional_funcs[pin_name] = GD32Pin(pin_name, [GD32PinFunction(sig, None, None, None, pages_info.subseries, pages_info.package) for sig in add_funcs_arr])
+        print(additional_funcs)
+        return additional_funcs
 
-    def process_af_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetAFPageParsingInfo) -> GD32PinMap:
-        parser_result = {
-            "alternate_functions": [],
-            "pins": dict()
-        }
+    # input: signal name with possible footnote
+    # output: cleaned signal name, footnote
+    def analyze_footnote(inp:str) -> Tuple[str, str]:
+        if "(" in inp and ")" in inp:
+            sig_name = inp[0:inp.index("(")]
+            func_footnode_part = inp[inp.index("("):]
+            # strip first and last char
+            footnote = func_footnode_part[1:-1]
+            #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
+            return sig_name, footnote
+        else:
+            return inp, None
+
+    def process_alts_and_remaps(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetPinDefPageParsingInfo) -> Dict[str, GD32Pin]:
+        parsed_pins: Dict[str, GD32Pin] = dict()
+        for i, j in dfs.iterrows():
+            # data row
+            pin_row = list(j)
+            pin_name = GD32DatasheetParser.remove_newlines(pin_row[0])
+            if is_nan(pin_name) or pin_name == "Pin Name" or not pin_name.startswith("P"):
+                print("Skipping empty line because pin is not there.")
+                continue
+            pin_name = GD32DatasheetParser.strip_pinname(pin_name)
+            last_column: str = j[len(j) - 1]
+            last_column = last_column.replace("\r", " ")
+            # apply overwrite quirk
+            overwrite_quirk = pages_info.get_quirks_of_type(OverwritePinDescriptionQuirk)
+            if len(overwrite_quirk) == 1:
+                overwrite_quirk: OverwritePinDescriptionQuirk = overwrite_quirk[0]
+                if overwrite_quirk.pin_name == pin_name:
+                    last_column = overwrite_quirk.pin_description
+            alternate_arr, remap_arr = GD32DatasheetParser.analyze_alternate_and_remap_funcs_string(last_column)
+            alternate_arr = GD32DatasheetParser.cleanup_funcs_array(alternate_arr)
+            remap_arr = GD32DatasheetParser.cleanup_funcs_array(remap_arr)
+            print("Pin %s Alt. Funcs: %s Remap funcs: %s" % (pin_name, str(alternate_arr), str(remap_arr)))
+            parsed_pins[pin_name] = GD32Pin(pin_name, [
+                GD32PinFunction(GD32DatasheetParser.analyze_footnote(sig)[0], 
+                None, 
+                GD32DatasheetParser.analyze_footnote(sig)[1], 
+                pages_info.footnotes_device_availability, 
+                pages_info.subseries, pages_info.package, False) for sig in alternate_arr
+            ] + [
+                GD32PinFunction(GD32DatasheetParser.analyze_footnote(sig)[0], 
+                None, 
+                GD32DatasheetParser.analyze_footnote(sig)[1], 
+                pages_info.footnotes_device_availability,
+                pages_info.subseries, pages_info.package, True) for sig in remap_arr
+            ])
+        print(parsed_pins)
+        return parsed_pins
+
+    def process_af_dataframe(dfs: DataFrame, datasheet_info: DatasheetParsingInfo, pages_info: DatasheetAFPageParsingInfo) -> Dict[str, GD32Pin]:
+        parser_result_alternate_functions = []
+        parser_result_pins: Dict[str, GD32Pin] = dict()
         for i, j in dfs.iterrows():
             # debug info
             if False:
@@ -307,14 +414,19 @@ class GD32DatasheetParser:
             if i == 0:
                 af_list_quirks: List[OverwriteAdditionFunctionsList] = pages_info.get_quirks_of_type(OverwriteAdditionFunctionsList)
                 if len(af_list_quirks) == 1:
-                    parser_result["alternate_functions"] = af_list_quirks[0].af_list
+                    parser_result_alternate_functions = af_list_quirks[0].af_list
                 else:
-                    alternate_funcs = filter_nans(j)
+                    alternate_funcs = filter_nans(j[1:])
                     print(alternate_funcs)
-                    if any([not x.startswith("AF") for x in alternate_funcs]):
+                    if not all([x.startswith("AF") for x in alternate_funcs]) or len(alternate_funcs) == 0:
                         print("Fail: These are not the alternate function descriptions: " + str(alternate_funcs))
+                        # check if we can use the columns:
+                        af_cols = dfs.columns[1:]
+                        if all([x.startswith("AF") for x in af_cols]):
+                            parser_result_alternate_functions = af_cols
+                            print("Saved by using column names")
                     else:
-                        parser_result["alternate_functions"] = alternate_funcs
+                        parser_result_alternate_functions = alternate_funcs
             else: 
                 # data row
                 pin_row = list(j)
@@ -331,9 +443,9 @@ class GD32DatasheetParser:
                 pin_alternate_funcs = [GD32DatasheetParser.filter_string(x) for x in pin_alternate_funcs]
                 #print("[Before adjustment] Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
                 print("Got pin: %s funcs %s" % (str(pin_name), str(pin_alternate_funcs)))
-                af_map = dict()
+                af_list: List[GD32PinFunction] = list()
                 for ind, func in enumerate(pin_alternate_funcs):
-                    af_name = parser_result["alternate_functions"][ind]
+                    af_name = parser_result_alternate_functions[ind]
                     # check if individual breakup is needed
                     funcs = None
                     if func is None: 
@@ -342,24 +454,11 @@ class GD32DatasheetParser:
                         funcs = func.split("/")
                     else:
                         funcs = [func]
-                    af_list = list()
                     for f in funcs:
                         # check if we need to extra footnotes
-                        sig_name = f 
-                        footnote = None
-                        if "(" in f and ")" in f:
-                            sig_name = f[0:f.index("(")]
-                            func_footnode_part = f[f.index("("):]
-                            # strip first and last char
-                            footnote = func_footnode_part[1:-1]
-                            #print("Got func with footnote. name = %s footnote = %s"  % (str(sig_name), str(func_footnode_part)))
-                        af_list.append(GD32AlternateFunc(sig_name, get_trailing_number(af_name), footnote, pages_info.footnotes_device_availability))
-                    if af_name not in af_map:
-                        af_map[af_name] = list()
-                    af_map[af_name].extend(af_list)
-                #print(af_map)
-                parser_result["pins"][pin_name] = GD32Pin(pin_name, af_map)
-        print("Parsed all %d pins." % len(parser_result["pins"]))
-        #print_parsing_result_json(parser_result["pins"])
-        device_pinmap = GD32PinMap(datasheet_info.series, datasheet_info, parser_result["pins"])
-        return device_pinmap
+                        sig_name, footnote = GD32DatasheetParser.analyze_footnote(f)
+                        af_list.append(GD32PinFunction(sig_name, get_trailing_number(af_name), footnote, pages_info.footnotes_device_availability))
+                print(af_list)
+                parser_result_pins[pin_name] = GD32Pin(pin_name, af_list)
+        print("Parsed all %d pins." % len(parser_result_pins))
+        return parser_result_pins

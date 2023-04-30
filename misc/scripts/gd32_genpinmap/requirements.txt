@@ -1,0 +1,2 @@
+pandas>=1.5.2
+tabula-py>=2.6.0
