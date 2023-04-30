@@ -55,7 +55,8 @@ def main_func():
     all_mcus = read_all_known_mcus()
     # temporary static path
     datasheet_pdf_paths = [
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F30x\\GD32F303xx_Datasheet_Rev1.9.pdf"
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F3x0\\GD32F350xx_Datasheet_Rev2.3.pdf"
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F30x\\GD32F303xx_Datasheet_Rev1.9.pdf"
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf",
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf",
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
@@ -68,7 +69,7 @@ def main_func():
             device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
             save_pinmap(device_pinmap)
             device_pinmap.solve_remapper_pins()
-            return
+            #return
         all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
         GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
 if __name__ == "__main__":

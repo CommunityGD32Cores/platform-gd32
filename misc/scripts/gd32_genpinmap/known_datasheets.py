@@ -344,6 +344,57 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         series = "GD32F303", # series
         family_type = "A", # family type
         family_name= "GD32F30x"
+    ),
+    "GD32F350xx_Datasheet_Rev2.3.pdf": DatasheetParsingInfo(
+        alternate_funcs = [ 
+            DatasheetAFPageParsingInfo([30], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+                ParseUsingAreaQuirk((127.622,122.413,748.243,535.416)),
+            ]),
+            DatasheetAFPageParsingInfo([31], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.112,117.204,687.223,539.137)),
+            ]),
+            DatasheetAFPageParsingInfo([32], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.112,124.645,394.027,534.672)),
+            ]),
+            DatasheetAFPageParsingInfo([32], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+                ParseUsingAreaQuirk((431.979,116.459,728.151,555.508)),
+            ]),
+            DatasheetAFPageParsingInfo([33], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+                ParseUsingAreaQuirk((97.112,123.901,422.305,534.672)),
+            ]),
+        ],
+        pin_defs = [
+            # GD32F350Rx
+            DatasheetPinDefPageParsingInfo([17], "GD32F350Rx", "LQFP64", [ParseUsingAreaQuirk((233.291,125.389,771.311,533.183))]),
+            DatasheetPinDefPageParsingInfo([18], "GD32F350Rx", "LQFP64", [
+                ParseUsingAreaQuirk((82.973,124.645,766.102,533.928)),
+                OverwritePinDescriptionQuirk("PB0", "Default: PB0\rAlternate: TIMER2_CH2, TIMER0_CH1_ON, TSI_G2_IO1, USART1_RX(4), EVENTOUT\rAdditional: ADC_IN8"),
+            ]),
+            DatasheetPinDefPageParsingInfo([19], "GD32F350Rx", "LQFP64", [ParseUsingAreaQuirk((81.484,123.157,773.544,535.416))]),
+            DatasheetPinDefPageParsingInfo([20], "GD32F350Rx", "LQFP64", [ParseUsingAreaQuirk((83.717,123.157,760.893,535.416))]),
+            DatasheetPinDefPageParsingInfo([21], "GD32F350Rx", "LQFP64", [ParseUsingAreaQuirk((81.484,123.901,201.293,534.672))]),
+            # GD32F350Cx
+            DatasheetPinDefPageParsingInfo([21], "GD32F350Cx", "LQFP48", [ParseUsingAreaQuirk((347.89,123.901,760.149,537.648))]),
+            DatasheetPinDefPageParsingInfo([22], "GD32F350Cx", "LQFP48", [ParseUsingAreaQuirk((82.973,124.645,767.591,537.648))]),
+            DatasheetPinDefPageParsingInfo([23], "GD32F350Cx", "LQFP48", [ParseUsingAreaQuirk((83.717,123.901,771.311,537.648))]),
+            DatasheetPinDefPageParsingInfo([24], "GD32F350Cx", "LQFP48", [ParseUsingAreaQuirk((82.229,123.157,446.118,538.393))]),
+            # GD32F350Kx
+            DatasheetPinDefPageParsingInfo([24], "GD32F350Kx", "QFN32", [
+                ParseUsingAreaQuirk((588.995,123.901,762.382,539.881)),
+                OverwritePinDescriptionQuirk("PA0", "Default: PA0\rAlternate: USART0_CTS(3), USART1_CTS(4), TIMER1_CH0, TIMER1_ETI, CMP0_OUT, TSI_G0_IO0, I2C1_SCL(5)\rAdditional: ADC_IN0, CMP0_IM6, RTC_TAMP1, WKUP0"),
+            ]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F350Kx", "QFN32", [ParseUsingAreaQuirk((84.461,122.413,769.079,537.648))]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F350Kx", "QFN32", [ParseUsingAreaQuirk((82.229,123.901,760.893,536.16))]),
+            # GD32F350Gx
+            DatasheetPinDefPageParsingInfo([27], "GD32F350Gx", "QFN28", [
+                ParseUsingAreaQuirk((288.358,123.157,769.079,536.904)),
+                OverwritePinDescriptionQuirk("PA5", "Default: PA5\rAlternate: SPI0_SCK, I2S0_CK, CEC, TIMER1_CH0, TIMER1_ETI, TSI_G1_IO1\rAdditional: ADC_IN5, CMP0_IM5, CMP1_IM5"),
+            ]),
+            DatasheetPinDefPageParsingInfo([28], "GD32F350Gx", "QFN28", [ParseUsingAreaQuirk((81.484,125.389,758.661,534.672))]),
+            DatasheetPinDefPageParsingInfo([29], "GD32F350Gx", "QFN28", [ParseUsingAreaQuirk((83.717,124.645,359.052,534.672))]),
+        ],
+        series = "GD32F350", # series
+        family_type = "B" # family type
     )
 }
 

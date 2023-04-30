@@ -6,7 +6,8 @@
     "f_cpu": "108000000L",
     "mcu": "gd32f350cbt6",
     "spl_series": "GD32F3x0",
-    "series": "GD32F350"
+    "series": "GD32F350",
+    "variant": "GD32F350CB_GENERIC"
   },
   "debug": {
     "jlink_device": "GD32F350CB",
@@ -21,7 +22,8 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "arduino"
   ],
   "name": "GD32F350CB (16k RAM, 128k Flash)",
   "upload": {

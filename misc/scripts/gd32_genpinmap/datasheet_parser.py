@@ -420,6 +420,11 @@ class GD32DatasheetParser:
                     print(alternate_funcs)
                     if any([not x.startswith("AF") for x in alternate_funcs]):
                         print("Fail: These are not the alternate function descriptions: " + str(alternate_funcs))
+                        # check if we can use the columns:
+                        af_cols = dfs.columns[1:]
+                        if all([x.startswith("AF") for x in af_cols]):
+                            parser_result_alternate_functions = af_cols
+                            print("Saved by using column names")
                     else:
                         parser_result_alternate_functions = alternate_funcs
             else: 
