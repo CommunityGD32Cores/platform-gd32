@@ -627,12 +627,16 @@ class GD32PinMapGenerator:
         flash = mcu.flash_kb
         template_file = path.join(path.dirname(path.realpath(__file__)), "ldscript.tpl")
         content = ""
+        # 2K stack for all with over 4K RAM, below that (<=4K RAM) we only set 512 bytes of RAM (1/8th of RAM at worst)
+        # this may still be too much for lower-RAM chips.. 
+        stack_size = "2048" if mcu.sram_kb > 4 else "512"
         with open(template_file) as fp:
             data = string.Template(fp.read())
             print(data)
             content = data.substitute(
                 ram=str(ram) + "K",
-                flash=str(flash) + "K")
+                flash=str(flash) + "K",
+                stack=stack_size)
         return content
 
     @staticmethod

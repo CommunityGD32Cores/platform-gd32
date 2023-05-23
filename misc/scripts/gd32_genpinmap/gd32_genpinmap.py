@@ -55,14 +55,14 @@ def main_func():
     all_mcus = read_all_known_mcus()
     # temporary static path
     datasheet_pdf_paths = [
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F3x0\\GD32F330xx_Datasheet_Rev2.6.pdf",
-        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F3x0\\GD32F350xx_Datasheet_Rev2.3.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F3x0\\GD32F330xx_Datasheet_Rev2.6.pdf",
+        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F3x0\\GD32F350xx_Datasheet_Rev2.3.pdf",
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F30x\\GD32F303xx_Datasheet_Rev1.9.pdf"
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32E23x\\GD32E230xx_Datasheet_Rev1.4.pdf",
         #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F190xx_Datasheet_Rev2.1.pdf",
-        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
-        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
-        #"C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
+        "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
     ]
     for datasheet_pdf_path in datasheet_pdf_paths:
         device_pinmap = load_pinmap(datasheet_pdf_path)
