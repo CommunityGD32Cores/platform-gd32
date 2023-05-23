@@ -256,6 +256,9 @@ class GD32PinMapGenerator:
             output = output.replace("    GPIO_AF_7,             /* 7 */\n", "")
             output = output.replace("    GPIO_AF_9,             /* 8 */\n", "")
             output = output.replace("    GPIO_AF_11             /* 9 */\n", "")
+        if pinmap.devicename_matches_constraint(device_name, "GD32F3x0"):
+            output = output.replace("    GPIO_AF_9,             /* 8 */\n", "")
+            output = output.replace("    GPIO_AF_11             /* 9 */\n", "")
         # ADC
         output += GD32PinMapGenerator.begin_pinmap("ADC")
         for p, f in GD32PinMapGenerator.get_adc_pins(pinmap, device_name):
@@ -270,6 +273,9 @@ class GD32PinMapGenerator:
         # DAC
         output += GD32PinMapGenerator.begin_pinmap("DAC")
         for p, f in GD32PinMapGenerator.get_dac_pins(pinmap, device_name):
+            # hotfix for differently named DAC peripheral (DAC0 -> DAC)
+            if device_name.lower().startswith("gd32f35"):
+                f.peripheral = "DAC"
             output += GD32PinMapGenerator.add_dac_pin(p, f)
         output += GD32PinMapGenerator.end_pinmap()
         # I2C SDA
