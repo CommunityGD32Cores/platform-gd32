@@ -22,11 +22,10 @@ import shutil
 # however tightly-coupled memory SRAM (TCMSRAM) needs to be separated from that.
 
 class GD32MCUInfo:
-    def __init__(self, name, series, line, speed_mhz, flash_kb, sram_kb, core_type) -> None:
+    def __init__(self, name, series, speed_mhz, flash_kb, sram_kb, core_type) -> None:
         self.name : str = name
         self.name_no_package = self.name[:-2]
         self.series = series
-        self.line = line
         self.speed_mhz = speed_mhz
         self.flash_kb = flash_kb
         self.sram_kb = sram_kb
@@ -479,7 +478,7 @@ def read_csv(filename, core_type) -> List[GD32MCUInfo]:
         csv_reader_object = csv.DictReader(csvfile, delimiter=',')
         for row in csv_reader_object:
             print(row)
-            mcu = GD32MCUInfo(row["Part No."], row["Series"], row["Line"], int(row["Speed"]), int(row["Flash"][:-1]), int(row["SRAM"][:-1]), core_type)
+            mcu = GD32MCUInfo(row["Part No."], row["Series"], int(row["Speed"]), int(row["Flash"][:-1]), int(row["SRAM"][:-1]), core_type)
             mcus.append(mcu)
     return mcus
 
@@ -517,23 +516,8 @@ def main():
     # these are probabl "upcoming" MCUs. 
     # filter them from the list for now.
     mcus = list(filter(lambda x: x.series != "GD32E232", mcus))
-
-    print(get_info_for_mcu_name("GD32F303CC", mcus))
-    print(get_info_for_mcu_name("GD32F350CB", mcus))
-    print(get_info_for_mcu_name("GD32F103C8", mcus))
-    print(get_info_for_mcu_name("GD32F205RE", mcus))
-    print(get_info_for_mcu_name("GD32E230C4", mcus))
-
     #return
-    #print_board_files_mcus = ["GD32F303CC", "GD32F350CB", "GD32F450IG", "GD32E103C8"]
-    #print(get_info_for_mcu_name("GD32F450IG", mcus))
-    #print_board_files_mcus = ["GD32F450IG", "GD32F405RG"]
-    #print_board_files_mcus = ["GD32F103C8", "GD32F205RE"]
-    #print_board_files_mcus = ["GD32E231C8T6"]
-    #print_board_files_mcus = ["GD32E507ZE"]
-    #print_board_files_mcus = ["GD32E507ZE"]
-    #print_board_files_mcus = ["GD32L233CBT6"]
-    print_board_files_mcus = ["GD32C103CBT6"]
+    print_board_files_mcus = ["GD32F405RG"]
 
     for mcu in print_board_files_mcus:
         output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()

@@ -2,11 +2,11 @@
   "build": {
     "core": "gd32",
     "cpu": "cortex-m4",
-    "extra_flags": "-DGD32F4 -DGD32F407 -DGD32F4xx",
+    "extra_flags": "-DGD32F4 -DGD32F405 -DGD32F4xx",
     "f_cpu": "168000000L",
     "mcu": "gd32f405zet6",
     "spl_series": "GD32F4xx",
-    "series": "GD32F407"
+    "series": "GD32F405"
   },
   "debug": {
     "jlink_device": "GD32F405ZE",
