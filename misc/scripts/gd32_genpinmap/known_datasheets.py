@@ -449,6 +449,28 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         series = "GD32F330", # series
         family_type = "B" # family type
     ),
+    "GD32F103xx-Datasheet-Rev-2.7.pdf": DatasheetParsingInfo(
+        alternate_funcs = [],
+        pin_defs = [
+            # GD32F103Rx
+            DatasheetPinDefPageParsingInfo([36], "GD32F103Rx", "LQFP64", [
+                ParseUsingAreaQuirk((135,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([37], "GD32F103Rx", "LQFP64", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([38], "GD32F103Rx", "LQFP64", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PC12", "Default: PC12\rAlternate: UART4_TX (4), SDIO_CK (4)\nRemap: USART2_CK (6), SPI2_MOSI (4), I2S2_SD (4)"),
+            ]),
+            DatasheetPinDefPageParsingInfo([39], "GD32F103Rx", "LQFP64", [
+                ParseUsingAreaQuirk((135,123,576,527)),
+            ]),         
+        ],
+        series = "GD32F10x", # series
+        family_name = "GD32F103xx",
+        family_type = "A" # family type
+    ),
 }
 
 #remapping_infos = [
@@ -482,6 +504,11 @@ remapper_infos = {
             "PC10": "SPI2_SCK/I2S2_CK",
             "PC11": "SPI2_MOSI",
             "PC12": "SPI2_MISO/I2S_SD",
+        }
+    },
+    "GD32F103xx": {
+        "GPIO_SPI2_REMAP": {
+            "PA4": "SPI0_NSS/USART1_CK/ADC01_IN4"
         }
     }
 }

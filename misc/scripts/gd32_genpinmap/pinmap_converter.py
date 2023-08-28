@@ -163,13 +163,13 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def add_i2c_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number
+        af_num = func.af_number or 0
         return GD32PinMapGenerator.add_pin(
             pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
 
     @staticmethod
     def add_uart_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number
+        af_num = func.af_number or 0 
         if func.has_af_number():
             return GD32PinMapGenerator.add_pin(
                 pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, GPIO_OTYPE_PP, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
