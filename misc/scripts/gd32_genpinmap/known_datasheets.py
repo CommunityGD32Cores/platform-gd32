@@ -452,6 +452,54 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     "GD32F103xx-Datasheet-Rev-2.7.pdf": DatasheetParsingInfo(
         alternate_funcs = [],
         pin_defs = [
+            # GD32F103Zx
+            DatasheetPinDefPageParsingInfo([21], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((180,123,769,527)),
+                OverwritePinDescriptionQuirk("PF6", "Default: PF6\rAlternate: ADC2_IN4, EXMC_NIORD\nRemap: TIMER9_CH0(3)"),
+            ]),
+            DatasheetPinDefPageParsingInfo([22], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([23], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PG1", "Default: PG1\rAlternate: EXMC_A11"),
+            ]),
+            DatasheetPinDefPageParsingInfo([24], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PB13", "Default: PB13\rAlternate: SPI1_SCK, USART2_CTS, TIMER0_CH0_ON, I2S1_CK"),
+            ]),
+            DatasheetPinDefPageParsingInfo([25], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([26], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PC10", "Default: PC10\nAlternate: UART3_TX, SDIO_D2\nRemap: USART2_TX, SPI2_SCK, I2S2_CK"),
+            ]),
+            DatasheetPinDefPageParsingInfo([27], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([28], "GD32F103Zx", "LQFP144", [
+                ParseUsingAreaQuirk((88,123,650,527)),
+            ]),
+            # GD32F103Vx
+            DatasheetPinDefPageParsingInfo([29], "GD32F103Vx", "LQFP100", [
+                ParseUsingAreaQuirk((133,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([30], "GD32F103Vx", "LQFP100", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+            ]),
+            DatasheetPinDefPageParsingInfo([31], "GD32F103Vx", "LQFP100", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PB13", "Default: PB13\nAlternate: SPI1_SCK, USART2_CTS, TIMER0_CH0_ON, I2S1_CK(4)"),
+            ]),
+            DatasheetPinDefPageParsingInfo([32], "GD32F103Vx", "LQFP100", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PC9", "Default: PB13\nAlternate: TIMER7_CH3(4), SDIO_D1(4)\nRemap: TIMER2_CH3"),
+            ]),
+            DatasheetPinDefPageParsingInfo([33], "GD32F103Vx", "LQFP100", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PD3", "Default: PD3\nAlternate: EXMC_CLK\nRemap: USART1_CTS"),
+            ]),            
             # GD32F103Rx
             DatasheetPinDefPageParsingInfo([36], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((135,123,769,527)),
@@ -461,15 +509,31 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             ]),
             DatasheetPinDefPageParsingInfo([38], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-                OverwritePinDescriptionQuirk("PC12", "Default: PC12\rAlternate: UART4_TX (4), SDIO_CK (4)\nRemap: USART2_CK (6), SPI2_MOSI (4), I2S2_SD (4)"),
+                OverwritePinDescriptionQuirk("PC12", "Default: PC12\rAlternate: UART4_TX(4), SDIO_CK(4)\nRemap: USART2_CK (6), SPI2_MOSI(4), I2S2_SD(4)"),
             ]),
             DatasheetPinDefPageParsingInfo([39], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((135,123,576,527)),
-            ]),         
+            ]),
+            # GD32F103Cx
+            DatasheetPinDefPageParsingInfo([40], "GD32F103Cx", "LQFP48", [
+                ParseUsingAreaQuirk((135,123,769,527)),
+                OverwritePinDescriptionQuirk("PB1", "Default: PB1\rAlternate: ADC01_IN9, TIMER2_CH3\nRemap: TIMER0_CH2_ON"),
+            ]),
+            DatasheetPinDefPageParsingInfo([41], "GD32F103Cx", "LQFP48", [
+                ParseUsingAreaQuirk((88,123,769,527)),
+                OverwritePinDescriptionQuirk("PB3", "Default: JTDO\rRemap: PB3, TRACESWO, TIMER1_CH1, SPI0_SCK"),
+            ]),
+            DatasheetPinDefPageParsingInfo([42], "GD32F103Cx", "LQFP48", [
+                ParseUsingAreaQuirk((88,123,476,527)),
+            ]),
         ],
-        series = "GD32F10x", # series
+        series = "GD32F10x",
         family_name = "GD32F103xx",
-        family_type = "A" # family type
+        family_type = "A",
+        internal_adc = {
+            "ADC_TEMP": ("0", "16"), # (adc, channel)
+            "ADC_VREF": ("0", "17"), 
+        }
     ),
 }
 

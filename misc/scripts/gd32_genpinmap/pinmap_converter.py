@@ -163,13 +163,22 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def add_i2c_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number or 0
-        return GD32PinMapGenerator.add_pin(
-            pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
+        if func.family_type is "B":
+            if func.has_af_number():
+                return GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % func.af_number, False)
+            else:
+                raise Exception("Alternate function number must be provided to enable i2c AF on B family devices")
+        elif func.family_type is "A":
+            # There is no AF config beyond setting GPIOx_CFGn and enabling the peripheral
+            return GD32PinMapGenerator.add_pin(
+                pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, 0)", False)
+        else:
+            raise Exception("Unknown family_type: %s" % func.family_type)
 
     @staticmethod
     def add_uart_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number or 0 
+        af_num = func.af_number
         if func.has_af_number():
             return GD32PinMapGenerator.add_pin(
                 pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, GPIO_OTYPE_PP, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
@@ -211,13 +220,19 @@ class GD32PinMapGenerator:
         #print(sig_split)
         #print(chan_num)
         #print(af_num)
-        if func.has_af_number():
+        if func.family_type == "B":
+            if func.has_af_number():
+                return GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNC_PWM(%d, IND_GPIO_AF_%d)" % (chan_num, af_num), False)
+            else: 
+                raise Exception("Alternate function number must be provided to enable PWM AF on B family devices")
+        elif func.family_type == "A":
+            # Just use the same, but with no alternate function
             return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNC_PWM(%d, IND_GPIO_AF_%d)" % (chan_num, af_num), False)
+                pin, func, "GD_PIN_FUNC_PWM(%d, 0)" % (chan_num), False)
         else:
-            return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNC_PWM_2(%d)" % (chan_num), False)
-
+            raise Exception("Unknown family_type: %s" % func.family_type)
+        
     @staticmethod
     def add_gpio_ports(pinmap:GD32PinMap, device_name:str) -> str:
         temp = "const uint32_t gpio_port[] = {\n"
@@ -250,7 +265,10 @@ class GD32PinMapGenerator:
     @staticmethod
     def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
         output = gigadevice_header
-        output += spl_family_b_peripheral_pins_c_header
+        if pinmap.datasheet_info.family_type == "B":
+            output += spl_family_b_peripheral_pins_c_header
+        elif pinmap.datasheet_info.family_type == "A":
+            output += spl_family_a_peripheral_pins_c_header
         # small correction for header: remove AF above 6
         if device_name.lower().startswith("gd32e23"):
             output = output.replace("    GPIO_AF_7,             /* 7 */\n", "")
@@ -265,10 +283,15 @@ class GD32PinMapGenerator:
             output += GD32PinMapGenerator.add_adc_pin(p, f)
         # ToDo: The "ADC" might actaully be "ADC0" ("ADC1"?) for some chips.
         # Channel 16 and 17 should be correct.
-        output += GD32PinMapGenerator.add_pin_text(
-            "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
-        output += GD32PinMapGenerator.add_pin_text(
-            "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
+        if pinmap.datasheet_info.internal_adc != None:
+            for (adc_name, (adc, channel)) in pinmap.datasheet_info.internal_adc.items():
+                output += GD32PinMapGenerator.add_pin_text(
+                    adc_name, "ADC%s" %(adc or ""), "GD_PIN_FUNC_ANALOG_CH(%s)" % channel, "ADC%s_IN%s" %(adc or "", channel))
+        else:
+            output += GD32PinMapGenerator.add_pin_text(
+                "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
+            output += GD32PinMapGenerator.add_pin_text(
+                "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
         output += GD32PinMapGenerator.end_pinmap()
         # DAC
         output += GD32PinMapGenerator.begin_pinmap("DAC")

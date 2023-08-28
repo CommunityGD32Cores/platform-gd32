@@ -1,8 +1,9 @@
 from typing import Dict, List, Optional
 
 class GD32PinFunction:
-    def __init__(self, signal_name: str, af_number: int, footnote: str, footnote_device_availability: Dict[str, List[str]], subseries: str = None, package: str = None, needs_remap: bool = False) -> None:
+    def __init__(self, signal_name: str, af_number: int, footnote: str, footnote_device_availability: Dict[str, List[str]], family_type: str, subseries: str = None, package: str = None, needs_remap: bool = False) -> None:
         self.signal_name = signal_name
+        self.family_type = family_type
         self.footnote = footnote
         self.footnote_device_availability = footnote_device_availability
         self.footnote_resolved = None
