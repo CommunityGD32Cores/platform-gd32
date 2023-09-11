@@ -1,8 +1,19 @@
+from enum import Enum
 from typing import Dict, List, Tuple
 import re
 from pin_definitions import GD32Pin, GD32PinFunction
 from parsing_info import DatasheetParsingInfo
-from known_datasheets import get_remapper_infos_for_family
+
+class GD32PinCriteriaType(Enum):
+    PERIPHERAL_STARTS_WITH = 0 
+    PIN_SUB_FUNCTION = 1 
+    PERIPHAL_AND_PIN_SUB_FUNCTION = 2
+    SIGNAL_CONTAINS = 3
+
+class GD32PinCriteria:
+    def __init__(self, criteria_type: GD32PinCriteriaType, criteria_values: List[any]) -> None:
+        self.type = criteria_type
+        self.values = criteria_values
 
 class GD32SubseriesPinMap:
     def __init__(self, series: str, subseries:str, package:str, datasheet_info:DatasheetParsingInfo, pin_map: Dict[str, GD32Pin]) -> None:
@@ -33,10 +44,6 @@ class GD32PinMap:
         if subseries_pinmaps is None: 
             subseries_pinmaps = dict()
         self.subseries_pinmaps = subseries_pinmaps
-
-    CRITERIA_PERIPHERAL_STARTS_WITH = 0
-    CRITERIA_PIN_SUB_FUNCTION = 1
-    CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION = 2
 
     def get_subfamily_for_device_name(self, device_name: str) -> str:
         # try to identify the family name
@@ -76,7 +83,7 @@ class GD32PinMap:
     #           devicename = GD32F190T6, constraint = GD32F190Tx => true
     @staticmethod
     def devicename_matches_constraint(device_name:str, constraint:str) -> bool:
-        if "x" not in constraint:
+        if "x" not in constraint and constraint.isalnum(): # may be regex
             ret = device_name == constraint
         else: 
             # replace x with "can be any character" regex
@@ -97,9 +104,15 @@ class GD32PinMap:
         if func.subseries is not None:
             if not GD32PinMap.devicename_matches_constraint(device_name, func.subseries):
                 return False
-        return any([GD32PinMap.devicename_matches_constraint(device_name, dev_constraint) for dev_constraint in func.footnote_resolved])
+        if func.footnote_resolved.signal_filter:
+            if func.signal_name.startswith(func.footnote_resolved.signal_filter):
+                return func.footnote_resolved.signal_inclusive == any([GD32PinMap.devicename_matches_constraint(device_name, dev_constraint) for dev_constraint in func.footnote_resolved.device_filter])
+            else:
+                return True
+        else:
+            return any([GD32PinMap.devicename_matches_constraint(device_name, dev_constraint) for dev_constraint in func.footnote_resolved.device_filter])
 
-    def search_pins_for_function(self, criteria_type, criteria_value,filter_device_name:str=None) -> List[Tuple[GD32Pin, GD32PinFunction]]:
+    def search_pins_for_function(self, pin_criteria:List[GD32PinCriteria], filter_device_name:str=None) -> List[Tuple[GD32Pin, GD32PinFunction]]:
         results: List[Tuple[GD32Pin, GD32PinFunction]] = list()
         pin_maps_to_search: List[GD32SubseriesPinMap]
         if filter_device_name is None:
@@ -110,47 +123,28 @@ class GD32PinMap:
             for pin in pin_map.pin_map.values():
                 # search through all functions
                 for function in pin.pin_functions:
-                    if criteria_type == GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH:
-                        if function.peripheral.startswith(criteria_value):
-                            results.append((pin, function))
-                    elif criteria_type == GD32PinMap.CRITERIA_PIN_SUB_FUNCTION:
-                        if function.subfunction is not None and criteria_value in function.subfunction:
-                            results.append((pin, function))
-                    elif criteria_type == GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION:
-                        if function.peripheral.startswith(criteria_value[0]) and (function.subfunction is not None and criteria_value[1] in function.subfunction):
-                            results.append((pin, function))
+                    # all pin_criteria are AND, but values are OR:
+                    # PERIPHERAL_STARTS_WITH("A" OR "B") AND SIGNAL_CONTAINS("C")
+                    all_criteria_passed = True
+                    for criteria in pin_criteria:
+                        criteria_passed = False
+                        if criteria.type == GD32PinCriteriaType.PERIPHERAL_STARTS_WITH:
+                            if any(function.peripheral.startswith(value) for value in criteria.values):
+                                criteria_passed = True
+                        elif criteria.type == GD32PinCriteriaType.PIN_SUB_FUNCTION:
+                            if any((function.subfunction is not None and value in function.subfunction) for value in criteria.values):
+                                criteria_passed = True
+                        elif criteria.type == GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION:
+                            if any((function.peripheral.startswith(value[0]) and (function.subfunction is not None and value[1] in function.subfunction)) for value in criteria.values):
+                                criteria_passed = True
+                        elif criteria.type == GD32PinCriteriaType.SIGNAL_CONTAINS:
+                            if any((value in function.signal_name) for value in criteria.values):
+                                criteria_passed = True
+                        all_criteria_passed &= criteria_passed
+                    if all_criteria_passed: 
+                        results.append((pin, function))
         results = list(filter(lambda p_func_tuple: GD32PinMap.does_pinfunction_pass_filter(p_func_tuple[1], filter_device_name), results))
         results = list(filter(lambda p_func_tuple: self.pin_is_available_for_device(p_func_tuple[0].pin_name, filter_device_name), results))
+        results.sort(key=lambda x: GD32Pin.natural_sort_key(x[0].pin_name) + x[1].signal_name)
         return results
-
-    def solve_remapper_pin(self, pin_name:str, pin_func: GD32PinFunction) -> str:
-        remapping_info = get_remapper_infos_for_family(self.datasheet_info)
-        # check if any macro knows this thing
-        sig_name = pin_func.signal_name
-        matches: List[str] = list()
-        for macro_name, pin_map in remapping_info.items():
-            if pin_name in pin_map:
-                if sig_name in pin_map[pin_name]:
-                    print(f"MATCH for {pin_name} ({sig_name}) -> {macro_name}")
-                    matches.append(macro_name)
-        # if we have multiple matches, prefer the one the "FULL" remap
-        if len(matches) > 1:
-            full_macros = list(filter(lambda m: "FULL" in m, matches))
-            if len(full_macros) == 1:
-                return full_macros[0]
-            else:
-                print(f"Multiple possibilities found for {pin_name} ({sig_name}) and no FULL in name, returning first one.")
-                return matches[0]
-        elif len(matches) == 1:
-            return matches[0]
-        print(f"No remapping match found for {pin_name} ({sig_name})")
-        return None
-
-    def solve_remapper_pins(self):
-        for subfamily in self.subseries_pinmaps:
-            pinmap = self.subseries_pinmaps[subfamily].pin_map
-            for pin_name, pin_info in pinmap.items():
-                for pin_func in pin_info.pin_functions:
-                    if pin_func.needs_remap:
-                        print(f"[{subfamily}] Pin {pin_name} ({pin_func.signal_name}) needs remapping info!")
-                        pin_func.remapping_activation_macro = self.solve_remapper_pin(pin_name, pin_func)
+    

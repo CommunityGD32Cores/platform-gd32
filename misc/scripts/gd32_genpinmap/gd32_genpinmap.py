@@ -70,8 +70,7 @@ def main_func():
         if device_pinmap is None or "--no-load-preparsed" in sys.argv:
             device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
             save_pinmap(device_pinmap)
-            device_pinmap.solve_remapper_pins()
-            #return
+            #return          
         all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
         GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
 if __name__ == "__main__":

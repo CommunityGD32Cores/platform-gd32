@@ -117,6 +117,29 @@ spl_family_a_peripheral_pins_c_header = """/*  void pin_function(PinName pin, in
  * so there doesn't need to be anything done more.
  */
 
+/* Generated remapping names */
+
+const int GD_GPIO_REMAP[] = {
+    0x00000000,
+#if __has_include("GD32_FAMILY_REMAP_HEADER")
+#define __REMAP_NAME__(remap) GPIO_ ## remap,
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#endif
+};
+
+enum GD_GPIO_REMAP_NAME {
+    REMAP_NONE = 0U,
+#if __has_include("gd32f10x_remap.h")
+#define __REMAP_NAME__(remap) remap,
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#define __REMAP_NAME__(remap) DISABLE_ ## remap = GPIO_ ## remap | (1U << 6),
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#endif
+};
+
 /* GPIO MODE */
 const int GD_GPIO_MODE[] = {
     GPIO_MODE_AIN,               /* 0 INPUT_ANALOG */
@@ -187,9 +210,12 @@ peripheralnames_h_header_end = """
 #endif
 """
 
-pinnamesvar_h_empty_header = """#ifndef _PINNAMESVAR_H_
+pinnamesvar_h_header_start = """#ifndef _PINNAMESVAR_H_
 #define _PINNAMESVAR_H_
 
+"""
+
+pinnamesvar_h_header_end = """
 #endif /* _PINNAMESVAR_H_ */"""
 
 variant_h_header_start = """#ifndef _VARIANT_

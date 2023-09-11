@@ -1,7 +1,8 @@
 from os import path
 from typing import Dict
-from parsing_info import DatasheetAFPageParsingInfo, DatasheetPinDefPageParsingInfo, DatasheetParsingInfo
+from parsing_info import DatasheetAFPageParsingInfo, DatasheetPinDefPageParsingInfo, DatasheetParsingInfo, FootnoteAvailabilityInfo
 from parsing_quirks import ParseUsingAreaQuirk, OverwritePinDescriptionQuirk, OverwritePinAlternateInfoQuirk, OverwriteAdditionFunctionsList, CondenseColumnsQuirk
+import gd32f10x_remap
 
 # Use this info to recognize the PDF and its parsing quirks.
 # Every PDF will probably need different parsing quirks, like only
@@ -11,9 +12,9 @@ from parsing_quirks import ParseUsingAreaQuirk, OverwritePinDescriptionQuirk, Ov
 known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     "GD32F190xx_Datasheet_Rev2.1.pdf" : DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([28,29], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
-            DatasheetAFPageParsingInfo([30,31], { "1": ["GD32F190x4"], "2": ["GD32F190x8", "GD32F190x6"], "3": ["GD32F190x8"]}),
-            DatasheetAFPageParsingInfo([32],    { "1": ["GD32F190x4"], "2": ["GD32F190x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([28,29], { "1": FootnoteAvailabilityInfo(["GD32F190x4"]), "2": FootnoteAvailabilityInfo(["GD32F190x8", "GD32F190x6"]), "3": FootnoteAvailabilityInfo(["GD32F190x8"])}),
+            DatasheetAFPageParsingInfo([30,31], { "1": FootnoteAvailabilityInfo(["GD32F190x4"]), "2": FootnoteAvailabilityInfo(["GD32F190x8", "GD32F190x6"]), "3": FootnoteAvailabilityInfo(["GD32F190x8"])}),
+            DatasheetAFPageParsingInfo([32],    { "1": FootnoteAvailabilityInfo(["GD32F190x4"]), "2": FootnoteAvailabilityInfo(["GD32F190x8"])}, quirks=[
                 ParseUsingAreaQuirk((95.623,123.157,766.102,533.928)),
                 OverwritePinAlternateInfoQuirk("PF7", ["I2C0_SDA(1)/I2C1_SDA(2)", None, None, None, None, None, None, None, None, "SEG31"])
             ])
@@ -48,9 +49,9 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ), 
     "GD32F170xx_Datasheet_Rev2.1.pdf" : DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([26], { "1": ["GD32F170x4"], "2": ["GD32F170x8", "GD32F170x6"], "3": ["GD32F170x8"]}),
-            DatasheetAFPageParsingInfo([27], { "1": ["GD32F170x4"], "2": ["GD32F170x8", "GD32F170x6"], "3": ["GD32F170x8"]}),
-            DatasheetAFPageParsingInfo([28], { "1": ["GD32F170x4"], "2": ["GD32F170x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([26], { "1": FootnoteAvailabilityInfo(["GD32F170x4"]), "2": FootnoteAvailabilityInfo(["GD32F170x8", "GD32F170x6"]), "3": FootnoteAvailabilityInfo(["GD32F170x8"])}),
+            DatasheetAFPageParsingInfo([27], { "1": FootnoteAvailabilityInfo(["GD32F170x4"]), "2": FootnoteAvailabilityInfo(["GD32F170x8", "GD32F170x6"]), "3": FootnoteAvailabilityInfo(["GD32F170x8"])}),
+            DatasheetAFPageParsingInfo([28], { "1": FootnoteAvailabilityInfo(["GD32F170x4"]), "2": FootnoteAvailabilityInfo(["GD32F170x8"])}, quirks=[
                 OverwriteAdditionFunctionsList(["AF%d" % x for x in range(10)])
             ])
         ],
@@ -84,20 +85,20 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ),
     "GD32F150xx_Datasheet_Rev3.2.pdf" : DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([30], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([30], { "1": FootnoteAvailabilityInfo(["GD32F150x4"]), "2": FootnoteAvailabilityInfo(["GD32F150x8", "GD32F150x6"]), "3": FootnoteAvailabilityInfo(["GD32F150x8"])}, quirks=[
                 ParseUsingAreaQuirk((132.804,123.132,765.204,532.332)),
                 CondenseColumnsQuirk(),
                 OverwritePinAlternateInfoQuirk("PA11", ["EVENTOUT", "USART0_CTS", "TIMER0_CH3", "TSI_G3_CH3", None, None, None, "CMP0_OUT"])
             ]),
-            DatasheetAFPageParsingInfo([31], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([31], { "1": FootnoteAvailabilityInfo(["GD32F150x4"]), "2": FootnoteAvailabilityInfo(["GD32F150x8", "GD32F150x6"]), "3": FootnoteAvailabilityInfo(["GD32F150x8"])}, quirks=[
                 ParseUsingAreaQuirk((80.724,123.132,321.036,532.332)),
                 CondenseColumnsQuirk()
             ]),
-            DatasheetAFPageParsingInfo([32], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([32], { "1": FootnoteAvailabilityInfo(["GD32F150x4"]), "2": FootnoteAvailabilityInfo(["GD32F150x8", "GD32F150x6"]), "3": FootnoteAvailabilityInfo(["GD32F150x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.836,122.388,656.58,532.332)),
                 CondenseColumnsQuirk()
             ]),
-            DatasheetAFPageParsingInfo([33], { "1": ["GD32F150x4"], "2": ["GD32F150x8", "GD32F150x6"], "3": ["GD32F150x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([33], { "1": FootnoteAvailabilityInfo(["GD32F150x4"]), "2": FootnoteAvailabilityInfo(["GD32F150x8", "GD32F150x6"]), "3": FootnoteAvailabilityInfo(["GD32F150x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.092,123.132,389.484,530.844)),
                 CondenseColumnsQuirk()
             ])
@@ -193,15 +194,15 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ),
     "GD32F130xx_Datasheet_Rev3.4.pdf" : DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([31], { "1": ["GD32F130x4"], "2": ["GD32F130x8", "GD32F130x6"], "3": ["GD32F130x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([31], { "1": FootnoteAvailabilityInfo(["GD32F130x4"]), "2": FootnoteAvailabilityInfo(["GD32F130x8", "GD32F130x6"]), "3": FootnoteAvailabilityInfo(["GD32F130x8"])}, quirks=[
                 ParseUsingAreaQuirk((130.572,123.132,704.94,533.076)),
                 CondenseColumnsQuirk(),
             ]),
-            DatasheetAFPageParsingInfo([32], { "1": ["GD32F130x4"], "2": ["GD32F130x8", "GD32F130x6"], "3": ["GD32F130x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([32], { "1": FootnoteAvailabilityInfo(["GD32F130x4"]), "2": FootnoteAvailabilityInfo(["GD32F130x8", "GD32F130x6"]), "3": FootnoteAvailabilityInfo(["GD32F130x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.836,124.62,687.084,533.82)),
                 CondenseColumnsQuirk(),
             ]),
-            DatasheetAFPageParsingInfo([33], { "1": ["GD32F130x4", "GD32F130x6"], "2": ["GD32F130x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([33], { "1": FootnoteAvailabilityInfo(["GD32F130x4", "GD32F130x6"]), "2": FootnoteAvailabilityInfo(["GD32F130x8"])}, quirks=[
                 ParseUsingAreaQuirk((96.348,124.62,405.852,533.82)),
                 CondenseColumnsQuirk(),
             ]),
@@ -291,17 +292,17 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ),
     "GD32E230xx_Datasheet_Rev1.4.pdf" : DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([32], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([32], { "1": FootnoteAvailabilityInfo(["GD32E230x4"]), "2": FootnoteAvailabilityInfo(["GD32E230x8", "GD32E230x6"]), "3": FootnoteAvailabilityInfo(["GD32E230x8"])}, quirks=[
                 ParseUsingAreaQuirk((132.831,124.645,708.059,533.928)),
             ]),
-            DatasheetAFPageParsingInfo([33], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([33], { "1": FootnoteAvailabilityInfo(["GD32E230x4"]), "2": FootnoteAvailabilityInfo(["GD32E230x8", "GD32E230x6"]), "3": FootnoteAvailabilityInfo(["GD32E230x8"])}, quirks=[
                 ParseUsingAreaQuirk((94.879,124.645,637.364,535.416)),
             ]),
-            DatasheetAFPageParsingInfo([33], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([33], { "1": FootnoteAvailabilityInfo(["GD32E230x4"]), "2": FootnoteAvailabilityInfo(["GD32E230x8", "GD32E230x6"]), "3": FootnoteAvailabilityInfo(["GD32E230x8"])}, quirks=[
                 ParseUsingAreaQuirk((658.201,125.389,757.917,533.928 )),
                 OverwritePinAlternateInfoQuirk("PF6", ["I2C0_SCL(1)/I2C1_SCL(3)", None, None, None, None, None, None])
             ]),
-            DatasheetAFPageParsingInfo([34], { "1": ["GD32E230x4"], "2": ["GD32E230x8", "GD32E230x6"], "3": ["GD32E230x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([34], { "1": FootnoteAvailabilityInfo(["GD32E230x4"]), "2": FootnoteAvailabilityInfo(["GD32E230x8", "GD32E230x6"]), "3": FootnoteAvailabilityInfo(["GD32E230x8"])}, quirks=[
                 ParseUsingAreaQuirk((79.996,124.645,178.968,533.183 ))
             ]),
         ],
@@ -347,19 +348,19 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ),
     "GD32F350xx_Datasheet_Rev2.3.pdf": DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([30], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([30], { "1": FootnoteAvailabilityInfo(["GD32F350x4"]), "2": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8", "GD32F350x6"]), "3": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8"])}, quirks=[
                 ParseUsingAreaQuirk((127.622,122.413,748.243,535.416)),
             ]),
-            DatasheetAFPageParsingInfo([31], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([31], { "1": FootnoteAvailabilityInfo(["GD32F350x4"]), "2": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8", "GD32F350x6"]), "3": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.112,117.204,687.223,539.137)),
             ]),
-            DatasheetAFPageParsingInfo([32], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([32], { "1": FootnoteAvailabilityInfo(["GD32F350x4"]), "2": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8", "GD32F350x6"]), "3": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.112,124.645,394.027,534.672)),
             ]),
-            DatasheetAFPageParsingInfo([32], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([32], { "1": FootnoteAvailabilityInfo(["GD32F350x4"]), "2": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8", "GD32F350x6"]), "3": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8"])}, quirks=[
                 ParseUsingAreaQuirk((431.979,116.459,728.151,555.508)),
             ]),
-            DatasheetAFPageParsingInfo([33], { "1": ["GD32F350x4"], "2": ["GD32F350xB", "GD32F350x8", "GD32F350x6"], "3": ["GD32F350xB", "GD32F350x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([33], { "1": FootnoteAvailabilityInfo(["GD32F350x4"]), "2": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8", "GD32F350x6"]), "3": FootnoteAvailabilityInfo(["GD32F350xB", "GD32F350x8"])}, quirks=[
                 ParseUsingAreaQuirk((97.112,123.901,422.305,534.672)),
             ]),
         ],
@@ -398,19 +399,19 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     ),
     "GD32F330xx_Datasheet_Rev2.6.pdf": DatasheetParsingInfo(
         alternate_funcs = [ 
-            DatasheetAFPageParsingInfo([34], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([34], { "1": FootnoteAvailabilityInfo(["GD32F330x4"]), "2": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8", "GD32F330x6"]), "3": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8"])}, quirks=[
                 ParseUsingAreaQuirk((125.389,124.645,643.318,536.16)),
             ]),
-            DatasheetAFPageParsingInfo([35], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([35], { "1": FootnoteAvailabilityInfo(["GD32F330x4"]), "2": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8", "GD32F330x6"]), "3": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8"])}, quirks=[
                 ParseUsingAreaQuirk((94.879,125.389,562.205,534.672)),
             ]),
-            DatasheetAFPageParsingInfo([36], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([36], { "1": FootnoteAvailabilityInfo(["GD32F330x4"]), "2": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8", "GD32F330x6"]), "3": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8"])}, quirks=[
                 ParseUsingAreaQuirk((110.506,123.157,405.934,533.928)),
             ]),
-            DatasheetAFPageParsingInfo([36], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([36], { "1": FootnoteAvailabilityInfo(["GD32F330x4"]), "2": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8", "GD32F330x6"]), "3": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8"])}, quirks=[
                 ParseUsingAreaQuirk((442.397,118.692,729.639,539.137)),
             ]),
-            DatasheetAFPageParsingInfo([37], { "1": ["GD32F330x4"], "2": ["GD32F330xB", "GD32F330x8", "GD32F330x6"], "3": ["GD32F330xB", "GD32F330x8"]}, quirks=[
+            DatasheetAFPageParsingInfo([37], { "1": FootnoteAvailabilityInfo(["GD32F330x4"]), "2": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8", "GD32F330x6"]), "3": FootnoteAvailabilityInfo(["GD32F330xB", "GD32F330x8"])}, quirks=[
                 ParseUsingAreaQuirk((111.25,123.901,436.444,535.416)),
             ]),
         ],
@@ -456,76 +457,84 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
             DatasheetPinDefPageParsingInfo([21], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((180,123,769,527)),
                 OverwritePinDescriptionQuirk("PF6", "Default: PF6\rAlternate: ADC2_IN4, EXMC_NIORD\nRemap: TIMER9_CH0(3)"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([22], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([23], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PG1", "Default: PG1\rAlternate: EXMC_A11"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([24], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PB13", "Default: PB13\rAlternate: SPI1_SCK, USART2_CTS, TIMER0_CH0_ON, I2S1_CK"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([25], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([26], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PC10", "Default: PC10\nAlternate: UART3_TX, SDIO_D2\nRemap: USART2_TX, SPI2_SCK, I2S2_CK"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([27], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             DatasheetPinDefPageParsingInfo([28], "GD32F103Zx", "LQFP144", [
                 ParseUsingAreaQuirk((88,123,650,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103Z[FGIK]"]) }),
             # GD32F103Vx
             DatasheetPinDefPageParsingInfo([29], "GD32F103Vx", "LQFP100", [
                 ParseUsingAreaQuirk((133,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103V[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"], "ADC2") }),
             DatasheetPinDefPageParsingInfo([30], "GD32F103Vx", "LQFP100", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103V[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"], "ADC2") }),
             DatasheetPinDefPageParsingInfo([31], "GD32F103Vx", "LQFP100", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PB13", "Default: PB13\nAlternate: SPI1_SCK, USART2_CTS, TIMER0_CH0_ON, I2S1_CK(4)"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103V[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"], "ADC2") }),
             DatasheetPinDefPageParsingInfo([32], "GD32F103Vx", "LQFP100", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PC9", "Default: PB13\nAlternate: TIMER7_CH3(4), SDIO_D1(4)\nRemap: TIMER2_CH3"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103V[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"], "ADC2") }),
             DatasheetPinDefPageParsingInfo([33], "GD32F103Vx", "LQFP100", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PD3", "Default: PD3\nAlternate: EXMC_CLK\nRemap: USART1_CTS"),
-            ]),            
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103V[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103V[CDEFGIK]"], "ADC2") }),            
             # GD32F103Rx
             DatasheetPinDefPageParsingInfo([36], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((135,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103R[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"], "ADC2"), "6": FootnoteAvailabilityInfo(["GD32F103R[8BCDEFGIK]"]) }),
             DatasheetPinDefPageParsingInfo([37], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((88,123,769,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103R[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"], "ADC2"), "6": FootnoteAvailabilityInfo(["GD32F103R[8BCDEFGIK]"]) }),
             DatasheetPinDefPageParsingInfo([38], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PC12", "Default: PC12\rAlternate: UART4_TX(4), SDIO_CK(4)\nRemap: USART2_CK (6), SPI2_MOSI(4), I2S2_SD(4)"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103R[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"], "ADC2"), "6": FootnoteAvailabilityInfo(["GD32F103R[8BCDEFGIK]"]) }),
             DatasheetPinDefPageParsingInfo([39], "GD32F103Rx", "LQFP64", [
                 ParseUsingAreaQuirk((135,123,576,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103R[FGIK]"]), "4": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"]), "5": FootnoteAvailabilityInfo(["GD32F103R[CDEFGIK]"], "ADC2"), "6": FootnoteAvailabilityInfo(["GD32F103R[8BCDEFGIK]"]) }),
             # GD32F103Cx
             DatasheetPinDefPageParsingInfo([40], "GD32F103Cx", "LQFP48", [
                 ParseUsingAreaQuirk((135,123,769,527)),
                 OverwritePinDescriptionQuirk("PB1", "Default: PB1\rAlternate: ADC01_IN9, TIMER2_CH3\nRemap: TIMER0_CH2_ON"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103C[468B]"], "ADC2"), "4": FootnoteAvailabilityInfo(["GD32F103C[8B]"]) }),
             DatasheetPinDefPageParsingInfo([41], "GD32F103Cx", "LQFP48", [
                 ParseUsingAreaQuirk((88,123,769,527)),
                 OverwritePinDescriptionQuirk("PB3", "Default: JTDO\rRemap: PB3, TRACESWO, TIMER1_CH1, SPI0_SCK"),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103C[468B]"], "ADC2"), "4": FootnoteAvailabilityInfo(["GD32F103C[8B]"]) }),
             DatasheetPinDefPageParsingInfo([42], "GD32F103Cx", "LQFP48", [
                 ParseUsingAreaQuirk((88,123,476,527)),
-            ]),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103C[468B]"], "ADC2"), "4": FootnoteAvailabilityInfo(["GD32F103C[8B]"]) }),
+            # GD32F103Tx
+            DatasheetPinDefPageParsingInfo([43], "GD32F103Tx", "LQFP36", [
+                ParseUsingAreaQuirk((135,123,769,527)),
+                OverwritePinDescriptionQuirk("PA9", "Default: PA9\rAlternate: USART0_TX, TIMER0_CH1"),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103T[468B]"], "ADC2", False), "4": FootnoteAvailabilityInfo(["GD32F103T[8B]"]) }),
+            DatasheetPinDefPageParsingInfo([44], "GD32F103Tx", "LQFP36", [
+                ParseUsingAreaQuirk((88,123,621,527)),
+            ], { "3": FootnoteAvailabilityInfo(["GD32F103T[468B]"], "ADC2", False), "4": FootnoteAvailabilityInfo(["GD32F103T[8B]"]) }),            
         ],
         series = "GD32F10x",
         family_name = "GD32F103xx",
@@ -571,16 +580,24 @@ remapper_infos = {
         }
     },
     "GD32F103xx": {
-        "GPIO_SPI2_REMAP": {
-            "PA4": "SPI0_NSS/USART1_CK/ADC01_IN4"
+        "NAME_TIMER3_REMAP": {
+            "PD12": "TIMER3_CH0"
+        },
+        "NAME_USART2_FULL_REMAP": {
+            "PD12": "USART2_RTS"
         }
     }
 }
 
-def get_remapper_infos_for_family(datasheet: DatasheetParsingInfo):
-    if datasheet.family_name in remapper_infos:
-        return remapper_infos[datasheet.family_name] 
-    raise RuntimeError("Remapper info not found for family: " + str(datasheet.family_name))
+# This structure will permit remapping of individual pins, but
+# what it doesn't describe accurately is the effect remapping
+# one pin will have on other pins. For instance, on GD32F103,
+# remapping TIMER1_CH2 to PB10 can map TIMER1_CH1 to PA1 or PB3
+# depending on the remap. Thus, this structure is also used to 
+# provide alternative mappings in the platform, ie PA0_ALT1.
+remapper_info = {
+    **gd32f10x_remap.remapping_info
+}
 
 def identify_datasheet(datasheet_pdf_path: str) -> DatasheetParsingInfo:
     global known_datasheets_infos
