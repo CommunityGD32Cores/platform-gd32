@@ -5,7 +5,7 @@ import sys
 from typing import Tuple
 from pin_definitions import GD32Pin, GD32PinFunction
 
-def get_trailing_number(s):
+def get_trailing_number(s:str):
     m = re.search(r'\d+$', s)
     return int(m.group()) if m else None
 

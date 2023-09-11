@@ -28,12 +28,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
+#include "gd32xxyy.h"
+#include "PeripheralPins.h"
+
 """
 
-spl_family_b_peripheral_pins_c_header = """#include "PeripheralPins.h"
-#include "gd32xxyy.h"
-
-/*  void pin_function(PinName pin, int function);
+spl_family_b_peripheral_pins_c_header = """/*  void pin_function(PinName pin, int function);
     configure the speed, mode,and remap function of pins
     the parameter function contains the configuration information,show as below
     bit 0:2   gpio mode
@@ -100,6 +100,68 @@ const int GD_GPIO_SPEED[] = {
 
 """
 
+# Reference wiring_digital.c to see which of the GD32PinMode enums are used 
+spl_family_a_peripheral_pins_c_header = """/*  void pin_function(PinName pin, int function);
+    configure the speed, mode,and remap function of pins
+    the parameter function contains the configuration information,show as below
+    bit 0:2   gpio mode
+    bit 3:8   remap
+    bit 9:10  gpio speed
+    bit 11:15 adc  /timer channel
+*/
+
+/* pin descriptions only reference the index in the array, so
+ * to get e.g. AF11 one must give it index = 9. provide 
+ * convenience macros here.
+ * for all other arrays, the value is also equivalent to the index,
+ * so there doesn't need to be anything done more.
+ */
+
+/* Generated remapping names */
+
+const int GD_GPIO_REMAP[] = {
+    0x00000000,
+#if __has_include("GD32_FAMILY_REMAP_HEADER")
+#define __REMAP_NAME__(remap) GPIO_ ## remap,
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#endif
+};
+
+enum GD_GPIO_REMAP_NAME {
+    REMAP_NONE = 0U,
+#if __has_include("gd32f10x_remap.h")
+#define __REMAP_NAME__(remap) remap,
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#define __REMAP_NAME__(remap) DISABLE_ ## remap = GPIO_ ## remap | (1U << 6),
+#include "GD32_FAMILY_REMAP_HEADER"
+#undef __REMAP_NAME__
+#endif
+};
+
+/* GPIO MODE */
+const int GD_GPIO_MODE[] = {
+    GPIO_MODE_AIN,               /* 0 INPUT_ANALOG */
+    GPIO_MODE_IN_FLOATING,       /* 1 INPUT */
+    GPIO_MODE_IPD,               /* 2 INPUT_PULLDOWN */
+    GPIO_MODE_IPU,               /* 3 INPUT_PULLUP */
+    GPIO_MODE_OUT_OD,            /* 4 OUTPUT_OPEN_DRAIN */
+    GPIO_MODE_OUT_PP,            /* 5 OUTPUT */
+    0,                           /* 6 (unused) */
+    0,                           /* 7 (unused) */
+};
+
+/* GPIO SPEED */
+const int GD_GPIO_SPEED[] = {
+    GPIO_OSPEED_2MHZ,             /* 0 */
+    GPIO_OSPEED_10MHZ,            /* 1 */
+    0,                            /* 2 (unused) */
+    GPIO_OSPEED_50MHZ,            /* 3 */
+};
+
+"""
+
 community_copyright_header = """/*
     Copyright (c) 2021, CommunityGD32Cores
 
@@ -148,9 +210,12 @@ peripheralnames_h_header_end = """
 #endif
 """
 
-pinnamesvar_h_empty_header = """#ifndef _PINNAMESVAR_H_
+pinnamesvar_h_header_start = """#ifndef _PINNAMESVAR_H_
 #define _PINNAMESVAR_H_
 
+"""
+
+pinnamesvar_h_header_end = """
 #endif /* _PINNAMESVAR_H_ */"""
 
 variant_h_header_start = """#ifndef _VARIANT_

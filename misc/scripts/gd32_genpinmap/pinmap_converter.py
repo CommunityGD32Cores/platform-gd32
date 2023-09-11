@@ -1,12 +1,11 @@
-from typing import Dict, Tuple, List
+from collections import defaultdict
+from typing import Callable, Dict, Tuple, List, TypeVar, Iterable
 from func_utils import get_trailing_number, print_big_str, natural_keys, remove_last_comma, write_to_file, natural_key_for_pin_func
-from known_datasheets import identify_datasheet
 from pin_definitions import GD32Pin, GD32PinFunction
-from pin_map import GD32PinMap, GD32SubseriesPinMap
-from datasheet_parser import GD32DatasheetParser
+from pin_map import GD32PinCriteria, GD32PinCriteriaType, GD32PinMap
 from static_data import *
 from os import mkdir, path
-import string
+import string, re
 import sys
 from pathlib import Path # if you haven't already done so
 file = Path(__file__).resolve()
@@ -18,9 +17,7 @@ from board_generator import GD32MCUInfo
 class GD32PinMapGenerator:
     @staticmethod
     def get_adc_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        l = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name=device_name)
-        l.sort(key=natural_key_for_pin_func) # to get that nice ADC_IN0.. ADC_IN11 ordering correct
-        return l
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["ADC"])], filter_device_name=device_name)
 
     @staticmethod
     def get_adc_pinnames(pinmap: GD32PinMap, device_name:str) -> List[str]:
@@ -38,75 +35,92 @@ class GD32PinMapGenerator:
         return non_adc_pins
 
     @staticmethod
+    def get_alt_pinnames(pinmap: GD32PinMap, mcu:GD32MCUInfo) -> List[str]:
+        subfam = pinmap.get_subfamily_for_device_name(mcu.name_no_package)
+        if subfam is None:
+            return list()
+        subfam = pinmap.subseries_pinmaps[subfam]
+        alt_pinnames = []
+        for pin_info in subfam.pin_map.values():
+            if len(pin_info.pin_functions):
+                nalts = max([len(func.remapping_macros(mcu) or []) for func in pin_info.pin_functions])
+                if nalts:
+                    alt_pinnames += [f"{pin_info.pin_name}_ALT{alt} ({pin_info.pin_name} | ALT{alt})" for alt in range(1, nalts)]        
+        return alt_pinnames
+    
+    @staticmethod
+    def get_all_alt_pins(peripheral_c: str) -> List[str]:
+        alt_match = re.findall("PORT[A-Z]_[0-9]+_ALT[0-9]", peripheral_c) or []
+        return sorted(set(alt_match), key=GD32Pin.natural_sort_key)
+    
+    @staticmethod
     def get_dac_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "DAC", filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["DAC"])], filter_device_name=device_name)
 
     @staticmethod
     def get_i2c_sda_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("I2C", "SDA"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("I2C", "SDA")])], filter_device_name=device_name)
 
     @staticmethod
     def get_i2c_scl_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("I2C", "SCL"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("I2C", "SCL")])], filter_device_name=device_name)
 
     @staticmethod
     def get_pwm_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        all_timers = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "TIMER", filter_device_name=device_name)
-        all_timers = list(filter(lambda p_func: "_CH" in p_func[1].signal_name, all_timers))
-        return all_timers
+        return pinmap.search_pins_for_function([
+                GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["TIMER"]),
+                GD32PinCriteria(GD32PinCriteriaType.SIGNAL_CONTAINS, ["_CH"])
+            ], 
+            filter_device_name=device_name)
 
     @staticmethod
     def get_uart_tx_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        res = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("USART", "TX"), filter_device_name=device_name)
-        return res + pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("UART", "TX"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("USART", "TX"), ("UART", "TX")])], filter_device_name=device_name)
 
     @staticmethod
     def get_uart_rx_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        res = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("USART", "RX"), filter_device_name=device_name)
-        return res + pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("UART", "RX"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("USART", "RX"), ("UART", "RX")])], filter_device_name=device_name)
 
     @staticmethod
     def get_uart_rts_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        res = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("USART", "RTS"), filter_device_name=device_name)
-        return res + pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("UART", "RTS"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("USART", "RTS"), ("UART", "RTS")])], filter_device_name=device_name)
 
     @staticmethod
     def get_uart_cts_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        res = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("USART", "CTS"), filter_device_name=device_name)
-        return res + pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("UART", "CTS"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("USART", "CTS"), ("UART", "CTS")])], filter_device_name=device_name)
    
     @staticmethod
     def get_spi_mosi_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("SPI", "MOSI"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("SPI", "MOSI")])], filter_device_name=device_name)
 
     @staticmethod
     def get_spi_miso_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("SPI", "MISO"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("SPI", "MISO")])], filter_device_name=device_name)
 
     @staticmethod
     def get_spi_sclk_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("SPI", "SCK"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("SPI", "SCK")])], filter_device_name=device_name)
 
     @staticmethod
     def get_spi_nss_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("SPI", "NSS"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("SPI", "NSS")])], filter_device_name=device_name)
 
     @staticmethod
     def get_can_rd_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "RX"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("CAN", "RX")])], filter_device_name=device_name)
 
     @staticmethod
     def get_can_td_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "TX"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("CAN", "TX")])], filter_device_name=device_name)
 
     # ToDo: check if it makes sense to declare these. (CAN builtin PHY pins)
     @staticmethod
     def get_can_h_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("", "CANH"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("", "CANH")])], filter_device_name=device_name)
 
     @staticmethod
     def get_can_l_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
-        return pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("", "CANL"), filter_device_name=device_name)
+        return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("", "CANL")])], filter_device_name=device_name)
 
     @staticmethod
     def begin_pinmap(name:str):
@@ -121,13 +135,33 @@ class GD32PinMapGenerator:
         port_ident = pin_name[1]
         pin_num = pin_name[2:]
         return "PORT%s_%s" % (port_ident, pin_num)
+    
+    @staticmethod
+    def get_chan_num(func: GD32PinFunction):
+        chan_num = 0
+        sig_split = func.signal_name.split("TIMER")
+        sig_split = [x.replace(",","") for x in sig_split]
+        
+        # we probably want to remember that "_ON" thing and 
+        # give it in the pinmap? don't fully understand PWM yet, but 
+        # there is the GD_PIN_CHON_GET() macro. 
+        sig_split = [x.replace("_ON","") for x in sig_split]
+        if len(sig_split) >= 2:
+            chan_num = get_trailing_number(sig_split[1])
+        
+        #print(pin.pin_name)
+        #print(func.signal_name)
+        #print(sig_split)
+        #print(chan_num)
 
+        return chan_num
+    
     @staticmethod
     def add_pin_text(pin_and_port:str, periph:str, function_bits:str, signal_name:str, commented_out:bool = False, width:int = 50):
         temp = "%s    {%s,%s %s,%s%s}," % (
             "" if commented_out is False else "//",
             pin_and_port,
-            " " * (len("PORTA_15") - len(pin_and_port)),
+            " " * (len("PORTA_15_ALT1") - len(pin_and_port)),
             periph,
             " " if "TIMER" not in periph else " " * (len("TIMER_15") - len(periph)), 
             function_bits
@@ -137,21 +171,44 @@ class GD32PinMapGenerator:
         return temp 
 
     @staticmethod
-    def add_pin(pin: GD32Pin, func: GD32PinFunction, function_bits:str, commented_out:bool = False, width:int = 50):
+    def add_pin(pin: GD32Pin, func: GD32PinFunction, function_bits:str, commented_out:bool = False, width:int = 50, alt:int = 0):
         return GD32PinMapGenerator.add_pin_text(
-            GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name),
+            GD32PinMapGenerator.format_pin_to_port_pin(pin.pin_name) + ("_ALT" + str(alt) if alt > 0 else ""),
             func.peripheral,
             function_bits,
             func.signal_name,
             commented_out,
             width
         )
+    
+    @staticmethod
+    def add_alt_pins(pin:GD32Pin, func:GD32PinFunction, function_bits, remapping_macros: any, commented_out:bool, alt: int = 0):
+        retStr = ""
+        for remapping_macro in remapping_macros:
+            retStr += GD32PinMapGenerator.add_pin(
+                pin, func, function_bits % remapping_macro, commented_out, alt=alt)
+            alt += 1
+        return retStr
 
     @staticmethod
-    def add_adc_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
+    def add_adc_pin(pin: GD32Pin, func: GD32PinFunction, mcu:GD32MCUInfo, context: any) -> str: 
         chan_num = get_trailing_number(func.signal_name)
-        return GD32PinMapGenerator.add_pin(
-            pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False)
+        alt = context["alt"]
+        if func.family_type == "A":
+            remapping_macros = func.remapping_macros(mcu)
+            context["alt"] += len(remapping_macros) or 1
+            if len(remapping_macros):
+                return GD32PinMapGenerator.add_alt_pins(
+                    pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)", [chan_num] * len(remapping_macros), False, alt)
+            else:
+                return GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False, alt=alt)
+        elif func.family_type == "B":
+            context["alt"] += 1
+            return GD32PinMapGenerator.add_pin(
+                pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False, alt=alt)
+        else:
+            raise Exception("Unknown family_type: %s" % func.family_type)
 
     @staticmethod
     def add_dac_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
@@ -162,62 +219,92 @@ class GD32PinMapGenerator:
             pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)" % chan_num, False)
 
     @staticmethod
-    def add_i2c_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number
-        return GD32PinMapGenerator.add_pin(
-            pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
-
-    @staticmethod
-    def add_uart_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number
-        if func.has_af_number():
-            return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, GPIO_OTYPE_PP, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % af_num, False)
-        else:
-            # output driving
-            if any([x in func.signal_name for x in ("TX", "CTS", "RTS")]):
-                return GD32PinMapGenerator.add_pin(
-                    pin, func, "7", False)
-            # input
+    def add_i2c_pin(pin: GD32Pin, func: GD32PinFunction, mcu: GD32MCUInfo, context) -> str: 
+        if func.family_type == "A":
+            alt = context["alt"]
+            remapping_macros = func.remapping_macros(mcu)
+            context["alt"] += len(remapping_macros) or 1
+            if remapping_macros and len(remapping_macros):
+                return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
             else:
+                return GD32PinMapGenerator.add_pin(pin, func, "7", False)
+        elif func.family_type is "B":
+            if func.has_af_number():
                 return GD32PinMapGenerator.add_pin(
-                    pin, func, "1", False)
+                    pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % func.af_number, False)
+            else:
+                raise Exception("Alternate function number must be provided to enable i2c AF on B family devices")
+        else:
+            raise Exception("Unknown family_type: %s" % func.family_type)
 
     @staticmethod
-    def add_standard_af_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        af_num = func.af_number
-        if func.has_af_number():
-            return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, GPIO_OTYPE_PP, PIN_PUPD_NONE, IND_GPIO_AF_%d)" % af_num, False)
+    def add_uart_pin(pin: GD32Pin, func: GD32PinFunction, mcu: GD32MCUInfo, context) -> str: 
+        alt = 0
+        if func.family_type == "A":
+            alt = context["alt"]
+            remapping_macros = func.remapping_macros(mcu)
+            context["alt"] += len(remapping_macros) or 1
+            if remapping_macros and len(remapping_macros):
+                return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
+        elif func.family_type == "B":
+            if func.has_af_number():
+                return GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % func.af_number, False)
         else:
-            # not correct for all cases like CAN_RD, FIXME
+            raise Exception("Unknown family_type: %s" % func.family_type)
+        
+        # output driving
+        if any([x in func.signal_name for x in ("TX", "CTS", "RTS")]):
             return GD32PinMapGenerator.add_pin(
-                pin, func, "7", False)
+                pin, func, "7", False, alt=alt)
+        # input
+        else:
+            return GD32PinMapGenerator.add_pin(
+                pin, func, "1", False, alt=alt)
 
     @staticmethod
-    def add_pwm_pin(pin: GD32Pin, func: GD32PinFunction) -> str: 
-        chan_num = 0
-        sig_split = func.signal_name.split("TIMER")
-        sig_split = [x.replace(",","") for x in sig_split]
-        # we probably want to remember that "_ON" thing and 
-        # give it in the pinmap? don't fully understand PWM yet, but 
-        # there is the GD_PIN_CHON_GET() macro. 
-        sig_split = [x.replace("_ON","") for x in sig_split]
-        if len(sig_split) >= 2:
-            chan_num = get_trailing_number(sig_split[1])
-        af_num = func.af_number
-        #print(pin.pin_name)
-        #print(func.signal_name)
-        #print(sig_split)
-        #print(chan_num)
-        #print(af_num)
-        if func.has_af_number():
-            return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNC_PWM(%d, IND_GPIO_AF_%d)" % (chan_num, af_num), False)
+    def add_standard_af_pin(pin: GD32Pin, func: GD32PinFunction, mcu: GD32MCUInfo, context) -> str: 
+        alt = 0
+        if func.family_type == "A":
+            alt = context["alt"]
+            remapping_macros = func.remapping_macros(mcu)
+            context["alt"] += len(remapping_macros) or 1
+            if remapping_macros and len(remapping_macros):
+                return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
+        elif func.family_type == "B":
+            af_num = func.af_number
+            if func.has_af_number():
+                return GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_NONE, IND_GPIO_AF_%d)" % af_num, False)
         else:
-            return GD32PinMapGenerator.add_pin(
-                pin, func, "GD_PIN_FUNC_PWM_2(%d)" % (chan_num), False)
+            raise Exception("Unknown family_type: %s" % func.family_type)
 
+        # not correct for all cases like CAN_RD, FIXME
+        return GD32PinMapGenerator.add_pin(
+            pin, func, "7", False, alt=alt)
+
+    @staticmethod
+    def add_pwm_pin(pin: GD32Pin, func: GD32PinFunction, mcu:GD32MCUInfo, context) -> str: 
+        if func.family_type == "A":
+            alt = context["alt"]
+            chan_num = GD32PinMapGenerator.get_chan_num(func)
+            remapping_macros = [(chan_num, m) for m in func.remapping_macros(mcu)]
+            context["alt"] += len(remapping_macros) or 1
+            return GD32PinMapGenerator.add_alt_pins(
+                pin, func, "GD_PIN_FUNC_PWM(%d, %s)", remapping_macros if len(remapping_macros) else [(chan_num, "0")], False, alt)
+        elif func.family_type == "B":
+            ret = ""
+            chan_num = GD32PinMapGenerator.get_chan_num(func)
+            af_num = func.af_number
+            if func.has_af_number():
+                #print(af_num)
+                ret += GD32PinMapGenerator.add_pin(
+                    pin, func, "GD_PIN_FUNC_PWM(%d, IND_GPIO_AF_%d)" % (chan_num, af_num), False)
+            else: 
+                raise Exception("Alternate function number must be provided to enable PWM AF on B family devices")
+        else:
+            raise Exception("Unknown family_type: %s" % func.family_type)
+        
     @staticmethod
     def add_gpio_ports(pinmap:GD32PinMap, device_name:str) -> str:
         temp = "const uint32_t gpio_port[] = {\n"
@@ -245,12 +332,37 @@ class GD32PinMapGenerator:
         temp += ",\n".join(all_pins)
         temp += "\n};\n\n"
         return temp
+    
+    T = TypeVar("T")
+    R = TypeVar("R")
+    
+    # itertools.groupby would need a sorted list
+    @staticmethod
+    def groupby(l: Iterable[T], key: Callable[[T],R]) -> Dict[R, T]:
+        d = defaultdict(list)
+        for item in l:
+            d[key(item)].append(item)
+        return d.items()
+        
+    @staticmethod
+    def exec_by_pin_group(pins: List[Tuple[GD32Pin, GD32PinFunction]], function:Callable[[GD32Pin, GD32PinFunction, any], str], context: Callable[[], any] = lambda: {"alt": 0}) -> str:
+        output = ""
+        # group all functions together by pin name
+        for p, fs in ((i, [j[1] for j in j]) for i, j in GD32PinMapGenerator.groupby(pins, lambda x: x[0])):
+            func_context = context()
+            for f in fs:
+                output += function(p, f, func_context)
+        return output
 
     # generation methods
     @staticmethod
-    def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, device_name:str) -> str:
+    def generate_arduino_peripheralpins_c(pinmap:GD32PinMap, mcu:GD32MCUInfo) -> str:
+        device_name = mcu.name_no_package
         output = gigadevice_header
-        output += spl_family_b_peripheral_pins_c_header
+        if pinmap.datasheet_info.family_type == "B":
+            output += spl_family_b_peripheral_pins_c_header
+        elif pinmap.datasheet_info.family_type == "A":
+            output += spl_family_a_peripheral_pins_c_header.replace("GD32_FAMILY_REMAP_HEADER", f"{mcu.spl_series.lower()}_remap.h")
         # small correction for header: remove AF above 6
         if device_name.lower().startswith("gd32e23"):
             output = output.replace("    GPIO_AF_7,             /* 7 */\n", "")
@@ -261,14 +373,20 @@ class GD32PinMapGenerator:
             output = output.replace("    GPIO_AF_11             /* 9 */\n", "")
         # ADC
         output += GD32PinMapGenerator.begin_pinmap("ADC")
-        for p, f in GD32PinMapGenerator.get_adc_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_adc_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_adc_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_adc_pin(p, f, mcu, context))
         # ToDo: The "ADC" might actaully be "ADC0" ("ADC1"?) for some chips.
         # Channel 16 and 17 should be correct.
-        output += GD32PinMapGenerator.add_pin_text(
-            "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
-        output += GD32PinMapGenerator.add_pin_text(
-            "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
+        if pinmap.datasheet_info.internal_adc != None:
+            for (adc_name, (adc, channel)) in pinmap.datasheet_info.internal_adc.items():
+                output += GD32PinMapGenerator.add_pin_text(
+                    adc_name, "ADC%s" %(adc or ""), "GD_PIN_FUNC_ANALOG_CH(%s)" % channel, "ADC%s_IN%s" %(adc or "", channel))
+        else:
+            output += GD32PinMapGenerator.add_pin_text(
+                "ADC_TEMP", "ADC", "GD_PIN_FUNC_ANALOG_CH(16)", "ADC_IN16")
+            output += GD32PinMapGenerator.add_pin_text(
+                "ADC_VREF", "ADC", "GD_PIN_FUNC_ANALOG_CH(17)", "ADC_IN17")
         output += GD32PinMapGenerator.end_pinmap()
         # DAC
         output += GD32PinMapGenerator.begin_pinmap("DAC")
@@ -280,68 +398,81 @@ class GD32PinMapGenerator:
         output += GD32PinMapGenerator.end_pinmap()
         # I2C SDA
         output += GD32PinMapGenerator.begin_pinmap("I2C_SDA")
-        for p, f in GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_i2c_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_i2c_sda_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_i2c_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # I2C SCL
         output += GD32PinMapGenerator.begin_pinmap("I2C_SCL")
-        for p, f in GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_i2c_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_i2c_scl_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_i2c_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # PWM
         output += GD32PinMapGenerator.begin_pinmap("PWM")
-        for p, f in GD32PinMapGenerator.get_pwm_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_pwm_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_pwm_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_pwm_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # UART TX
         output += GD32PinMapGenerator.begin_pinmap("UART_TX")
-        for p, f in GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_uart_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_uart_tx_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_uart_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # UART RX
         output += GD32PinMapGenerator.begin_pinmap("UART_RX")
-        for p, f in GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_uart_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_uart_rx_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_uart_pin(p, f, mcu, context))        
         output += GD32PinMapGenerator.end_pinmap()
         # UART RTS
         output += GD32PinMapGenerator.begin_pinmap("UART_RTS")
-        for p, f in GD32PinMapGenerator.get_uart_rts_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_uart_rts_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))          
         output += GD32PinMapGenerator.end_pinmap()
         # UART CTS
         output += GD32PinMapGenerator.begin_pinmap("UART_CTS")
-        for p, f in GD32PinMapGenerator.get_uart_cts_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_uart_cts_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))          
         output += GD32PinMapGenerator.end_pinmap()
         # SPI MOSI
         output += GD32PinMapGenerator.begin_pinmap("SPI_MOSI")
-        for p, f in GD32PinMapGenerator.get_spi_mosi_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_spi_mosi_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))         
         output += GD32PinMapGenerator.end_pinmap()
         # SPI MISO
         output += GD32PinMapGenerator.begin_pinmap("SPI_MISO")
-        for p, f in GD32PinMapGenerator.get_spi_miso_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_spi_miso_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))          
         output += GD32PinMapGenerator.end_pinmap()
         # SPI SCLK
         output += GD32PinMapGenerator.begin_pinmap("SPI_SCLK")
-        for p, f in GD32PinMapGenerator.get_spi_sclk_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_spi_sclk_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))           
         output += GD32PinMapGenerator.end_pinmap()
         # SPI SSEL
         output += GD32PinMapGenerator.begin_pinmap("SPI_SSEL")
-        for p, f in GD32PinMapGenerator.get_spi_nss_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_spi_nss_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # CAN RD
         output += GD32PinMapGenerator.begin_pinmap("CAN_RD")
-        for p, f in GD32PinMapGenerator.get_can_rd_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_can_rd_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))
         output += GD32PinMapGenerator.end_pinmap()
         # CAN TD
         output += GD32PinMapGenerator.begin_pinmap("CAN_TD")
-        for p, f in GD32PinMapGenerator.get_can_td_pins(pinmap, device_name):
-            output += GD32PinMapGenerator.add_standard_af_pin(p, f)
+        output += GD32PinMapGenerator.exec_by_pin_group(
+            GD32PinMapGenerator.get_can_td_pins(pinmap, device_name), 
+            lambda p, f, context: GD32PinMapGenerator.add_standard_af_pin(p, f, mcu, context))        
         output += GD32PinMapGenerator.end_pinmap()
         # was refactored to be in core since it's constant data.
         # ports
@@ -410,8 +541,8 @@ class GD32PinMapGenerator:
         return output
 
     @staticmethod
-    def generate_arduino_pinnamesvar_h(pinmap:GD32PinMap, device_name:str) -> str:
-        output = pinnamesvar_h_empty_header
+    def generate_arduino_pinnamesvar_h(peripheral_pins_output: str) -> str:
+        output = "".join(m + ",\n" for m in GD32PinMapGenerator.get_all_alt_pins(peripheral_pins_output))
         return output
 
     @staticmethod
@@ -450,7 +581,8 @@ class GD32PinMapGenerator:
                 return pin_candidate
 
     @staticmethod
-    def generate_arduino_variant_h(pinmap:GD32PinMap, device_name:str) -> str:
+    def generate_arduino_variant_h(pinmap:GD32PinMap, mcu:GD32MCUInfo, peripheral_c: str) -> str:
+        device_name = mcu.name_no_package
         output = community_copyright_header
         output += variant_h_header_start
         # generate all "#define <pin name> <index>" macros
@@ -478,6 +610,14 @@ class GD32PinMapGenerator:
             output += GD32PinMapGenerator.add_macro_def("ANALOG_PINS_LAST", all_adc_pins[-1])
         else:
             output += "/* warning: no ADC pins detected.. */\n"
+
+        output += "\n/* alternative pin remappings */\n"
+        for p in GD32PinMapGenerator.get_all_alt_pins(peripheral_c):
+            # convert from PORTA_1_ALT1 to PA1_ALT1
+            m = re.match("PORT([A-Z])_([0-9]+)_(ALT.)", p)
+            arduino_pin = f"P{m.group(1)}{m.group(2)}"
+            output += f"#define {arduino_pin}_{m.group(3)} ({arduino_pin} | {m.group(3)})\n"
+
         output += "\n/* LED definitions */\n"
         if pinmap.pin_is_available_for_device("PC13", device_name):
             output += GD32PinMapGenerator.add_macro_def("LED_BUILTIN", "PC13") # default for now
@@ -641,40 +781,39 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def print_pinmap_info(pinmap: GD32PinMap):
-        all_i2c_sda_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA")
+        all_i2c_sda_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PIN_SUB_FUNCTION, ["SDA"])])
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
-        all_uart_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "UART")
-        all_uart_pins.extend(pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "USART"))
+        all_uart_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["UART", "USART"])])
         for pin, func in all_uart_pins:
             print("Found UART pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
-        all_can_rx_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHAL_AND_PIN_SUB_FUNCTION, ("CAN", "RX"))
+        all_can_rx_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHAL_AND_PIN_SUB_FUNCTION, [("CAN", "RX")])])
         for pin, func in all_can_rx_pins:
             print("Found CAN RX pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
 
-        all_can_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "CAN")
+        all_can_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["CAN"])])
         for pin, func in all_can_pins:
             if func.has_af_number():
                 print("Found CAN pin %s (AF%d, func %s, periph %s, footnote %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote))  
             else:
                 print("Found CAN pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
 
-        all_adc_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC")
+        all_adc_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["ADC"])])
         for pin, func in all_adc_pins:
             print("Found ADC pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
 
         print("Testing search for only a device name.")
-        all_adc_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PERIPHERAL_STARTS_WITH, "ADC", filter_device_name="GD32F190T6")
+        all_adc_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["ADC"])], filter_device_name="GD32F190T6")
         for pin, func in all_adc_pins:
             print("Found ADC pin %s (func %s, periph %s, subseries %s)" % (pin.pin_name, func.signal_name, func.peripheral, func.subseries))  
 
-        all_i2c_sda_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA", filter_device_name="GD32F190T6")
+        all_i2c_sda_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PIN_SUB_FUNCTION, ["SDA"])], filter_device_name="GD32F190T6")
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
-        all_i2c_sda_pins = pinmap.search_pins_for_function(GD32PinMap.CRITERIA_PIN_SUB_FUNCTION, "SDA", filter_device_name="GD32F190T4")
+        all_i2c_sda_pins = pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PIN_SUB_FUNCTION, ["SDA"])], filter_device_name="GD32F190T4")
         for pin, func in all_i2c_sda_pins:
             print("Found I2C SDA pin %s (AF%d, func %s, periph %s, footnote %s %s)" % (pin.pin_name, func.af_number, func.signal_name, func.peripheral, func.footnote, func.footnote_resolved))  
 
@@ -694,11 +833,11 @@ class GD32PinMapGenerator:
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "PeripheralNames.h"))
             # PeripheralPins.c
-            output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, mcu_name)
-            print_big_str(output)
-            write_to_file(output, path.join(target_base_folder, "PeripheralPins.c"))
-            # PinNamesVar.h
-            output = GD32PinMapGenerator.generate_arduino_pinnamesvar_h(pinmap, mcu_name)
+            peripheral_output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, mcu)
+            print_big_str(peripheral_output)
+            write_to_file(peripheral_output, path.join(target_base_folder, "PeripheralPins.c"))
+            # PinNamesVar.h; Attention! Uses PeripheralPins.c output to generate a list of alt names 
+            output = GD32PinMapGenerator.generate_arduino_pinnamesvar_h(peripheral_output) 
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "PinNamesVar.h"))
             # variant.cpp
@@ -706,7 +845,7 @@ class GD32PinMapGenerator:
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.cpp"))
             # variant.h
-            output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu_name)
+            output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu, peripheral_output)
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.h"))
             # ldscript.ld
