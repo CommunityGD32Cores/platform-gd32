@@ -49,6 +49,11 @@ class GD32PinMapGenerator:
         return alt_pinnames
     
     @staticmethod
+    def get_all_alt_pins(peripheral_c: str) -> List[str]:
+        alt_match = re.findall("PORT[A-Z]_[0-9]+_ALT[0-9]", peripheral_c) or []
+        return sorted(set(alt_match), key=GD32Pin.natural_sort_key)
+    
+    @staticmethod
     def get_dac_pins(pinmap: GD32PinMap, device_name:str) -> List[Tuple[GD32Pin, GD32PinFunction]]:
         return pinmap.search_pins_for_function([GD32PinCriteria(GD32PinCriteriaType.PERIPHERAL_STARTS_WITH, ["DAC"])], filter_device_name=device_name)
 
@@ -537,8 +542,7 @@ class GD32PinMapGenerator:
 
     @staticmethod
     def generate_arduino_pinnamesvar_h(peripheral_pins_output: str) -> str:
-        alt_match = re.findall("PORT[A-Z]_[0-9]+_ALT[0-9]", peripheral_pins_output) or []
-        output = "".join(m + ",\n" for m in sorted(set(alt_match), key=GD32Pin.natural_sort_key))
+        output = "".join(m + ",\n" for m in GD32PinMapGenerator.get_all_alt_pins(peripheral_pins_output))
         return output
 
     @staticmethod
@@ -577,7 +581,7 @@ class GD32PinMapGenerator:
                 return pin_candidate
 
     @staticmethod
-    def generate_arduino_variant_h(pinmap:GD32PinMap, mcu:GD32MCUInfo) -> str:
+    def generate_arduino_variant_h(pinmap:GD32PinMap, mcu:GD32MCUInfo, peripheral_c: str) -> str:
         device_name = mcu.name_no_package
         output = community_copyright_header
         output += variant_h_header_start
@@ -607,10 +611,12 @@ class GD32PinMapGenerator:
         else:
             output += "/* warning: no ADC pins detected.. */\n"
 
-        all_alt_pins = GD32PinMapGenerator.get_alt_pinnames(pinmap, mcu)
         output += "\n/* alternative pin remappings */\n"
-        for p in all_alt_pins:
-            output += f"#define {p}\n"
+        for p in GD32PinMapGenerator.get_all_alt_pins(peripheral_c):
+            # convert from PORTA_1_ALT1 to PA1_ALT1
+            m = re.match("PORT([A-Z])_([0-9]+)_(ALT.)", p)
+            arduino_pin = f"P{m.group(1)}{m.group(2)}"
+            output += f"#define {arduino_pin}_{m.group(3)} ({arduino_pin} | {m.group(3)})\n"
 
         output += "\n/* LED definitions */\n"
         if pinmap.pin_is_available_for_device("PC13", device_name):
@@ -827,11 +833,11 @@ class GD32PinMapGenerator:
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "PeripheralNames.h"))
             # PeripheralPins.c
-            output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, mcu)
-            print_big_str(output)
-            write_to_file(output, path.join(target_base_folder, "PeripheralPins.c"))
-            # PinNamesVar.h; Use PeripheralPins.c output to generate a list of alt names 
-            output = GD32PinMapGenerator.generate_arduino_pinnamesvar_h(output) 
+            peripheral_output = GD32PinMapGenerator.generate_arduino_peripheralpins_c(pinmap, mcu)
+            print_big_str(peripheral_output)
+            write_to_file(peripheral_output, path.join(target_base_folder, "PeripheralPins.c"))
+            # PinNamesVar.h; Attention! Uses PeripheralPins.c output to generate a list of alt names 
+            output = GD32PinMapGenerator.generate_arduino_pinnamesvar_h(peripheral_output) 
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "PinNamesVar.h"))
             # variant.cpp
@@ -839,7 +845,7 @@ class GD32PinMapGenerator:
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.cpp"))
             # variant.h
-            output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu)
+            output = GD32PinMapGenerator.generate_arduino_variant_h(pinmap, mcu, peripheral_output)
             print_big_str(output)
             write_to_file(output, path.join(target_base_folder, "variant.h"))
             # ldscript.ld
