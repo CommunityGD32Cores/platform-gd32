@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+import argparse
+from collections import defaultdict
 import csv
 import os
 import json
-from typing import Tuple, List
+import re
+from typing import Dict, Tuple, List
 import shutil
 
 # This script converts CSV files, obtainable from the "Export to CSV" 
@@ -366,31 +369,22 @@ class GD32MCUInfo:
         board_def = json.dumps(board, indent=2)
         return output_filename, board_def
 
-def generate_arduino_board_def(boards: List[GD32MCUInfo]) -> str:
-    output = """# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+def generate_arduino_board_def(all_boards: Dict[str, List[GD32MCUInfo]], header: str) -> str:
+    output = header
 
-menu.pnum=Board part number
-menu.upload_method=Upload method
-menu.opt=Optimize
-menu.usb=USB support"""
-    output += "\n"
+    print("Got %d different series: %s." % (len(all_boards), str(all_boards.keys())))
 
-    # begin the generic F30X series
-    # first, filter out all arduino capable boards..
-    boards = list(filter(lambda b: b.arduino_variant is not None, boards))
-    possible_series = set()
-    for b in boards:
-        possible_series.add(b.spl_series)
+    for series, boards in all_boards.items():
+        print("Processing series %s" % series)
+        # first, filter out all arduino capable boards..
+        boards = list(filter(lambda b: b.arduino_variant is not None, boards))
 
+        print("Got %d Arduino capable boards." % len(boards))
 
-    print("Got %d Arduino capable boards." % len(boards))
-    print("Got %d different series: %s." % (len(possible_series), str(possible_series)))
-
-    for series in possible_series:
         series_boards = list(filter(lambda b: b.spl_series == series, boards))
         # lets checkout the ones which are the _GENERIC types
         generic_boards = list(filter(lambda b: b.arduino_variant.endswith("_GENERIC"), series_boards))
-        print("Got %d generic %s boards." % (len(generic_boards), series))
+        print("Got %d generic boards." % len(generic_boards))
 
         def gen_series(name:str, series:str, boards:List[GD32MCUInfo]): 
             o = "\n" + "#"*50 + "\n"
@@ -431,7 +425,7 @@ menu.usb=USB support"""
 
             o += f"{s_name}.menu.usb.off=Off\n"
             # Only do this for USB enabled boards
-            if b.spl_series.lower() in ("gd32f30x"):
+            if b.spl_series.lower() in ("gd32f30x", "gd32f10x"):
                 o += f"{s_name}.menu.usb.on=On\n"
                 o += s_name + ".menu.usb.on.build.enable_usb={build.usb_flags} -DUSBCON -DUSBD_USE_CDC\n"
             o += "\n"
@@ -441,7 +435,7 @@ menu.usb=USB support"""
                 ("gdlinkMethod", "GDlink (SWD)", "gdlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "gdlink_upload"),
                 ("stlinkMethod", "STLink (SWD)", "stlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "stlink_upload"),
                 ("jlinkMethod", "JLink (SWD)", "jlink", "", "-DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG=1 -DSERIAL_USB -DGENERIC_BOOTLOADER", "jlink_upload"),
-                ("dfuUtilMethod", "dfu-util (DFU - STMDuino bootloader)", "dfu", "", "", "dfu-util"),
+                ("dfuUtilMethod", "dfu-util (DFU - STMDuino bootloader)", "dfu", "-a 2 -w", "", "dfu-util"),
             ):
                 o += f"{s_name}.menu.upload_method.{m[0]}={m[1]}\n"
                 o += f"{s_name}.menu.upload_method.{m[0]}.upload.protocol={m[2]}\n"
@@ -449,9 +443,9 @@ menu.usb=USB support"""
                 o += f"{s_name}.menu.upload_method.{m[0]}.build.upload_flags={m[4]}\n"
                 o += f"{s_name}.menu.upload_method.{m[0]}.upload.tool={m[5]}\n"
                 o += "\n"
-            o += f"{s_name}.menu.upload_method.dfuUtilMethod.build.flash_offset=0x0x2000\n"
-            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.pid=0x004\n"
-            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.vid=0x1209\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.build.flash_offset=0x2000\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.pid=0x0003\n"
+            o += f"{s_name}.menu.upload_method.dfuUtilMethod.upload.vid=0x1eaf\n"
             o += "\n# Optimizations\n"
             for m in (
                 ("osstd", "Smallest (default)", ""),
@@ -489,11 +483,19 @@ def get_info_for_mcu_name(mcu_name, mcu_data):
 
 def read_all_known_mcus() -> List[GD32MCUInfo]:
     this_script_path = os.path.dirname(os.path.realpath(__file__))
-    mcus = []
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
-    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
+    mcu_files = [
+        ("gd32_cortex_m4_devs.csv", "cortex-m4"),
+        ("gd32_cortex_m3_devs.csv", "cortex-m3"),
+        ("gd32_cortex_m23_devs.csv", "cortex-m23"),
+        ("gd32_cortex_m33_devs.csv", "cortex-m33"),
+    ]
+    mcus = defaultdict(lambda: list())
+
+    for (mcu_file, arch) in mcu_files:
+        csv_res = read_csv(os.path.join(this_script_path, mcu_file), arch)
+        for board in csv_res:
+            mcus[board.spl_series].append(board)
+
     return mcus
 
 def print_big_str(res:str):
@@ -503,38 +505,81 @@ def print_big_str(res:str):
     for x in [res[i:i+n] for i in range(0, len(res), n)]:
         print(x, end="", flush=True)
         sys.stdout.flush()
-
+ 
 def main():
+    parser = argparse.ArgumentParser(
+                    prog='Arduino Boards Generator')
+    parser.add_argument('-b', help='Specify old boards.txt to match board order, for shorter diffing')
+    args = parser.parse_args()
+
+    boards_order = dict()
+
+    boards_header = """# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+
+    menu.pnum=Board part number
+    menu.upload_method=Upload method
+    menu.opt=Optimize
+    menu.usb=USB support"""
+    boards_header += "\n"
+
+    if args.b:
+        auto_gen_found = False
+        board_num = 1
+        boards_header = "" # If reusing an old board, use their header
+        series_expr = re.compile('^# Generic ([a-z0-9]+)$', re.RegexFlag.IGNORECASE)
+        old_boards_loc = args.b
+        if not os.path.isfile(old_boards_loc):
+            raise Exception("Old boards file specified does not exist")
+        old_boards_file = open(old_boards_loc, 'r')
+        for line in old_boards_file:
+            if not auto_gen_found:
+                boards_header += line
+                if line.startswith("## Auto-generated content here"):
+                    auto_gen_found = True
+                else: 
+                    continue
+            series_match = series_expr.match(line)
+            if series_match and series_match.group(1):
+                boards_order[series_match.group(1).lower()] = board_num
+                board_num += 1
+
     mcus = read_all_known_mcus()
 
-    #print(mcus)
-    for x in mcus:
-        print(repr(x))
+    mcus = dict(sorted(list(mcus.items()), key=lambda item: boards_order[item[0].lower()] if item[0].lower() in boards_order else 100))
 
-    # special case: GD32E232 MCUs are listed in the CSV file but have no released datasheet or SPL support yet
-    # (the GD32E23x.h only accepts E230 or E231, not E232).
-    # these are probabl "upcoming" MCUs. 
-    # filter them from the list for now.
-    mcus = list(filter(lambda x: x.series != "GD32E232", mcus))
-    #return
-    print_board_files_mcus = ["GD32F405RG"]
-
-    for mcu in print_board_files_mcus:
-        output_filename, board_def = get_info_for_mcu_name(mcu, mcus).generate_board_def()
-        print(output_filename + ":")
-        print(board_def)
     #return
     if os.path.exists("generated_output"):
         shutil.rmtree("generated_output")
     os.mkdir("generated_output")
-    for x in mcus:  
-        output_filename, board_def = x.generate_board_def()
-        with open(os.path.join("generated_output", output_filename), "w") as fp:
-            fp.write(board_def)
+
+    for series, boards in mcus.items():
+        #print(series)
+        for x in boards:
+            print(repr(x))
+
+        # special case: GD32E232 MCUs are listed in the CSV file but have no released datasheet or SPL support yet
+        # (the GD32E23x.h only accepts E230 or E231, not E232).
+        # these are probabl "upcoming" MCUs. 
+        # filter them from the list for now.
+        mcus[series] = list(filter(lambda x: x.series != "GD32E232", boards))
+        #return
+        print_board_files_mcus = ["GD32F405RG"]
+
+        for mcu in print_board_files_mcus:
+            mcu_info = get_info_for_mcu_name(mcu, boards)
+            if mcu_info:
+                output_filename, board_def = mcu_info.generate_board_def()
+                print(output_filename + ":")
+                print(board_def)
+
+        for x in boards:
+            output_filename, board_def = x.generate_board_def()
+            with open(os.path.join("generated_output", output_filename), "w") as fp:
+                fp.write(board_def)
 
     print("Done writing %d board defs." % len(mcus))
 
-    board_txt_content = generate_arduino_board_def(mcus)
+    board_txt_content = generate_arduino_board_def(mcus, boards_header)
     print("boards.txt (%d bytes):" % (len(board_txt_content)))
     # uncomment this to print it to console
     #print_big_str(board_txt_content)
