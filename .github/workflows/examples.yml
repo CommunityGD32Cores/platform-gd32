@@ -14,6 +14,7 @@ jobs:
           - "examples/gd32-mbedos-baremetal-blinky"
           - "examples/gd32-spl-blinky"
           - "examples/gd32-w51x-wifi-scan"
+          - "examples/gd32-e503c_start-spl-blinky"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
