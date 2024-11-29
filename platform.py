@@ -22,6 +22,11 @@ from platformio.managers.platform import PlatformBase
 from platformio.util import get_systype
 
 class Gd32Platform(PlatformBase):
+    # provides fixes for GD32E50x. Mac packages are still t.b.d.
+    openocd_gd32 = {
+        "windows_amd64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#windows_x64",
+        "linux_x86_64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#linux_x64",
+    }
 
     def configure_default_packages(self, variables, targets):
         board = variables.get("board")
@@ -29,6 +34,12 @@ class Gd32Platform(PlatformBase):
         build_core = variables.get(
             "board_build.core", board_config.get("build.core", "arduino"))
         build_mcu = variables.get("board_build.mcu", board_config.get("build.mcu", ""))
+
+        sys_type = get_systype()
+        openocd_pkg = "tool-openocd-gd32"
+        # upgrade OpenOCD version if we have a package for it
+        if openocd_pkg in self.packages and sys_type in Gd32Platform.openocd_gd32:
+            self.packages[openocd_pkg]["version"] = Gd32Platform.openocd_gd32[sys_type]
 
         frameworks = variables.get("pioframework", [])
         if "arduino" in frameworks:
