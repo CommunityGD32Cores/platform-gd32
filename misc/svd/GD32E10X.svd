@@ -8,7 +8,7 @@
   <name>CM4</name>
   <revision>r2p1</revision>
   <endian>little</endian>
-  <mpuPresent>1</mpuPresent>
+  <mpuPresent>0</mpuPresent>
   <fpuPresent>1</fpuPresent>
   <nvicPrioBits>4</nvicPrioBits>
   <vendorSystickConfig>0</vendorSystickConfig>
@@ -3154,9 +3154,9 @@
       </addressBlock>
       <registers>
         <register>
-          <name>CTL</name>
-          <displayName>CTL</displayName>
-          <description>control register</description>
+          <name>CTL0</name>
+          <displayName>CTL0</displayName>
+          <description>control register 0</description>
           <addressOffset>0x0</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
@@ -3272,207 +3272,205 @@
           </fields>
         </register>
         <register>
-          <name>DAC0_R12DH</name>
-          <displayName>DAC0_R12DH</displayName>
-          <description>DAC0 12-bit right-aligned data holding register</description>
+          <name>OUT0_R12DH</name>
+          <displayName>OUT0_R12DH</displayName>
+          <description>DACx_OUT0 12-bit right-aligned data holding register </description>
           <addressOffset>0x08</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 12-bit right-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 12-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DAC0_L12DH</name>
-          <displayName>DAC0_L12DH</displayName>
-          <description>DAC0 12-bit left-aligned data holding register</description>
+          <name>OUT0_L12DH</name>
+          <displayName>OUT0_L12DH</displayName>
+          <description>DACx_OUT0 12-bit left-aligned data holding register</description>
           <addressOffset>0x0C</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 12-bit left-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 12-bit left-aligned data</description>
               <bitOffset>4</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DAC0_R8DH</name>
-          <displayName>DAC0_R8DH</displayName>
-          <description>DAC0 8-bit right aligned data holding register</description>
+          <name>OUT0_R8DH</name>
+          <displayName>OUT0_R8DH</displayName>
+          <description>DACx_OUT0 8-bit right-aligned data holding register</description>
           <addressOffset>0x10</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 8-bit right-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 8-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>8</bitWidth>
             </field>
           </fields>
         </register>
        <register>
-          <name>DAC1_R12DH</name>
-          <displayName>DAC1_R12DH</displayName>
-          <description>DAC1 12-bit right-aligned data holding
-          register</description>
+          <name>OUT1_R12DH</name>
+          <displayName>OUT1_R12DH</displayName>
+          <description>DACx_OUT1 12-bit right-aligned data holding register</description>
           <addressOffset>0x14</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 12-bit right-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 12-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DAC1_L12DH</name>
-          <displayName>DAC1_L12DH</displayName>
-          <description>DAC1 12-bit left aligned data holding register</description>
+          <name>OUT1_L12DH</name>
+          <displayName>OUT1_L12DH</displayName>
+          <description>DACx_OUT1 12-bit left-aligned data holding register</description>
           <addressOffset>0x18</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 12-bit left-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 12-bit left-aligned data</description>
               <bitOffset>4</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DAC1_R8DH</name>
-          <displayName>DAC1_R8DH</displayName>
-          <description>DAC1 8-bit right aligned data holding register</description>
+          <name>OUT1_R8DH</name>
+          <displayName>OUT1_R8DH</displayName>
+          <description>DACx_OUT1 8-bit right-aligned data holding register</description>
           <addressOffset>0x1C</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 8-bit right-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 8-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>8</bitWidth>
             </field>
           </fields>
         </register>
        <register>
-          <name>DACC_R12DH</name>
-          <displayName>DACC_R12DH</displayName>
-          <description>DAC concurrent mode 12-bit right-aligned data holding register</description>
+          <name>C_R12DH</name>
+          <displayName>C_R12DH</displayName>
+          <description>DACx concurrent mode 12-bit right-aligned data holding register</description>
           <addressOffset>0x20</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 12-bit right-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 12-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
             <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 12-bit right-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 12-bit right-aligned data</description>
               <bitOffset>16</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DACC_L12DH</name>
-          <displayName>DACC_L12DH</displayName>
-          <description>DAC concurrent mode 12-bit left aligned data holding register</description>
+          <name>C_L12DH</name>
+          <displayName>C_L12DH</displayName>
+          <description>DACx concurrent mode 12-bit left-aligned data holding register</description>
           <addressOffset>0x24</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 12-bit left-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 12-bit left-aligned data</description>
               <bitOffset>4</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
            <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 12-bit left-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 12-bit left-aligned data</description>
               <bitOffset>20</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DACC_R8DH</name>
-          <displayName>DACC_R8DH</displayName>
-          <description>DAC concurrent mode 8-bit right aligned data holding
-          register</description>
+          <name>C_R8DH</name>
+          <displayName>C_R8DH</displayName>
+          <description>DACx concurrent mode 8-bit right-aligned data holding register</description>
           <addressOffset>0x28</addressOffset>
           <size>0x20</size>
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DH</name>
-              <description>DAC0 8-bit right-aligned data</description>
+              <name>OUT0_DH</name>
+              <description>DACx_OUT0 8-bit right-aligned data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>8</bitWidth>
             </field>
             <field>
-              <name>DAC1_DH</name>
-              <description>DAC1 8-bit right-aligned data</description>
+              <name>OUT1_DH</name>
+              <description>DACx_OUT1 8-bit right-aligned data</description>
               <bitOffset>8</bitOffset>
               <bitWidth>8</bitWidth>
             </field>
           </fields>
         </register>
         <register>
-          <name>DAC0_DO</name>
-          <displayName>DAC0_DO</displayName>
-          <description>DAC0 data output register</description>
+          <name>OUT0_DO</name>
+          <displayName>OUT0_DO</displayName>
+          <description>DACx_OUT0 data output register</description>
           <addressOffset>0x2C</addressOffset>
           <size>0x20</size>
           <access>read-only</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC0_DO</name>
-              <description>DAC0 data output</description>
+              <name>OUT0_DO</name>
+              <description>DACx_OUT0 12-bit output data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
           </fields>
         </register>
        <register>
-          <name>DAC1_DO</name>
-          <displayName>DAC1_DO</displayName>
-          <description>DAC1 data output register</description>
+          <name>OUT1_DO</name>
+          <displayName>OUT1_DO</displayName>
+          <description>DACx_OUT1 data output register</description>
           <addressOffset>0x30</addressOffset>
           <size>0x20</size>
           <access>read-only</access>
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
-              <name>DAC1_DO</name>
-              <description>DAC1 data output</description>
+              <name>OUT1_DO</name>
+              <description>DACx_OUT1 12-bit output data</description>
               <bitOffset>0</bitOffset>
               <bitWidth>12</bitWidth>
             </field>
@@ -9624,10 +9622,10 @@
               <access>read-write</access>
               </field>
             <field>
-              <name>PLLMF_5_4</name>
-              <description>Bit 5 and Bit 4 of PLLMF</description>
+              <name>PLLMF_4</name>
+              <description>Bit 4 of PLLMF</description>
               <bitOffset>29</bitOffset>
-              <bitWidth>2</bitWidth>
+              <bitWidth>1</bitWidth>
               <access>read-write</access>
               </field>
             <field>
