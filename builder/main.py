@@ -15,7 +15,7 @@
 import sys
 from platform import system
 from os import makedirs
-from os.path import basename, isdir, join, isfile
+from os.path import basename, isdir, join, isfile, realpath
 import re
 
 from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
@@ -404,8 +404,9 @@ elif upload_protocol == "gdlinkcli":
         script_path = join(build_dir, "upload.gdlinkcli")
         # halt, load binary, reset, quit.
         commands = [
-            "h", 
-            "loadbin %s %s" % (source, board.get(
+            "c 0", # use first GDLink device
+            "h",
+            "load %s %s" % (source, board.get(
                 "upload.offset_address", "0x08000000")),
             "r",
             "q"

@@ -78,10 +78,20 @@ class GD32MCUInfo:
         "GD32E230": "GD32E23x",
         "GD32E231": "GD32E23x",
         "GD32E232": "GD32E23x", # MCU not yet available
+        "GD32E501": "GD32E50x",
+        "GD32E502": "GD32E50x",
         "GD32E503": "GD32E50x", # uppercase X is in macro (specially handled) but all folder names user lowercase x
         "GD32E505": "GD32E50x",
         "GD32E507": "GD32E50x",
         "GD32E508": "GD32E50x",  # listed in SPL header but no chip listed yet..
+        "GD32E513": "GD32E51x",
+        "GD32E517": "GD32E51x",
+        "GD32E518": "GD32E51x",
+        "GD32EPRT": "GD32EPRT",
+        "GD32G553": "GD32G55x",
+        "GD32A503": "GD32A50X",
+        "GD32A513": "GD32A51X",
+        "GD32F527": "GD32F5xx",
         "GD32L233": "GD32L23x",
         "GD32C103": "GD32C10X", # uppercase X wanted
         "GD32W515": "GD32W51x"
@@ -290,7 +300,7 @@ class GD32MCUInfo:
         self.infer_mbedos_variant()
         self.infer_openocd_target()
         self.infer_usb_dfu_supported()
-        self.mcu_url = f"https://www.gigadevice.com/microcontroller/{self.name.lower()}/"
+        self.mcu_url = f"https://www.gigadevice.com/product/mcu/mcus-product-selector/{self.name.lower()}/"
 
     def set_val_if_exists(self, d, key, val):
         if val is not None:
@@ -478,7 +488,13 @@ def read_csv(filename, core_type) -> List[GD32MCUInfo]:
         csv_reader_object = csv.DictReader(csvfile, delimiter=',')
         for row in csv_reader_object:
             print(row)
-            mcu = GD32MCUInfo(row["Part No."], row["Series"], int(row["Speed"]), int(row["Flash"][:-1]), int(row["SRAM"][:-1]), core_type)
+            part_no = row["Part No."] if "Part No." in row else row["Part No"]
+            max_speed = row["Speed"] if "Speed" in row else row["Max Speed (MHz)"]
+            flash_kb = row["Flash"] if "Flash" in row else row["Flash (Bytes)"]
+            sram_kb = row["SRAM"] if "SRAM" in row else row["SRAM (Bytes)"]
+            if "+" in sram_kb:
+                sram_kb = str(int(eval(sram_kb.lower().replace("k", "*1024").replace("mb", "*1024*1024")))//1024) + "k"
+            mcu = GD32MCUInfo(part_no, row["Series"], int(max_speed), int(flash_kb[:-1]), int(sram_kb[:-1]), core_type)
             mcus.append(mcu)
     return mcus
 
@@ -515,7 +531,7 @@ def main():
     # (the GD32E23x.h only accepts E230 or E231, not E232).
     # these are probabl "upcoming" MCUs. 
     # filter them from the list for now.
-    mcus = list(filter(lambda x: x.series != "GD32E232", mcus))
+    mcus = list(filter(lambda x: x.series not in ("GD32E232", "GD32G553"), mcus))
     #return
     print_board_files_mcus = ["GD32F405RG"]
 
