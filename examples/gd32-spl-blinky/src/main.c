@@ -37,9 +37,9 @@
 #define LEDPIN      GPIO_PIN_1
 #define LED_CLOCK   RCU_GPIOA
 #else
-#define LEDPORT     GPIOC
-#define LEDPIN      GPIO_PIN_0
-#define LED_CLOCK   RCU_GPIOC
+#define LEDPORT     GPIOA
+#define LEDPIN      GPIO_PIN_5
+#define LED_CLOCK   RCU_GPIOA
 #endif
 
 void systick_config(void);

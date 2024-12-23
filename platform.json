@@ -47,6 +47,13 @@
       "description": "GD32W51x WIFI SDK",
       "homepage": "http://www.gd32mcu.com/en/download/0?kw=GD32W5",
       "title": "WiFi SDK"
+    },
+    "zephyr": {
+      "package": "framework-zephyr",
+      "script": "builder/frameworks/zephyr.py",
+      "description": "The Zephyr Project is a scalable real-time operating system (RTOS) supporting multiple hardware architectures, optimized for resource constrained devices, and built with safety and security in mind",
+      "homepage": "https://www.zephyrproject.org",
+      "title": "Zephyr RTOS"
     }
   },
   "packages": {
@@ -87,6 +94,12 @@
       "owner": "maxgerhardt",
       "version": "https://github.com/CommunityGD32Cores/gd32-pio-wifi-sdk.git"
     },
+    "framework-zephyr": {
+      "type": "framework",
+      "optional": true,
+      "owner": "platformio",
+      "version": "https://github.com/CommunityGD32Cores/zephyr.git"
+    },
     "tool-sreccat": {
       "owner": "platformio",
       "version": "~1.164.0",
@@ -121,6 +134,26 @@
       "optional": true,
       "owner": "platformio",
       "version": "~1.9.190708"
+    },
+    "tool-cmake": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "~3.21.0"
+    },
+    "tool-dtc": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "~1.4.7"
+    },
+    "tool-ninja": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "^1.7.0"
+    },
+    "tool-gperf": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "^3.0.0"
     }
   }
 }

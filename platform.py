@@ -15,6 +15,7 @@
 import copy
 import json
 import os
+import sys
 
 from platform import system
 
@@ -56,7 +57,14 @@ class Gd32Platform(PlatformBase):
             self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
         if "wifi-sdk" in frameworks:
             self.packages["tool-sreccat"]["optional"] = False
-
+        if "zephyr" in variables.get("pioframework", []):
+            for p in self.packages:
+                if p in ("tool-cmake", "tool-dtc", "tool-ninja"):
+                    self.packages[p]["optional"] = False
+            self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.120301.0"
+            IS_WINDOWS = sys.platform.startswith("win")
+            if not IS_WINDOWS:
+                self.packages["tool-gperf"]["optional"] = False
         # include or exclude other packages for different frameworks.. 
 
         default_protocol = board_config.get("upload.protocol") or ""

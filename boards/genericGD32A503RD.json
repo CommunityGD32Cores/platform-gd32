@@ -6,7 +6,10 @@
     "f_cpu": "100000000L",
     "mcu": "gd32a503rdt3",
     "spl_series": "GD32A50X",
-    "series": "GD32A503"
+    "series": "GD32A503",
+    "zephyr": {
+      "variant": "gd32a503v_eval"
+   }
   },
   "debug": {
     "jlink_device": "GD32A503RD",
@@ -21,14 +24,15 @@
     ]
   },
   "frameworks": [
-    "spl"
+    "spl",
+    "zephyr"
   ],
   "name": "GD32A503RD (48k RAM, 384k Flash)",
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 49152,
     "maximum_size": 393216,
-    "protocol": "stlink",
+    "protocol": "gdlinkcli",
     "protocols": [
       "jlink",
       "cmsis-dap",

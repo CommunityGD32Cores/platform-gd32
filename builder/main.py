@@ -189,6 +189,12 @@ if "wifi-sdk" in pioframework:
         join("frameworks", "wifi-sdk-pre.py"),
         exports={"env": env}
     )
+if "zephyr" in pioframework:
+    env.SConscript(
+        join(platform.get_package_dir(
+            "framework-zephyr"), "scripts", "platformio", "platformio-build-pre.py"),
+        exports={"env": env}
+    )
 
 target_elf = None
 if "nobuild" in COMMAND_LINE_TARGETS:
@@ -197,6 +203,11 @@ if "nobuild" in COMMAND_LINE_TARGETS:
 else:
     target_elf = env.BuildProgram()
     target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
+
+    if "zephyr" in pioframework and "mcuboot-image" in COMMAND_LINE_TARGETS:
+        target_firm = env.MCUbootImage(
+            join("$BUILD_DIR", "${PROGNAME}.mcuboot.bin"), target_firm)
+
     env.Depends(target_firm, "checkprogsize")
 
 # replace target_firm variable with *combined* .bin image
