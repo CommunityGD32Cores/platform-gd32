@@ -39,6 +39,7 @@ class GD32MCUInfo:
         self.compile_flags = None
         self.arduino_variant = None
         self.mbedos_variant = None
+        self.zephyr_variant = None
         self.usb_dfu_supported = False
         self.openocd_target = None
         self.hwids = None
@@ -123,7 +124,12 @@ class GD32MCUInfo:
         "GD32F450ZIT6": "GD32_F450ZI",
         "GD32E103VBT6": "GD32_E103VB",
         "GD32F307VGT6": "GD32_F307VG"
-    }   
+    }
+
+    known_zephyr_variants = {
+       "GD32A503RDT3": "gd32a503v_eval", # just for testing, works on this chip too
+       "GD32A503VDT3": "gd32a503v_eval" # intended target chip
+    }
 
     # stm32duino bootloader hwid's PID/VID
     leaf_hwids = [
@@ -242,6 +248,10 @@ class GD32MCUInfo:
         if self.name in GD32MCUInfo.known_mbedos_variants:
             self.mbedos_variant =  GD32MCUInfo.known_mbedos_variants[self.name]
 
+    def infer_zephyr_variant(self):
+        if self.name in GD32MCUInfo.known_zephyr_variants:
+            self.zephyr_variant =  GD32MCUInfo.known_zephyr_variants[self.name]
+
     def infer_openocd_target(self):
         if self.spl_series in GD32MCUInfo.spl_series_to_openocd_target:
             self.openocd_target = GD32MCUInfo.spl_series_to_openocd_target[self.spl_series]
@@ -298,6 +308,7 @@ class GD32MCUInfo:
         self.infer_compile_flags()
         self.infer_arduino_variant()
         self.infer_mbedos_variant()
+        self.infer_zephyr_variant()
         self.infer_openocd_target()
         self.infer_usb_dfu_supported()
         self.mcu_url = f"https://www.gigadevice.com/product/mcu/mcus-product-selector/{self.name.lower()}/"
@@ -368,10 +379,17 @@ class GD32MCUInfo:
         self.set_val_if_exists(board["build"], "variant", self.arduino_variant)
         self.add_val_to_arr_if_true(board, "frameworks", self.arduino_variant != None, "arduino")
         self.add_val_to_arr_if_true(board, "frameworks", self.mbedos_variant != None, "mbed")
+        self.add_val_to_arr_if_true(board, "frameworks", self.zephyr_variant != None, "zephyr")
         self.add_val_to_arr_if_true(board, "frameworks", self.spl_series.startswith("GD32W51x"), "wifi-sdk")
         self.set_val_if_exists(board["build"], "mbed_variant", self.mbedos_variant)
+        if "zephyr" in board["frameworks"]:
+            board["build"]["zephyr"] = { "variant": self.zephyr_variant }
         self.add_val_to_arr_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
         self.set_val_if_exists(board["upload"], "closely_coupled_ram_size", self.core_coupled_memory_kb * 1024 if self.core_coupled_memory_kb != 0 else None)
+
+        # not supported in OpenOCD yet
+        if self.name.startswith("GD32A50"):
+            board["upload"]["protocol"] = "gdlinkcli"
 
         board_def = json.dumps(board, indent=2)
         return output_filename, board_def

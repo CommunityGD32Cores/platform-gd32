@@ -4,7 +4,7 @@
     "cpu": "cortex-m33",
     "extra_flags": "-DGD32A5 -DGD32A503 -DGD32A50X",
     "f_cpu": "100000000L",
-    "mcu": "gd32a503rdt3",
+    "mcu": "gd32a503vdt3",
     "spl_series": "GD32A50X",
     "series": "GD32A503",
     "zephyr": {
@@ -12,7 +12,7 @@
     }
   },
   "debug": {
-    "jlink_device": "GD32A503RD",
+    "jlink_device": "GD32A503VD",
     "openocd_target": "unknown",
     "svd_path": "GD32A50X.svd",
     "default_tools": [
@@ -27,7 +27,7 @@
     "spl",
     "zephyr"
   ],
-  "name": "GD32A503RD (48k RAM, 384k Flash)",
+  "name": "GD32A503VD (48k RAM, 384k Flash)",
   "upload": {
     "disable_flushing": false,
     "maximum_ram_size": 49152,
@@ -46,6 +46,6 @@
     "use_1200bps_touch": false,
     "wait_for_upload_port": false
   },
-  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32a503rdt3/",
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32a503vdt3/",
   "vendor": "GigaDevice"
 }
