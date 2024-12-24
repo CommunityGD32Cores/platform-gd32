@@ -112,6 +112,7 @@ class GD32MCUInfo:
         "GD32L23x": "gd32e23x", # works per user comment
         "GD32C10X": "stm32f4x",  # try Cortex-M4 compatible target
         "GD32W51x": "gd32e50x", # buest guess with Cortex-M33
+        "GD32A50X": "stm32f1x", # no flashing supported
     }
 
     known_arduino_variants = {

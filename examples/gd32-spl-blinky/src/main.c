@@ -61,9 +61,9 @@ int main(void)
     while (1)
     {
         gpio_bit_set(LEDPORT, LEDPIN);
-        delay_1ms(100);
+        delay_1ms(1000);
         gpio_bit_reset(LEDPORT, LEDPIN);
-        delay_1ms(100);
+        delay_1ms(1000);
     }
 }
 

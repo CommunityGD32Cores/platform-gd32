@@ -10,7 +10,7 @@
   },
   "debug": {
     "jlink_device": "GD32A503KB",
-    "openocd_target": "unknown",
+    "openocd_target": "stm32f1x",
     "svd_path": "GD32A50X.svd",
     "default_tools": [
       "stlink"

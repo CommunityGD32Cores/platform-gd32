@@ -166,7 +166,7 @@ class Gd32Platform(PlatformBase):
                     ])
                     if str(debug.get("rtos", "no")) in ("true", "yes", "1"):
                         server_args.extend([
-                            "-c", "$_TARGETNAME configure -rtos FreeRTOS"
+                            "-c", "$_TARGETNAME configure -rtos auto"
                         ])
                     server_args.extend(debug.get("openocd_extra_args", []))
 
