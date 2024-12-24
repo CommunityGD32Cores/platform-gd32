@@ -98,7 +98,7 @@
       "type": "framework",
       "optional": true,
       "owner": "platformio",
-      "version": "https://github.com/CommunityGD32Cores/zephyr.git"
+      "version": "https://github.com/CommunityGD32Cores/zephyr.git#v4.0-branch-package"
     },
     "tool-sreccat": {
       "owner": "platformio",
