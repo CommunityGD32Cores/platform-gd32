@@ -25,7 +25,7 @@ from platformio.util import get_systype
 class Gd32Platform(PlatformBase):
     # provides fixes for GD32E50x. Mac packages are still t.b.d.
     openocd_gd32 = {
-        "windows_amd64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#windows_x64",
+        "windows_amd64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#windows_x64_gigadevice",
         "linux_x86_64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#linux_x64",
     }
 
@@ -164,12 +164,11 @@ class Gd32Platform(PlatformBase):
                     server_args.extend([
                         "-f", "target/%s.cfg" % debug.get("openocd_target")
                     ])
-                    if str(debug.get("rtos", "no")) in ("true", "yes", "1"):
-                        server_args.extend([
-                            "-c", "$_TARGETNAME configure -rtos auto"
-                        ])
+                    # Always try and detect any RTOS
+                    server_args.extend([
+                        "-c", "$_TARGETNAME configure -rtos auto"
+                    ])
                     server_args.extend(debug.get("openocd_extra_args", []))
-
                 debug["tools"][link] = {
                     "server": {
                         "package": "tool-openocd-gd32",

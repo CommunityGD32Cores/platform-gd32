@@ -10,7 +10,7 @@
   },
   "debug": {
     "jlink_device": "GD32H737ZM",
-    "openocd_target": "stm32f1x",
+    "openocd_target": "gd32h7xx",
     "svd_path": "GD32H7XX.svd",
     "default_tools": [
       "cmsis-dap"
@@ -29,7 +29,7 @@
     "maximum_ram_size": 327680,
     "maximum_size": 3932160,
     "ram_start": "0x24000000",
-    "protocol": "gdlinkcli",
+    "protocol": "cmsis-dap",
     "protocols": [
       "jlink",
       "cmsis-dap",
