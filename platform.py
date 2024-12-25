@@ -166,7 +166,7 @@ class Gd32Platform(PlatformBase):
                     ])
                     # Always try and detect any RTOS
                     server_args.extend([
-                        "-c", "$_TARGETNAME configure -rtos auto"
+                        "-c", "%s.cpu configure -rtos auto" % (debug.get("openocd_target"))
                     ])
                     server_args.extend(debug.get("openocd_extra_args", []))
                 debug["tools"][link] = {
