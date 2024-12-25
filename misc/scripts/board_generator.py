@@ -95,7 +95,11 @@ class GD32MCUInfo:
         "GD32F527": "GD32F5xx",
         "GD32L233": "GD32L23x",
         "GD32C103": "GD32C10X", # uppercase X wanted
-        "GD32W515": "GD32W51x"
+        "GD32W515": "GD32W51x",
+        "GD32H75E": "GD32H75E",
+        "GD32H737": "GD32H7XX",
+        "GD32H757": "GD32H7XX",
+        "GD32H759": "GD32H7XX",
     }
 
     spl_series_to_openocd_target = {
@@ -113,6 +117,7 @@ class GD32MCUInfo:
         "GD32C10X": "stm32f4x",  # try Cortex-M4 compatible target
         "GD32W51x": "gd32e50x", # buest guess with Cortex-M33
         "GD32A50X": "stm32f1x", # no flashing supported
+        "GD32H7XX": "stm32f1x", # no flashing supported
     }
 
     known_arduino_variants = {
@@ -385,6 +390,16 @@ class GD32MCUInfo:
         self.set_val_if_exists(board["build"], "mbed_variant", self.mbedos_variant)
         if "zephyr" in board["frameworks"]:
             board["build"]["zephyr"] = { "variant": self.zephyr_variant }
+        # special memory layout on H7xx forces this
+        # we can have one contiguous 1MB region with this instead of a split
+        if self.spl_series.lower().startswith("gd32h7xx"):
+            # default option bytes set for 64K ITCM, 128K DTCM, 320K AXI SRAM
+            # temporarily set it to 320K until we figure out how to all of it as well as possible
+            # weird crashes otherwise. Find out if we actuall have 1MB of SRAM..
+            board["upload"]["maximum_ram_size"] = 320*1024
+            board["upload"]["ram_start"] = "0x24000000" # start of AXI SRAM (max 512K)
+            # note: 0x20000000 is regular DTCM (128K by default)
+            # note: 0x24080000 is all shared RAM (ITCM/DTCM/AXI), first 64K belongs to ITCM
         self.add_val_to_arr_if_true(board["upload"], "protocols", self.usb_dfu_supported, "dfu")
         self.set_val_if_exists(board["upload"], "closely_coupled_ram_size", self.core_coupled_memory_kb * 1024 if self.core_coupled_memory_kb != 0 else None)
 
@@ -527,6 +542,7 @@ def read_all_known_mcus() -> List[GD32MCUInfo]:
     mcus = []
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m4_devs.csv"), "cortex-m4")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m3_devs.csv"), "cortex-m3")
+    mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m7_devs.csv"), "cortex-m7")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m23_devs.csv"), "cortex-m23")
     mcus += read_csv(os.path.join(this_script_path, "gd32_cortex_m33_devs.csv"), "cortex-m33")
     return mcus

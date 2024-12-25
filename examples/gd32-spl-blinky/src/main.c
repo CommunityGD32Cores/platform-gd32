@@ -26,6 +26,8 @@
 #include "gd32w51x.h"
 #elif defined(GD32C10X)
 #include "gd32c10x.h"
+#elif defined(GD32H7XX)
+#include "gd32h7xx.h"
 #else
 #error "Unknown chip series"
 #endif
@@ -36,10 +38,20 @@
 #define LEDPORT     GPIOA
 #define LEDPIN      GPIO_PIN_1
 #define LED_CLOCK   RCU_GPIOA
-#else
-#define LEDPORT     GPIOA
+#elif defined(GD32A503R_START)
+#define LEDPORT     GPIOA // for A503
 #define LEDPIN      GPIO_PIN_5
 #define LED_CLOCK   RCU_GPIOA
+#else
+#define LEDPORT     GPIOE // for H757Z
+#define LEDPIN      GPIO_PIN_5
+#define LED_CLOCK   RCU_GPIOE
+#endif
+
+#if defined(GD32H7XX)
+#define GPIO_SPEED GPIO_OSPEED_12MHZ
+#else 
+#define GPIO_SPEED GPIO_OSPEED_2MHZ
 #endif
 
 void systick_config(void);
@@ -52,9 +64,9 @@ int main(void)
     rcu_periph_clock_enable(LED_CLOCK);
 
     /* set output as output */
-#if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x) || defined(GD32L23x) || defined(GD32W51x) || defined(GD32A50X)
+#if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x) || defined(GD32L23x) || defined(GD32W51x) || defined(GD32A50X) || defined(GD32H7XX)
     gpio_mode_set(LEDPORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LEDPIN);
-    gpio_output_options_set(LEDPORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, LEDPIN);
+    gpio_output_options_set(LEDPORT, GPIO_OTYPE_PP, GPIO_SPEED, LEDPIN);
 #else /* valid for GD32F10x, GD32E20x, GD32F30x, GD32F403, GD32E10X, GD32C10X */
     gpio_init(LEDPORT, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, LEDPIN);
 #endif

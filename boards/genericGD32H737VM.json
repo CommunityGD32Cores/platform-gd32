@@ -1,0 +1,48 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m7",
+    "extra_flags": "-DGD32H7 -DGD32H737 -DGD32H7XX",
+    "f_cpu": "600000000L",
+    "mcu": "gd32h737vmt6",
+    "spl_series": "GD32H7XX",
+    "series": "GD32H737"
+  },
+  "debug": {
+    "jlink_device": "GD32H737VM",
+    "openocd_target": "stm32f1x",
+    "svd_path": "GD32H7XX.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32H737VM (1024k RAM, 3840k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 327680,
+    "maximum_size": 3932160,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false,
+    "ram_start": "0x24000000"
+  },
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32h737vmt6/",
+  "vendor": "GigaDevice"
+}

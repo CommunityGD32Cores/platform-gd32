@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m7",
+    "extra_flags": "-DGD32H7 -DGD32H75E -DGD32H75E",
+    "f_cpu": "600000000L",
+    "mcu": "gd32h75eymj6b",
+    "spl_series": "GD32H75E",
+    "series": "GD32H75E"
+  },
+  "debug": {
+    "jlink_device": "GD32H75EYMJ",
+    "openocd_target": "unknown",
+    "svd_path": "GD32H75E.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32H75EYMJ (1024k RAM, 3840k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 1048576,
+    "maximum_size": 3932160,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32h75eymj6b/",
+  "vendor": "GigaDevice"
+}

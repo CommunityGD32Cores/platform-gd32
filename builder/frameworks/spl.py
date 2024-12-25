@@ -87,6 +87,7 @@ def get_linker_script(mcu):
                             "ldscripts", mcu[:-2].upper() + "_DEFAULT.ld")
 
     ram = board.get("upload.maximum_ram_size", 0)
+    ram_start = str(board.get("upload.ram_start", "0x20000000"))
     ccram = board.get("upload.closely_coupled_ram_size", 0)
     flash = board.get("upload.maximum_size", 0)
     flash_start = int(board.get("upload.offset_address", "0x8000000"), 0)
@@ -96,7 +97,8 @@ def get_linker_script(mcu):
     with open(template_file) as fp:
         data = Template(fp.read())
         content = data.substitute(
-            stack=hex(0x20000000 + ram), # 0x20000000 - start address for RAM
+            stack=hex(int(ram_start, base=0) + ram), # 0x20000000 - usual start address for RAM
+            ramstart=ram_start,
             ram=str(int(ram/1024)) + "K",
             ccram=str(int(ccram/1024)) + "K", # Closely coupled RAM - not all parts have this
             flash=str(int(flash/1024)) + "K",
@@ -265,12 +267,19 @@ def configure_floatingpoint(board):
     should_use_cm33_hardfloat = str(should_use_cm33_hardfloat).lower() in ("1", "yes", "true")
     should_use_cm4_hardfloat = board.get("build.cm4_hardfloat", False)
     should_use_cm4_hardfloat = str(should_use_cm4_hardfloat).lower() in ("1", "yes", "true")
+    should_use_cm7_hardfloat = board.get("build.cm7_hardfloat", False)
+    should_use_cm7_hardfloat = str(should_use_cm7_hardfloat).lower() in ("1", "yes", "true")
     # deduce flags
     board_cpu = board.get('build.cpu', "")
     core_type_to_fpu_flags = {
         "cortex-m33": [
             "-mfloat-abi=%s" % ("hard" if should_use_cm33_hardfloat else "softfp") , 
-            "-march=armv8-m.main+dsp+fp" # E50x and W51x all have DSP + FPU
+            "-mfpu=auto" # E50x and W51x all have DSP + FPU
+        ],
+        "cortex-m7": [
+            "-mfloat-abi=%s" % ("hard" if should_use_cm7_hardfloat else "softfp") , 
+            "-mfpu=fpv5-sp-d16", # e.g. GD32H7xx
+            "-march=armv7e-m+fpv5+fp.dp",
         ],
         "cortex-m4": [
             "-mfloat-abi=%s" % ("hard" if should_use_cm4_hardfloat else "softfp") , 
