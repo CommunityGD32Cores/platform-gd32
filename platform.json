@@ -67,6 +67,11 @@
         "~1.90201.0"
       ]
     },
+    "toolchain-riscv-nuclei": {
+      "type": "toolchain",
+      "optional": true,
+      "version": "https://github.com/CommunityGD32Cores/toolchain-riscv-nuclei.git#windows_x64"
+    },
     "framework-mbed": {
       "type": "framework",
       "optional": true,

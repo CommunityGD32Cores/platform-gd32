@@ -17,6 +17,7 @@
 #
 
 from SCons.Script import DefaultEnvironment
+from os.path import join
 
 env = DefaultEnvironment()
 
@@ -27,8 +28,7 @@ env.Append(
         "-Os",  # optimize for size
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
-        "-Wall",
-        "-mthumb"
+        "-Wall"
     ],
 
     CXXFLAGS=[
@@ -44,22 +44,50 @@ env.Append(
 
     LINKFLAGS=[
         "-Os",
-        "-Wl,--gc-sections,--relax",
-        "-mthumb"
+        '-Wl,-Map="%s"' % join("${BUILD_DIR}", "${PROGNAME}.map"),
+        "-Wl,--gc-sections,--relax"
     ],
 
     LIBS=["c", "gcc", "m", "stdc++"]
 )
 
 if "BOARD" in env:
-    env.Append(
-        CCFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
-        ],
-        LINKFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
-        ]
-    )
+    board = env.BoardConfig()
+    is_riscv = board.get("build.mcu", "").startswith("gd32vw")
+
+    if is_riscv:
+        env.Append(
+            CCFLAGS=[
+                "-march=%s" % board.get("build.cpu"),
+                "-mabi=ilp32"
+            ],
+            LINKFLAGS=[
+                "-march=%s" % board.get("build.cpu"),
+                "-mabi=ilp32",
+                "-nostartfiles",
+                "-Wl,--no-warn-rwx-segments"
+            ]
+        )
+    else: #arm
+        env.Append(
+            CCFLAGS=[
+                "-mcpu=%s" % board.get("build.cpu"),
+                "-mthumb"
+            ],
+            LINKFLAGS=[
+                "-mcpu=%s" % board.get("build.cpu"),
+                "-mthumb"
+            ]
+        )
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
+
+# create .lst file
+env.AddPostAction(
+    "$BUILD_DIR/${PROGNAME}.elf",
+    env.VerboseAction(" ".join([
+        "$OBJDUMP", "-drwC",
+        "$BUILD_DIR/${PROGNAME}.elf", ">", "$BUILD_DIR/${PROGNAME}.lst"
+    ]), "Building .pio/build/$PIOENV/${PROGNAME}.lst")
+)

@@ -32,6 +32,8 @@ board = env.BoardConfig()
 
 env.SConscript("_bare.py")
 
+is_riscv = board.get("build.mcu", "").startswith("gd32vw")
+
 def get_flag_value(flag_name:str, default_val:bool):
     flag_val = board.get("build.%s" % flag_name, default_val)
     flag_val = str(flag_val).lower() in ("1", "yes", "true")
@@ -143,10 +145,14 @@ def get_startup_filename(board):
             startup_file = f"startup_{spl_series.lower()}.S" 
     return startup_file
 
+if is_riscv:
+    core_path = join(FRAMEWORK_DIR, spl_chip_type, "cmsis", "cores", "gd32_riscv", "drivers")
+else: #arm
+    core_path = join(FRAMEWORK_DIR, spl_chip_type, "cmsis", "cores", spl_chip_type)
+
 env.Append(
     CPPPATH=[
-        join(FRAMEWORK_DIR, spl_chip_type,
-             "cmsis", "cores", spl_chip_type),
+        core_path,
         join(FRAMEWORK_DIR, spl_chip_type,
              "cmsis", "startup_files"),
         join(FRAMEWORK_DIR, spl_chip_type, "cmsis",
@@ -178,14 +184,6 @@ process_standard_library_configuration(cpp_defines)
 extra_flags = board.get("build.extra_flags", "")
 src_filter_patterns = ["+<*>"]
 # could come in handy later to exclude certain files, not needed / trigger now
-if "STM32F40_41xxx" in extra_flags:
-    src_filter_patterns += ["-<stm32f4xx_fmc.c>"]
-if "STM32F427_437xx" in extra_flags:
-    src_filter_patterns += ["-<stm32f4xx_fsmc.c>"]
-elif "STM32F303xC" in extra_flags:
-    src_filter_patterns += ["-<stm32f30x_hrtim.c>"]
-elif "STM32L1XX_MD" in extra_flags:
-    src_filter_patterns += ["-<stm32l1xx_flash_ramfunc.c>"]
 
 libs = []
 

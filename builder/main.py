@@ -104,15 +104,19 @@ env.SConscript("compat.py", exports="env")
 platform = env.PioPlatform()
 board = env.BoardConfig()
 
+is_riscv = board.get("build.mcu", "").startswith("gd32vw")
+toolchain_triple = "arm-none-eabi" if not is_riscv else "riscv64-unknown-elf"
+
 env.Replace(
-    AR="arm-none-eabi-gcc-ar",
-    AS="arm-none-eabi-as",
-    CC="arm-none-eabi-gcc",
-    CXX="arm-none-eabi-g++",
-    GDB="arm-none-eabi-gdb",
-    OBJCOPY="arm-none-eabi-objcopy",
-    RANLIB="arm-none-eabi-gcc-ranlib",
-    SIZETOOL="arm-none-eabi-size",
+    AR="%s-gcc-ar" % toolchain_triple,
+    AS="%s-as" % toolchain_triple,
+    CC="%s-gcc" % toolchain_triple,
+    CXX="%s-g++" % toolchain_triple,
+    GDB="%s-gdb" % toolchain_triple,
+    OBJCOPY="%s-objcopy" % toolchain_triple,
+    OBJDUMP="%s-objdump" % toolchain_triple,
+    RANLIB="%s-gcc-ranlib" % toolchain_triple,
+    SIZETOOL="%s-size" % toolchain_triple,
 
     ARFLAGS=["rc"],
 

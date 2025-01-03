@@ -28,15 +28,26 @@ class Gd32Platform(PlatformBase):
         "windows_amd64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#windows_x64_gigadevice",
         "linux_x86_64": "https://github.com/CommunityGD32Cores/tool-openocd-gd32.git#linux_x64",
     }
+    toolchain_riscv = {
+        "windows_amd64": "https://github.com/CommunityGD32Cores/toolchain-riscv-nuclei.git#windows_x64",
+        "linux_x86_64": "https://github.com/CommunityGD32Cores/toolchain-riscv-nuclei.git#linux_x64"
+    }
 
     def configure_default_packages(self, variables, targets):
         board = variables.get("board")
         board_config = self.board_config(board)
         build_core = variables.get(
             "board_build.core", board_config.get("build.core", "arduino"))
-        build_mcu = variables.get("board_build.mcu", board_config.get("build.mcu", ""))
+        build_mcu:str = variables.get("board_build.mcu", board_config.get("build.mcu", ""))
 
         sys_type = get_systype()
+        is_riscv = build_mcu.startswith("gd32vw")
+        if is_riscv:
+            del self.packages["toolchain-gccarmnoneeabi"]
+            self.packages["toolchain-riscv-nuclei"]["optional"] = False
+            if sys_type in Gd32Platform.toolchain_riscv: 
+                self.packages["toolchain-riscv-nuclei"]["version"] = Gd32Platform.toolchain_riscv[sys_type]
+
         openocd_pkg = "tool-openocd-gd32"
         # upgrade OpenOCD version if we have a package for it
         if openocd_pkg in self.packages and sys_type in Gd32Platform.openocd_gd32:

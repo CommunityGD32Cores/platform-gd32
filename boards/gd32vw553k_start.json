@@ -1,0 +1,50 @@
+{
+  "build": {
+    "core": "n307fd",
+    "f_cpu": "160000000L",
+    "cpu": "rv32imac_zba_zbb_zbc_zbs_xxldspn1x",
+    "hwids": [
+      [
+        "0x0403",
+        "0x6010"
+      ]
+    ],
+    "arch_ext": "_zba_zbb_zbc_zbs_xxldspn1x",
+    "soc": "gd32vw55x",
+    "mcu": "gd32vw553kmq6",
+    "download": "flashxip",
+    "ldscript": "",
+    "download_modes": [
+      "flashxip",
+      "sram"
+    ],
+    "spl_series": "GD32VW55x",
+    "series": "GD32VW55x"
+  },
+  "debug": {
+    "jlink_device": "GD32VW553HM",
+    "svd_path": "GD32VW55X.svd",
+    "openocd_target": "gd32vw55x.cfg",
+    "onboard_tools": [
+      "gd-link"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32VW553K-START Board",
+  "upload": {
+    "maximum_ram_size": 294912,
+    "maximum_size": 2097152,
+    "flash_start": "0x08000000",
+    "sram_start": "0x20000000",
+    "protocol": "gdlinkcli",
+    "protocols": [
+      "cmsis-dap",
+      "jlink",
+      "gdlinkcli"
+    ]
+  },
+  "url": "https://www.gigadevice.com/product/mcu/risc-v",
+  "vendor": "GigaDevice"
+}
