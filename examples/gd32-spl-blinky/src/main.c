@@ -42,10 +42,14 @@
 #define LEDPORT     GPIOA // for A503
 #define LEDPIN      GPIO_PIN_5
 #define LED_CLOCK   RCU_GPIOA
-#else
+#elif defined(GD32H757Z_START)
 #define LEDPORT     GPIOE // for H757Z
 #define LEDPIN      GPIO_PIN_5
 #define LED_CLOCK   RCU_GPIOE
+#else
+#define LEDPORT     GPIOA
+#define LEDPIN      GPIO_PIN_5
+#define LED_CLOCK   RCU_GPIOA
 #endif
 
 #if defined(GD32H7XX)
