@@ -63,15 +63,18 @@ def main_func():
         # "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F170xx_Datasheet_Rev2.1.pdf",
         # "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
         # "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
-        "~/gd32-pdf/GD32F103xx-Datasheet-Rev-2.7.pdf"
+        #"~/gd32-pdf/GD32F103xx-Datasheet-Rev-2.7.pdf"
+        "C:\\Users\\Max\\Desktop\\GD32F303xx_Datasheet_Rev1.9.pdf",
     ]
     for datasheet_pdf_path in datasheet_pdf_paths:
         device_pinmap = load_pinmap(datasheet_pdf_path)
-        if device_pinmap is None or "--no-load-preparsed" in sys.argv:
+        if device_pinmap is None or "--no-load-preparsed" in sys.argv or True:
             device_pinmap = GD32DatasheetParser.get_pinmap_for_pdf(datasheet_pdf_path)
             save_pinmap(device_pinmap)
             #return          
         all_matching_mcus = get_all_mcus_matching_pinmap(all_mcus, device_pinmap)
+        print("Matching MCUs for pinmap \"%s\": %s" % (device_pinmap.series, str([m.name_no_package for m in all_matching_mcus])))
+        #exit(0)
         GD32PinMapGenerator.generate_from_pinmap(device_pinmap, all_matching_mcus)
 if __name__ == "__main__":
     main_func()

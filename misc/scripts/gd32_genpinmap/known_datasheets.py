@@ -339,8 +339,15 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
     "GD32F303xx_Datasheet_Rev1.9.pdf" : DatasheetParsingInfo(
         alternate_funcs = [],
         pin_defs = [
+            # GD32F303Zx
+            DatasheetPinDefPageParsingInfo([20,21,22,23,24,25,26,27], "GD32F303Zx", "LQFP144", [ParseUsingAreaQuirk((81.484,123.157,773.544,535.416))], {"3":FootnoteAvailabilityInfo(["GD32F303ZG", "GD32F303ZI", "GD32F303ZK"])}),
+            # GD32F303Vx
+            DatasheetPinDefPageParsingInfo([29,30,31,32,33,34], "GD32F303Vx", "LQFP100", [ParseUsingAreaQuirk((81.484,123.157,773.544,535.416))], {"3":FootnoteAvailabilityInfo(["GD32F303VG", "GD32F303VI", "GD32F303VK"])}),
             # GD32F303Cx
-            DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))], {"3":["GD32F303CG"]}),
+            DatasheetPinDefPageParsingInfo([39], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((130.572,123.132,759.252,531.588))], {"3":FootnoteAvailabilityInfo(["GD32F303CG"])}),
+            DatasheetPinDefPageParsingInfo([40,41], "GD32F303Cx", "LQFP48", [ParseUsingAreaQuirk((81.484,123.157,773.544,535.416))], {"3":FootnoteAvailabilityInfo(["GD32F303CG"])}),
+            # GD32F303Rx
+            DatasheetPinDefPageParsingInfo([35, 36, 37, 38], "GD32F303Rx", "LQFP64", [], {"3":FootnoteAvailabilityInfo(["GD32F303RG", "GD32F303RI", "GD32F303RK"])}),
         ],
         series = "GD32F303", # series
         family_type = "A", # family type

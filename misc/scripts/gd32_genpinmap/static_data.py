@@ -148,8 +148,8 @@ const int GD_GPIO_MODE[] = {
     GPIO_MODE_IPU,               /* 3 INPUT_PULLUP */
     GPIO_MODE_OUT_OD,            /* 4 OUTPUT_OPEN_DRAIN */
     GPIO_MODE_OUT_PP,            /* 5 OUTPUT */
-    0,                           /* 6 (unused) */
-    0,                           /* 7 (unused) */
+    GPIO_MODE_AF_OD,             /* 6 ALT FUNC OPEN DRAIN */
+    GPIO_MODE_AF_PP,             /* 7 ALT FUNC PUSH PULL */
 };
 
 /* GPIO SPEED */

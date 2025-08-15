@@ -227,7 +227,7 @@ class GD32PinMapGenerator:
             if remapping_macros and len(remapping_macros):
                 return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
             else:
-                return GD32PinMapGenerator.add_pin(pin, func, "7", False)
+                return GD32PinMapGenerator.add_pin(pin, func, "GPIO_MODE_AF_OD", False)
         elif func.family_type is "B":
             if func.has_af_number():
                 return GD32PinMapGenerator.add_pin(
@@ -256,11 +256,11 @@ class GD32PinMapGenerator:
         # output driving
         if any([x in func.signal_name for x in ("TX", "CTS", "RTS")]):
             return GD32PinMapGenerator.add_pin(
-                pin, func, "7", False, alt=alt)
+                pin, func, "PIN_MODE_AF_PP", False, alt=alt)
         # input
         else:
             return GD32PinMapGenerator.add_pin(
-                pin, func, "1", False, alt=alt)
+                pin, func, "GPIO_MODE_IN_FLOATING", False, alt=alt)
 
     @staticmethod
     def add_standard_af_pin(pin: GD32Pin, func: GD32PinFunction, mcu: GD32MCUInfo, context) -> str: 
@@ -279,9 +279,12 @@ class GD32PinMapGenerator:
         else:
             raise Exception("Unknown family_type: %s" % func.family_type)
 
-        # not correct for all cases like CAN_RD, FIXME
+        # special casing CAN_RD (should probably add an explicit add_can_pin)
+        if "RD" in func.signal_name:
+            return GD32PinMapGenerator.add_pin(
+                pin, func, "GPIO_MODE_IPU", False, alt=alt)
         return GD32PinMapGenerator.add_pin(
-            pin, func, "7", False, alt=alt)
+            pin, func, "GPIO_MODE_AF_PP", False, alt=alt)
 
     @staticmethod
     def add_pwm_pin(pin: GD32Pin, func: GD32PinFunction, mcu:GD32MCUInfo, context) -> str: 
