@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32F5 -DGD32F527 -DGD32F5xx",
+    "f_cpu": "200000000L",
+    "mcu": "gd32f527vst7",
+    "spl_series": "GD32F5xx",
+    "series": "GD32F527"
+  },
+  "debug": {
+    "jlink_device": "GD32F527VS",
+    "openocd_target": "unknown",
+    "svd_path": "GD32F5xx.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32F527VS (576k RAM, 7680k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 589824,
+    "maximum_size": 7864320,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32f527vst7/",
+  "vendor": "GigaDevice"
+}

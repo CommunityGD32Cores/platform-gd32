@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32EP -DGD32EPRT -DGD32EPRT",
+    "f_cpu": "180000000L",
+    "mcu": "gd32eprtrdt6",
+    "spl_series": "GD32EPRT",
+    "series": "GD32EPRT"
+  },
+  "debug": {
+    "jlink_device": "GD32EPRTRD",
+    "openocd_target": "unknown",
+    "svd_path": "GD32EPRT.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32EPRTRD (4192k RAM, 384k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 4292608,
+    "maximum_size": 393216,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32eprtrdt6/",
+  "vendor": "GigaDevice"
+}

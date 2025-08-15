@@ -228,7 +228,7 @@ class GD32PinMapGenerator:
                 return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
             else:
                 return GD32PinMapGenerator.add_pin(pin, func, "GPIO_MODE_AF_OD", False)
-        elif func.family_type is "B":
+        elif func.family_type == "B":
             if func.has_af_number():
                 return GD32PinMapGenerator.add_pin(
                     pin, func, "GD_PIN_FUNCTION4(PIN_MODE_AF, PIN_OTYPE_OD, PIN_PUPD_PULLUP, IND_GPIO_AF_%d)" % func.af_number, False)

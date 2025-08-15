@@ -351,7 +351,11 @@ known_datasheets_infos: Dict[str, DatasheetAFPageParsingInfo] = {
         ],
         series = "GD32F303", # series
         family_type = "A", # family type
-        family_name= "GD32F30x"
+        family_name= "GD32F30x",
+        internal_adc = {
+            "ADC_TEMP": ("0", "16"), # (adc, channel)
+            "ADC_VREF": ("0", "17"), 
+        }
     ),
     "GD32F350xx_Datasheet_Rev2.3.pdf": DatasheetParsingInfo(
         alternate_funcs = [ 

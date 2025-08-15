@@ -1,0 +1,47 @@
+{
+  "build": {
+    "core": "gd32",
+    "cpu": "cortex-m33",
+    "extra_flags": "-DGD32E5 -DGD32E518 -DGD32E51x",
+    "f_cpu": "180000000L",
+    "mcu": "gd32e518ret6",
+    "spl_series": "GD32E51x",
+    "series": "GD32E518"
+  },
+  "debug": {
+    "jlink_device": "GD32E518RE",
+    "openocd_target": "unknown",
+    "svd_path": "GD32E51x.svd",
+    "default_tools": [
+      "stlink"
+    ],
+    "openocd_extra_pre_target_args": [
+      "-c",
+      "set CPUTAPID 0"
+    ]
+  },
+  "frameworks": [
+    "spl"
+  ],
+  "name": "GD32E518RE (128k RAM, 512k Flash)",
+  "upload": {
+    "disable_flushing": false,
+    "maximum_ram_size": 131072,
+    "maximum_size": 524288,
+    "protocol": "stlink",
+    "protocols": [
+      "jlink",
+      "cmsis-dap",
+      "stlink",
+      "blackmagic",
+      "sipeed-rv-debugger",
+      "serial",
+      "gdlinkcli"
+    ],
+    "require_upload_port": true,
+    "use_1200bps_touch": false,
+    "wait_for_upload_port": false
+  },
+  "url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32e518ret6/",
+  "vendor": "GigaDevice"
+}
