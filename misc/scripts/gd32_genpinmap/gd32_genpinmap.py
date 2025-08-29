@@ -64,7 +64,8 @@ def main_func():
         # "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F150xx_Datasheet_Rev3.2.pdf",
         # "C:\\Users\\Max\\Desktop\\gd32_dev\\gigadevice-firmware-and-docs\\GD32F1x0\\GD32F130xx_Datasheet_Rev3.4.pdf",
         #"~/gd32-pdf/GD32F103xx-Datasheet-Rev-2.7.pdf"
-        "C:\\Users\\Max\\Desktop\\GD32F303xx_Datasheet_Rev1.9.pdf",
+        #"C:\\Users\\Max\\Desktop\\GD32F303xx_Datasheet_Rev1.9.pdf",
+        "C:\\Users\\Max\\temp\\\gigadevice-firmware-and-docs\\GD32F10x\\GD32F103xx-Datasheet-Rev-2.7.pdf",
     ]
     for datasheet_pdf_path in datasheet_pdf_paths:
         device_pinmap = load_pinmap(datasheet_pdf_path)
