@@ -184,7 +184,9 @@ class GD32PinMapGenerator:
     @staticmethod
     def add_alt_pins(pin:GD32Pin, func:GD32PinFunction, function_bits, remapping_macros: any, commented_out:bool, alt: int = 0):
         retStr = ""
-        for remapping_macro in remapping_macros:
+        for remapping_macro in remapping_macros.copy():
+            if "DISABLE" in remapping_macro[1]:
+                remapping_macro = (remapping_macro[0], "0")
             retStr += GD32PinMapGenerator.add_pin(
                 pin, func, function_bits % remapping_macro, commented_out, alt=alt)
             alt += 1
@@ -197,7 +199,7 @@ class GD32PinMapGenerator:
         if func.family_type == "A":
             remapping_macros = func.remapping_macros(mcu)
             context["alt"] += len(remapping_macros) or 1
-            if len(remapping_macros):
+            if len(remapping_macros) and not any(["DISABLE" in x for x in remapping_macros]):
                 return GD32PinMapGenerator.add_alt_pins(
                     pin, func, "GD_PIN_FUNC_ANALOG_CH(%d)", [chan_num] * len(remapping_macros), False, alt)
             else:
@@ -224,7 +226,7 @@ class GD32PinMapGenerator:
             alt = context["alt"]
             remapping_macros = func.remapping_macros(mcu)
             context["alt"] += len(remapping_macros) or 1
-            if remapping_macros and len(remapping_macros):
+            if remapping_macros and len(remapping_macros) and not any(["DISABLE" in x for x in remapping_macros]):
                 return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
             else:
                 return GD32PinMapGenerator.add_pin(pin, func, "GPIO_MODE_AF_OD", False)
@@ -244,7 +246,7 @@ class GD32PinMapGenerator:
             alt = context["alt"]
             remapping_macros = func.remapping_macros(mcu)
             context["alt"] += len(remapping_macros) or 1
-            if remapping_macros and len(remapping_macros):
+            if remapping_macros and len(remapping_macros) and not any(["DISABLE" in x for x in remapping_macros]):
                 return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
         elif func.family_type == "B":
             if func.has_af_number():
@@ -269,7 +271,7 @@ class GD32PinMapGenerator:
             alt = context["alt"]
             remapping_macros = func.remapping_macros(mcu)
             context["alt"] += len(remapping_macros) or 1
-            if remapping_macros and len(remapping_macros):
+            if remapping_macros and len(remapping_macros) and not any(["DISABLE" in x for x in remapping_macros]):
                 return GD32PinMapGenerator.add_alt_pins(pin, func, "GD_PIN_FUNCTION5(PIN_MODE_AF, PIN_OTYPE_PP, PIN_PUPD_PULLUP, %s)", remapping_macros, False, alt)
         elif func.family_type == "B":
             af_num = func.af_number
