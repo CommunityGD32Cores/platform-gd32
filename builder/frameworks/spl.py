@@ -79,8 +79,13 @@ def process_standard_library_configuration(cpp_defines):
 def get_linker_script(mcu):
     # naming convention is to take the MCU name but without the package name
     # e.g., GD32F103RC (without "T6" at the end)
-    ldscript = join(FRAMEWORK_DIR,"platformio","ldscripts",mcu[:-4].upper() +"x" + mcu[-3].upper() + ".lds")
-
+    if mcu.upper().startswith("GD32VW"):
+        ldscript = join(FRAMEWORK_DIR, "platformio", 
+                    "ldscripts", mcu[:-4].upper() + "x" + mcu[-3].upper() + ".lds")
+    else:
+        ldscript = join(FRAMEWORK_DIR, "platformio",
+                    "ldscripts", mcu[:-2].upper() + "_FLASH.ld")
+    
     if isfile(ldscript):
         return ldscript
 
